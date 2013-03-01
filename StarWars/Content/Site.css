@@ -1,0 +1,9 @@
+﻿html {
+    overflow: hidden;
+}
+
+body {
+    background-image: url('Images/Space01.jpg');
+    background-position: left top;
+    background-repeat: no-repeat;
+}
