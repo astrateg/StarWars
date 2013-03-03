@@ -10,14 +10,20 @@ namespace StarWars.Controllers
 {
 	public class HomeController : Controller
 	{
-		//
-		// GET: /Home/
-
 		public ActionResult Index()
 		{
-			ViewBag.ServerName = Game.Instance.ServerName;  // На всякий случай - для имени корабля
-			ViewBag.SessionId = Session.SessionID;          // Для ID корабля (пока что Имя - это то же самое, что и id)
+			ViewBag.ServerName = Game.Instance.ServerName;
 			return View();
+		}
+
+		public JsonResult GetSessionAndShips()
+		{
+			if (Session["Ship"] == null)
+				Session["Ship"] = Session.SessionID;
+
+			// Для ID корабля (пока что Имя - это то же самое, что и id)
+			var response = new { sessionId = Session["Ship"], ships = Game.Instance.GetShipList };
+			return Json(response, JsonRequestBehavior.AllowGet);
 		}
 
 		public JsonResult SynchronizePlanets()
@@ -40,13 +46,6 @@ namespace StarWars.Controllers
 				VectorRotate = vectorRotate,
 				Delay = int.Parse(delay)
 			};
-
-			//string sessionName = string.Empty;
-			//if (Session["Ship"] != null)
-			//    sessionName = Session["Ship"].ToString();  // Передается "бортовой" номер корабля (т.е. имя компьютера)
-			//else
-			//    sessionName = Session.SessionID;
-			//    Session["Ship"] = sessionName;
 
 			Game.Instance.UpdateShipList(newShip);
 			return Json(new { ships = Game.Instance.GetShipList});

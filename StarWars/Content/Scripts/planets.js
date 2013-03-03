@@ -5,25 +5,23 @@
     this.CenterY = canvas.height / 2;
     this.Image = image;
     this.Angle = 0;
+}
 
-    this.GetCenterX = function () {
-        return canvas.width / 2;
-    }
-    this.GetCenterY = function () {
-        return canvas.height / 2;
-    }
+Sun.prototype.GetCenter = function () {
+    this.CenterX = canvas.width / 2;
+    this.CenterY = canvas.height / 2;
+}
 
-    this.Show = function () {
-        context.save();
-        context.translate(this.CenterX, this.CenterY);
-        context.rotate(this.Angle);
-        context.drawImage(this.Image, -this.Size / 2, -this.Size / 2);
-        context.restore();
-    }
+Sun.prototype.Show = function () {
+    context.save();
+    context.translate(this.CenterX, this.CenterY);
+    context.rotate(this.Angle);
+    context.drawImage(this.Image, -this.Size / 2, -this.Size / 2);
+    context.restore();
+}
 
-    this.Rotate = function () {
-        this.Angle += sunRotationAngle;
-    }
+Sun.prototype.Rotate = function () {
+    this.Angle += sunRotationAngle;
 }
 
 function Planet(name, orbitRadius, orbitAngleStart, moveAngle, planetSize, image) {

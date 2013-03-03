@@ -62,8 +62,29 @@ Ship.prototype.CheckReappear = function () {
         this.Y = -this.Size;
 }
 
+Ship.prototype.GetCenterX = function () {
+    return this.X + this.Size / 2;
+}
+
+Ship.prototype.GetCenterY = function () {
+    return this.Y + this.Size / 2;
+}
+
 Ship.prototype.Show = function () {
-    if (this.VectorMove == "Inactive") {
+    var state = this.VectorMove;
+    if (state == "Inactive") {
+        return;
+    }
+
+    if (state.indexOf("Explode") != -1) {   // Например, Explode01 (X = 1, Y = 0)
+        var explodeX = state[8];
+        var explodeY = state[7];
+        var canvasX = this.GetCenterX() - imgExplosionStepX / 2;
+        var canvasY = this.GetCenterY() - imgExplosionStepY / 2;
+        context.drawImage(imgExplosion,
+            imgExplosionStepX * explodeX, imgExplosionStepY * explodeY, imgExplosionStepX, imgExplosionStepY,
+            canvasX, canvasY, imgExplosionStepX, imgExplosionStepY);
+
         return;
     }
 
@@ -72,7 +93,7 @@ Ship.prototype.Show = function () {
     } else {
         // If Angle <> 0, have to rotate the ship ("Angle" - direction for moving & shooting)
         context.save();
-        context.translate(this.X + this.Size / 2, this.Y + this.Size / 2);
+        context.translate(this.GetCenterX(), this.GetCenterY());
         context.rotate(this.Angle);
         context.drawImage(this.Image, -this.Size / 2, -this.Size / 2);
         context.restore();
