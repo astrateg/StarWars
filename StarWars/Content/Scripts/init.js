@@ -32,7 +32,7 @@ var imgJupiter = new Image();
 // Image for ship explosion
 var imgExplosion = new Image();
 imgExplosion.src = imagePath + "explosion.png";
-var imgExplosionSizeX = 384, imgExplosionSizeY = 256;   // Image size
+var imgExplosionSizeX = 384, imgExplosionSizeY = 256;   // Explosion Image size
 var imgExplosionStepX = imgExplosionSizeX / 3, imgExplosionStepY = imgExplosionSizeY / 4;   // Image step for "background shift"
 
 var imgShip = [];
@@ -251,6 +251,16 @@ function SynchronizeShips() {
             }
         }
 
+        vectorMove = ship1.VectorMove;
+        vectorRotate = ship1.VectorRotate;
+        // Именно здесь перемещаем наш корабль! (нажатые клавиши задают векторы, а движение выполняется здесь)
+        if ((vectorMove).slice(0, 4) == "Move") {
+            ship1[vectorMove](speed);
+        }
+        if ((vectorRotate).slice(0, 6) == "Rotate") {
+            ship1[vectorRotate](angle);
+        }
+
         ReloadCanvas();
     });
 }
@@ -454,37 +464,21 @@ window.onkeydown = function (key) {
         case 65:    // A
         case 97:    // a
             ship1.VectorRotate = "RotateCCW";
-            ship1.RotateCCW(angle);
-            if ((ship1.VectorMove).slice(0, 4) == "Move") {
-                ship1[ship1.VectorMove](speed);
-            }
             break;
         case 38:    // Up Arrow     (Move Forward)
         case 87:    // W
         case 119:   // w
             ship1.VectorMove = "MoveForward";
-            ship1.MoveForward(speed);
-            if ((ship1.VectorRotate).slice(0, 6) == "Rotate") {
-                ship1[ship1.VectorRotate](angle);
-            }
             break;
         case 39:    // Right Arrow  (Rotate CW)
         case 68:    // D
         case 100:   // d
             ship1.VectorRotate = "RotateCW";
-            ship1.RotateCW(angle);
-            if ((ship1.VectorMove).slice(0, 4) == "Move") {
-                ship1[ship1.VectorMove](speed);
-            }
             break;
         case 40:    // Down Arrow   (Move Backward)
         case 83:    // S
         case 115:   // s
             ship1.VectorMove = "MoveBackward";
-            ship1.MoveBackward(speed);
-            if ((ship1.VectorRotate).slice(0, 6) == "Rotate") {
-                ship1[ship1.VectorRotate](angle);
-            }
             break;
         case 32:    // Space        (Fire)
             // Центрируем бомбу по оси наклона корабля (аналогично планетам) и затем смещаем бомбу на половину ее размера по X и Y (чтобы скомпенсировать "left top" для Image)
