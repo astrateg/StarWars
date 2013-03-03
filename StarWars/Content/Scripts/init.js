@@ -457,7 +457,7 @@ window.onresize = function () {
 };
 
 window.onkeydown = function (key) {
-    if (ship1.VectorMove.indexOf("Explode") != -1) return;   // If my ship is in the explosion state, it cannot move.
+    if ((ship1.VectorMove).indexOf("Explode") != -1) return;   // If my ship is in the explosion state, it cannot move.
 
     switch (key.keyCode) {
         case 37:    // Left Arrow   (Rotate CCW)
@@ -495,7 +495,7 @@ window.onkeydown = function (key) {
 };
 
 window.onkeyup = function (key) {
-    if (ship1.VectorMove.indexOf("Explode") != -1) return;   // If my ship is in the explosion state, it cannot move.
+    if ((ship1.VectorMove).indexOf("Explode") != -1) return;   // If my ship is in the explosion state, it cannot move.
 
     switch (key.keyCode) {
         case 37:    // Left Arrow   (Rotate CCW)

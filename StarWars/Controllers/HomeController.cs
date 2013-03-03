@@ -19,7 +19,17 @@ namespace StarWars.Controllers
 		public JsonResult GetSessionAndShips()
 		{
 			if (Session["Ship"] == null)
-				Session["Ship"] = Session.SessionID;
+			{
+				HttpCookie cookie = Request.Cookies["Ship"];
+				if (cookie == null)
+				{
+					cookie = new HttpCookie("Ship");
+					cookie.Value = Session.SessionID;
+					cookie.Expires = DateTime.Now.AddDays(1);
+					this.ControllerContext.HttpContext.Response.Cookies.Add(cookie);
+				}
+				Session["Ship"] = cookie.Value;
+			}
 
 			// Для ID корабля (пока что Имя - это то же самое, что и id)
 			var response = new { sessionId = Session["Ship"], ships = Game.Instance.GetShipList };
