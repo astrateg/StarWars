@@ -1,14 +1,23 @@
-﻿function Ship(name, X, Y, angle, size, image, imageNameIndex, vectorMove, vectorRotate, delay) {
+﻿function Ship(name, type, X, Y, angle, size, image, vectorMove, vectorRotate, delay) {
     this.Name = name;
+    this.Type = type;
     this.X = X;
     this.Y = Y;
     this.Angle = angle;
     this.Size = size;
-    this.Image = image;                     // Объект Image (Image.src - полное имя файла-изображения)
-    this.ImageNameIndex = imageNameIndex;   // Индекс имени файла-изображения (для массива imgShipShortName)
+    this.Image = image;                     // Индекс имени файла-изображения (для массива imgShipShortName)
     this.VectorMove = vectorMove;
     this.VectorRotate = vectorRotate;
     this.Delay = delay;
+    this.Bombs = [];
+}
+
+Ship.prototype.GetImage = function () {
+    if (this.Type == "dominator") {            // Выбираем, из какого массива берем изображение корабля
+        return imgDominatorSmersh[this.Image];
+    }
+
+    return imgShip[this.Image];
 }
 
 Ship.prototype.RotateCCW = function (angle) {
@@ -17,7 +26,7 @@ Ship.prototype.RotateCCW = function (angle) {
     context.save();
     context.translate(this.X + this.Size / 2, this.Y + this.Size / 2);
     context.rotate(this.Angle);
-    context.drawImage(this.Image, -this.Size / 2, -this.Size / 2);
+    context.drawImage(this.GetImage(), -this.Size / 2, -this.Size / 2);
     context.restore();
 }
 
@@ -27,7 +36,7 @@ Ship.prototype.RotateCW = function (angle) {
     context.save();
     context.translate(this.X + this.Size / 2, this.Y + this.Size / 2);
     context.rotate(this.Angle);
-    context.drawImage(this.Image, -this.Size / 2, -this.Size / 2);
+    context.drawImage(this.GetImage(), -this.Size / 2, -this.Size / 2);
     context.restore();
 }
 
@@ -89,13 +98,13 @@ Ship.prototype.Show = function () {
     }
 
     if (this.Angle == 0) {
-        context.drawImage(this.Image, this.X, this.Y);
+        context.drawImage(this.GetImage(), this.X, this.Y);
     } else {
         // If Angle <> 0, have to rotate the ship ("Angle" - direction for moving & shooting)
         context.save();
         context.translate(this.GetCenterX(), this.GetCenterY());
         context.rotate(this.Angle);
-        context.drawImage(this.Image, -this.Size / 2, -this.Size / 2);
+        context.drawImage(this.GetImage(), -this.Size / 2, -this.Size / 2);
         context.restore();
     }
 }

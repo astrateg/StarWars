@@ -1,8 +1,4 @@
-﻿// 1. Сделать привязку к сессии (перед стартом получать данные с сервера - если мой корабль уже есть, то брать его, иначе - создавать новый).
-// 2. Проверить, сохраняется ли порядок Ajax-запросов, а главное - Ajax-ответов (вероятно, НЕТ - из-за этого дергания).
-// 3. Исправить синхронизацию планет с сервером (сделать ее 1 раз - перед стартом - и сохранить где-то).
-
-// ***** Initialization *****
+﻿// ***** Initialization *****
 var serverName = $('body').attr('data-server');
 var sessionId = "";
 
@@ -50,14 +46,16 @@ for (var i = 0; i < imgDominatorSmershMax; i++) {
 }
 
 // *** Weapons ***
-var arrMyBombs = [], arrDominatorBombs = [];
+// var arrMyBombs = [], arrDominatorBombs = [];
 var bombSize = 24;
 
 // Weapon images
-var imgRangerBomb = new Image();
-imgRangerBomb.src = imagePath + "weapon-bomb02-green.png";
-var imgDominatorBomb = new Image();
-imgDominatorBomb.src = imagePath + "weapon-bomb02-blue.png";
+var imgRangerBomb = [];
+imgRangerBomb[0] = new Image();
+imgRangerBomb[0].src = imagePath + "weapon-bomb02-green.png";
+var imgDominatorBomb = [];
+imgDominatorBomb[0] = new Image();
+imgDominatorBomb[0].src = imagePath + "weapon-bomb02-blue.png";
 
 // Objects "Image" are used as properties of the appropriate "Planet" objects (planets.js).
 imgSun.src = imagePath + "sun.png";
@@ -84,8 +82,8 @@ var shipSize = 64;
 var arrShips = [];                      // Array of Ships
 
 var dominatorSmersh, dominatorSmershSpeed = 1, dominatorSmershAngle = 0.01;
-var arrDominators = [];  // Array of Dominators
-var arrDominatorTimers = []; // Array of timers for Dominators
+var arrDominators = [];         // Array of Dominators
+var arrDominatorTimers = [];    // Array of timers for Dominators
 var dominatorTimer, dominatorBombTimer;
 
 var smershXStart = 1400, smershYStart = 100, smershAngleStart = 0;
@@ -112,14 +110,14 @@ function InitSpace() {
     arrPlanets.push(mars);
     arrPlanets.push(jupiter);
 
-    // Ship construstor: Ship(name, X, Y, angle, size, image, imageNameIndex, vectorMove, vectorRotate, delay)
+    // Ship construstor: Ship(name, type, X, Y, angle, size, image, vectorMove, vectorRotate, delay)
 
     // Generating dominator ships
     var smersh, randomIndex, randomAngle;
-    for (var i = 1; i < 10; i++) {
+    for (var i = 1; i < 2; i++) {
         randomIndex = getRandomInt(0, imgDominatorSmershMax - 1);
         randomAngle = Math.random() * (2 * Math.PI);
-        smersh = new Ship('Smersh' + i, smershXStart, smershYStart + (i - 1) * 100, randomAngle, smershSize, imgDominatorSmersh[randomIndex], "MoveForward", "Stop", 0);
+        smersh = new Ship('Smersh' + i, "dominator", smershXStart, smershYStart + (i - 1) * 100, randomAngle, smershSize, randomIndex, "MoveForward", "Stop", 0);
         arrDominators.push(smersh);
         arrDominatorTimers.push(null);
     }
@@ -155,27 +153,29 @@ function SynchronizePlanets() {
 
 function GetShips(ships) {
     var isMyShipFound = false;
-    for (var i = 0; i < ships.length; i++) {
-        var imageIndex = parseInt(ships[i].Image);
-        if (ships[i].Name == sessionId) {
-            isMyShipFound = true;
-            ship1 = new Ship(ships[i].Name, ships[i].X, ships[i].Y, ships[i].Angle, shipSize, imgShip[imageIndex], imageIndex, "Stop", "Stop", 0);
-        }
-        else {
+    if (ships[0] != null) {
+        for (var i = 0; i < ships.length; i++) {
             var imageIndex = parseInt(ships[i].Image);
-            otherShip = new Ship(
-                ships[i].Name,
-                ships[i].X,
-                ships[i].Y,
-                ships[i].Angle,
-                shipSize,
-                imgShip[imageIndex],
-                imageIndex,
-                ships[i].VectorMove,
-                ships[i].VectorRotate,
-                ships[i].Delay
-            );
-            arrShips.push(otherShip);
+            if (ships[i].Name == sessionId) {
+                isMyShipFound = true;
+                ship1 = new Ship(ships[i].Name, "ranger", ships[i].X, ships[i].Y, ships[i].Angle, shipSize, imageIndex, "Stop", "Stop", 0);
+            }
+            else {
+                var imageIndex = parseInt(ships[i].Image);
+                otherShip = new Ship(
+                    ships[i].Name,
+                    ships[i].Type,
+                    ships[i].X,
+                    ships[i].Y,
+                    ships[i].Angle,
+                    shipSize,
+                    imageIndex,
+                    ships[i].VectorMove,
+                    ships[i].VectorRotate,
+                    ships[i].Delay
+                );
+                arrShips.push(otherShip);
+            }
         }
     }
 
@@ -183,7 +183,7 @@ function GetShips(ships) {
     randomIndex = getRandomInt(0, imgShipMax - 1);
     if (!isMyShipFound) {
         var shipX1 = 0, shipY1 = 0, shipAngle1 = 0;
-        ship1 = new Ship(sessionId, shipX1, shipY1, shipAngle1, shipSize, imgShip[randomIndex], randomIndex, "Stop", "Stop", 0);
+        ship1 = new Ship(sessionId, "ranger", shipX1, shipY1, shipAngle1, shipSize, randomIndex, "Stop", "Stop", 0);
     }
 
     // Свой корабль НЕ добавляем в общий массив arrShips! (нет смысла корректировать его положение - мы его и так знаем).
@@ -191,21 +191,18 @@ function GetShips(ships) {
 }
 
 function SynchronizeShips() {
+    var bombs = ship1.Bombs.filter(function (obj) { return obj.Sync == 0; });   // Берем из массива только бомбы, которые еще не отправлялись на сервер
+    for (var i = 0; i < bombs.length; i++) {
+        bombs[i].Sync = 1;  // Помечаем бомбы как отправленные (таким образом, каждая бомба посылается на сервер только один раз, а дальше - обрабатывается на клиенте)
+    }
+
+    var stringified = JSON.stringify(ship1);
     var request = $.ajax({
         url: "http://" + serverName + "/game/Home/SynchronizeShips",
         type: "POST",
-        data: {
-            Name: ship1.Name,
-            X: ship1.X,
-            Y: ship1.Y,
-            Angle: ship1.Angle,
-            Size: ship1.Size,
-            Image: ship1.ImageNameIndex,
-            VectorMove: ship1.VectorMove,
-            VectorRotate: ship1.VectorRotate,
-            Delay: ship1.Delay
-        },
-        dataType: "json",
+        data: stringified,
+        dataType: "json",                               // !!!
+        contentType: "application/json; charset=utf-8", // !!! (по умолчанию - "application/x-www-form-urlencoded; charset=UTF-8")
         cache: false,
         timeout: syncRateGlobal
     });
@@ -218,15 +215,30 @@ function SynchronizeShips() {
             if (ship1.Name != data.ships[i].Name) {   // если не наш корабль - добавляем в массив (или обновляем)
                 for (var j = 0; j < arrShips.length; j++) {
                     if (arrShips[j].Name != data.ships[i].Name) {   // сравниваем массивы - локальный (Javascript) и пришедший (JSON)
-                        continue;                   // если не одинаковые имена - берем следующий
+                        continue;                                   // если не одинаковые имена - берем следующий
                     }
-                    else {                          // если корабль встретился в массиве JS - обновляем данные
+                    else {                                          // если корабль встретился в массиве JS - обновляем данные (только те, которые изменились)
                         arrShips[j].X = data.ships[i].X;
                         arrShips[j].Y = data.ships[i].Y;
                         arrShips[j].Angle = data.ships[i].Angle;
                         arrShips[j].VectorMove = data.ships[i].VectorMove;
                         arrShips[j].VectorRotate = data.ships[i].VectorRotate;
                         arrShips[j].Delay = data.ships[i].Delay;
+                        arrShips[j].Bombs = [];                     // сначала обнуляем массив бомб для каждого рейнджера
+                        if (data.ships[i].Bombs != null) {          // а затем заполняем массив данными с сервера
+                            for (var k = 0; k < data.ships[i].Bombs.length; k++) {
+                                arrShips[j].Bombs[k] = new Bomb(
+                                    data.ships[i].Bombs[k].Type,
+                                    data.ships[i].Bombs[k].X,
+                                    data.ships[i].Bombs[k].Y,
+                                    data.ships[i].Bombs[k].Angle,
+                                    data.ships[i].Bombs[k].Size,
+                                    data.ships[i].Bombs[k].Image,
+                                    data.ships[i].Bombs[k].speed
+                                    );
+                            }
+                        }
+
                         isShipFound = true;
                         break;
                     }
@@ -236,16 +248,29 @@ function SynchronizeShips() {
                     var imageIndex = parseInt(data.ships[i].Image);
                     otherShip = new Ship(
                         data.ships[i].Name,
+                        data.ships[i].Type,
                         data.ships[i].X,
                         data.ships[i].Y,
                         data.ships[i].Angle,
                         shipSize,
-                        imgShip[imageIndex],
                         imageIndex,
                         data.ships[i].VectorMove,
                         data.ships[i].VectorRotate,
                         data.ships[i].Delay
                     );
+                    if (data.ships[i].Bombs != null) {
+                        for (var k = 0; k < data.ships[i].Bombs.length; k++) {
+                            otherShip.Bombs[k] = new Bomb(
+                                data.ships[i].Bombs[k].Type,
+                                data.ships[i].Bombs[k].X,
+                                data.ships[i].Bombs[k].Y,
+                                data.ships[i].Bombs[k].Angle,
+                                data.ships[i].Bombs[k].Size,
+                                data.ships[i].Bombs[k].Image,
+                                data.ships[i].Bombs[k].speed
+                                );
+                        }
+                    }   // иначе: otherShip.Bombs = [] (см. конструктор Bomb)
                     arrShips.push(otherShip);
                 }
             }
@@ -288,8 +313,8 @@ function GenerateDominatorBombs() {
 
         var bombX = GetNewBombX(arrDominators[i]);
         var bombY = GetNewBombY(arrDominators[i]);
-        var bomb = new Bomb(arrDominators[i].Name, bombX, bombY, arrDominators[i].Angle, bombSize, imgDominatorBomb, speed * 0.5);
-        arrDominatorBombs.push(bomb);
+        var bomb = new Bomb("dominator", bombX, bombY, arrDominators[i].Angle, bombSize, 0, speed * 0.5);
+        arrDominators[i].Bombs.push(bomb);
     }
 }
 
@@ -303,43 +328,86 @@ function ReloadCanvas() {
     }
     
     // *** My Bombs ***
-    for (i = 0; i < arrMyBombs.length; i++) {
-        arrMyBombs[i].Move();
+    for (i = 0; i < ship1.Bombs.length; i++) {
+        ship1.Bombs[i].Move();
     }
 
     // Функция Array.prototype.filter имеет аналог в jQuery: $.grep
-    arrMyBombs = arrMyBombs.filter(function (obj) { return obj.Vector !== "Inactive"; });   // Убираем из массива все бомбы, улетевшие за экран
+    ship1.Bombs = ship1.Bombs.filter(function (obj) { return obj.Vector !== "Inactive"; });   // Убираем из массива все бомбы, улетевшие за экран
 
-    for (i = 0; i < arrMyBombs.length; i++) {               // Неактивных бомб в массиве нет
-        arrMyBombs[i].Show();
+    for (i = 0; i < ship1.Bombs.length; i++) {               // Неактивных бомб в массиве нет
+        ship1.Bombs[i].Show();
         for (var j = 0; j < arrDominators.length; j++) {    // А неактивные корабли - есть
             var state = arrDominators[j].VectorMove;
             if (state == "Inactive" || state.indexOf("Explode") != -1) {
                 continue;
             }
-            if (CheckBombAndShip(arrMyBombs[i], arrDominators[j])) {            // Проверяем, не встретилась ли наша бомба с вражеским кораблем
+            if (CheckBombAndShip(ship1.Bombs[i], arrDominators[j])) {            // Проверяем, не встретилась ли наша бомба с вражеским кораблем
                 arrDominators[j].VectorMove = "Explode00";                      // Взрыв проверяется только по свойству VectorMove (для определенности)
                 arrDominators[j].VectorRotate = "Inactive";
-                arrMyBombs[i].Vector = "Inactive";
+                ship1.Bombs[i].Vector = "Inactive";
             }
         }
     }
 
-    // *** Dominator Bombs ***
-    for (i = 0; i < arrDominatorBombs.length; i++) {
-        arrDominatorBombs[i].Move();
-    }
-    arrDominatorBombs = arrDominatorBombs.filter(function (obj) { return obj.Vector !== "Inactive"; });   // Убираем из массива все бомбы, улетевшие за экран
-
-    for (i = 0; i < arrDominatorBombs.length; i++) {
-        arrDominatorBombs[i].Show();
-        if (CheckBombAndShip(arrDominatorBombs[i], ship1)) {            // Проверяем, не встретилась ли вражеская бомба с нашим кораблем
-            ship1.VectorMove = "Explode00";
-            ship1.VectorRotate = "Stop";
-            arrDominatorBombs[i].Vector = "Inactive";
+    // *** Rangers bombs ***
+    for (i = 0; i < arrShips.length; i++) {
+        if (arrShips[i].Bombs != null) {
+            arrShips[i].Bombs = arrShips[i].Bombs.filter(function (obj) { return obj.Vector !== "Inactive"; });   // Убираем из массива все бомбы, улетевшие за экран
         }
     }
 
+    for (i = 0; i < arrShips.length; i++) {
+        if (arrShips[i].Bombs != null) {
+            for (var j = 0; j < arrShips[i].Bombs.length; j++) {
+                arrShips[i].Bombs[j].Show();
+
+                if (CheckBombAndShip(arrShips[i].Bombs[j], ship1)) {            // Проверяем, не встретилась ли вражеская бомба с нашим кораблем
+                    ship1.VectorMove = "Explode00";
+                    ship1.VectorRotate = "Stop";
+                    arrShips[i].Bombs[j].Vector = "Inactive";
+                }
+            }
+        }
+    }
+
+    if (CheckSunAndShip(ship1)) {            // Проверяем, не налетели ли на Солнце
+        ship1.VectorMove = "Explode00";
+        ship1.VectorRotate = "Stop";
+    }
+    ship1.Show();
+
+    for (i = 0; i < arrShips.length; i++) {
+        arrShips[i].Show();
+    }
+
+    for (i = 0; i < arrDominators.length; i++) {
+        arrDominators[i].Show();
+    }
+
+    // *** Dominator Bombs ***
+    for (i = 0; i < arrDominators.length; i++) {
+        for (var j = 0; j < arrDominators[i].Bombs.length; j++) {
+            arrDominators[i].Bombs[j].Move();
+        }
+        arrDominators[i].Bombs = arrDominators[i].Bombs.filter(function (obj) { return obj.Vector !== "Inactive"; });   // Убираем из массива все бомбы, улетевшие за экран
+    }
+
+    for (i = 0; i < arrDominators.length; i++) {
+        for (var j = 0; j < arrDominators[i].Bombs.length; j++) {
+            arrDominators[i].Bombs[j].Show();
+            if (CheckBombAndShip(arrDominators[i].Bombs[j], ship1)) {            // Проверяем, не встретилась ли вражеская бомба с нашим кораблем
+                ship1.VectorMove = "Explode00";
+                ship1.VectorRotate = "Stop";
+                arrDominators[i].Bombs[j].Vector = "Inactive";
+            }
+        }
+    }
+
+    if (CheckSunAndShip(ship1)) {            // Проверяем, не налетели ли на Солнце
+        ship1.VectorMove = "Explode00";
+        ship1.VectorRotate = "Stop";
+    }
     ship1.Show();
     for (i = 0; i < arrShips.length; i++) {
         arrShips[i].Show();
@@ -348,23 +416,38 @@ function ReloadCanvas() {
     for (i = 0; i < arrDominators.length; i++) {
         arrDominators[i].Show();
     }
+
+    // Check colliding bombs with ships
+    function CheckBombAndShip(bomb, ship) {
+        if (ship.VectorMove.indexOf("Explode") != -1) {
+            return false;
+        }
+        var checkX = (bomb.X >= ship.X - bombSize / 2) && (bomb.X <= ship.X + shipSize - bombSize / 2);
+        var checkY = (bomb.Y >= ship.Y - bombSize / 2) && (bomb.Y <= ship.Y + shipSize - bombSize / 2);
+        if (checkX && checkY) {
+            return true;
+        }
+        else {
+            return false;
+        }
+    }
+
+    function CheckSunAndShip(ship) {
+        if (ship.VectorMove.indexOf("Explode") != -1) {
+            return false;
+        }
+
+        if (Math.sqrt(Math.pow(sun.CenterX - ship.GetCenterX(), 2) + Math.pow(sun.CenterY - ship.GetCenterY(), 2)) < sunSize / 2) {
+            return true;
+        }
+        else {
+            return false;
+        }
+    }
+
 }
 
 // *** Bombs ***
-function CheckBombAndShip(bomb, ship) {
-    if (ship.VectorMove.indexOf("Explode") != -1) {
-        return false;
-    }
-    var checkX = (bomb.X >= ship.X - bombSize / 2) && (bomb.X <= ship.X + shipSize - bombSize / 2);
-    var checkY = (bomb.Y >= ship.Y - bombSize / 2) && (bomb.Y <= ship.Y + shipSize - bombSize / 2);
-    if (checkX && checkY) {
-        return true;
-    }
-    else {
-        return false;
-    }
-}
-
 function GetNewBombX(ship) {
     return (ship.X + shipSize / 2) + (Math.cos(ship.Angle)) * (shipSize / 2) - (bombSize / 2);
 }
@@ -391,7 +474,7 @@ function GenerateExplodes() {
                 X = 0; Y++;
             }
             if (Y > 3) {
-                if (ship.Name == ship1.Name) {  // If it's my ship, reload it.
+                if (ship.Name == ship1.Name) {  // If it's my ship, reload it after exploding.
                     ship.X = 10;
                     ship.Y = 10;
                     ship.VectorMove = "Stop";
@@ -484,10 +567,10 @@ window.onkeydown = function (key) {
             // Центрируем бомбу по оси наклона корабля (аналогично планетам) и затем смещаем бомбу на половину ее размера по X и Y (чтобы скомпенсировать "left top" для Image)
             var bombX = GetNewBombX(ship1);
             var bombY = GetNewBombY(ship1);
-            var bomb = new Bomb(ship1.Name, bombX, bombY, ship1.Angle, bombSize, imgRangerBomb, speed * 1.5);
-            arrMyBombs.push(bomb);
+            var bomb = new Bomb("ranger", bombX, bombY, ship1.Angle, bombSize, 0, speed * 1.5);
+            ship1.Bombs.push(bomb);
             break;
-        case 27:    // Esc        (...)
+        //case 27:    // Esc        (...)
         //    alert('Конец игры');
         //    window.close();
         //    break;

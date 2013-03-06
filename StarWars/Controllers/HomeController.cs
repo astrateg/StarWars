@@ -5,6 +5,7 @@ using System.Linq;
 using System.Web;
 using System.Web.Mvc;
 using StarWars.Models;
+using Newtonsoft.Json.Linq;
 
 namespace StarWars.Controllers
 {
@@ -42,21 +43,8 @@ namespace StarWars.Controllers
 		}
 
 		[HttpPost]
-		public JsonResult SynchronizeShips(string name, string x, string y, string angle, string size, string image, string vectorMove, string vectorRotate, string delay)
+		public JsonResult SynchronizeShips(Ship newShip)
 		{
-			Ship newShip = new Ship
-			{
-				Name = name,
-				X = double.Parse(x, CultureInfo.InvariantCulture),  // Точка/запятая в вещественных числах для ENG/RUS
-				Y = double.Parse(y, CultureInfo.InvariantCulture),
-				Angle = double.Parse(angle, CultureInfo.InvariantCulture),
-				Size = int.Parse(size),
-				Image = image,
-				VectorMove = vectorMove,
-				VectorRotate = vectorRotate,
-				Delay = int.Parse(delay)
-			};
-
 			Game.Instance.UpdateShipList(newShip);
 			return Json(new { ships = Game.Instance.GetShipList});
 		}

@@ -52,15 +52,12 @@ namespace StarWars.Models
                 // Можно перебрать свойства через reflection (но это чересчур трудоемко): 
                 // GetType().GetProperties() - коллекция свойств объекта
                 // GetType().GetProperty(property.Name).SetValue(...) - задает свойству объекта указанное 
-                _ships[shipIndex].Name = newShip.Name;
                 _ships[shipIndex].X = newShip.X;
                 _ships[shipIndex].Y = newShip.Y;
                 _ships[shipIndex].Angle = newShip.Angle;
-                _ships[shipIndex].Size = newShip.Size;
-                _ships[shipIndex].Image = newShip.Image;
                 _ships[shipIndex].VectorMove = newShip.VectorMove;
                 _ships[shipIndex].VectorRotate = newShip.VectorRotate;
-                _ships[shipIndex].Delay = newShip.Delay;
+                _ships[shipIndex].Bombs = newShip.Bombs;
             }
 
             for (int i = 0; i < _ships.Count; i++)
