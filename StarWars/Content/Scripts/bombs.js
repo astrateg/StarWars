@@ -12,10 +12,10 @@
 
 Bomb.prototype.GetImage = function () {
     if (this.Type == "dominator") {            // Выбираем, из какого массива берем изображение бомбы
-        return imgDominatorBomb[this.Image];
+        return SHIP.DominatorBombImages[this.Image];
     }
 
-    return imgRangerBomb[this.Image];
+    return SHIP.RangerBombImages[this.Image];
 };
 
 Bomb.prototype.Move = function () {

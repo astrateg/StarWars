@@ -13,8 +13,11 @@
 }
 
 Ship.prototype.GetImage = function () {
-    if (this.Type == "dominator") {            // Выбираем, из какого массива берем изображение корабля
-        return imgDominatorSmersh[this.Image];
+    var type = this.Type;
+    if (type.indexOf("dominator") != -1) {  // "dominator-smersh", "dominator-menok", "dominator-urgant", "dominator-ekventor"
+        type = type.slice(10);               // "smersh", "menok", "urgant", "ekventor"
+        var indexType = SHIP.DominatorTypes.Type.indexOf(type);
+        return SHIP.DominatorTypes.Images[indexType][this.Image];
     }
 
     return SHIP.RangerImages[this.Image];

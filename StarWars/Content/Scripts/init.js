@@ -16,6 +16,16 @@ var GAME = (function () {
     return my;
 })();
 
+var UTILS = (function () {
+    var my = {};
+    // Generating random int number for fetching random image from array of dominator ships
+    my.GetRandomInt = function (min, max) {
+        return Math.floor(Math.random() * (max - min + 1)) + min;
+    }
+
+    return my;
+})();
+
 // *** MODULE for Space ***
 var SPACE = (function () {
     var my = {};
@@ -62,28 +72,54 @@ var SPACE = (function () {
 // *** MODULE for Ships & Bombs ***
 var SHIP = (function () {
     var my = {};
-    my.ShipSize = 64;
-    my.MyShip = {}, my.ShipSpeed = 5, my.ShipAngle = 0.04;   // Ship's speed & rotating angle
-    my.Ships = [];                                          // Array of Ships
-    my.BombSpeed = 2.5;
+
+    // Ships
+    my.ShipSize = 64, my.ShipSpeed = 5, my.ShipAngle = 0.05;
+    my.MyShip = {};   // Ship's speed & rotating angle
+    my.Ships = [];    // Array of Ships
 
     my.RangerImages = [];
     my.RangerImagesMax = 4;
     for (var i = 0; i < my.RangerImagesMax; i++) {
         my.RangerImages[i] = new Image();
-        my.RangerImages[i].src = GAME.ImagePath + "ranger0" + (i + 1) + ".png";
+        my.RangerImages[i].src = GAME.ImagePath + "Rangers/ranger0" + (i + 1) + ".png";
     }
+
+    //imgDominatorSmersh
+    my.DominatorTypesMax = 4;
+    my.DominatorTypes = {
+        Type: ["smersh", "menok", "urgant", "ekventor"],
+        Speed: [5, 4, 3, 2],
+        Angle: [0.05, 0.04, 0.03, 0.02],
+        Size: [70, 75, 85, 85],
+        Images: new Array(my.DominatorTypesMax)
+    };
+
+    my.DominatorImagesMax = 3;
+    for (var i = 0; i < my.DominatorTypesMax; i++) {   // ["smersh", "menok", "urgant", "ekventor"]
+        my.DominatorTypes.Images[i] = new Array(my.DominatorImagesMax);
+        for (var j = 0; j < my.DominatorImagesMax; j++) {
+            my.DominatorTypes.Images[i][j] = new Image();
+            my.DominatorTypes.Images[i][j].src = GAME.ImagePath + "Dominators/dominator-" + my.DominatorTypes.Type[i] + "0" + (j + 1) + ".png";
+        }
+    }
+
+    // Bombs
+    my.BombSize = 24, my.BombSpeed = 2.5;
+
+    my.RangerBombImages = [];
+    my.RangerBombImages[0] = new Image();
+    my.RangerBombImages[0].src = GAME.ImagePath + "Weapons/weapon-bomb02-green.png";
+
+    my.DominatorBombImages = [];
+    my.DominatorBombImages[0] = new Image();
+    my.DominatorBombImages[0].src = GAME.ImagePath + "Weapons/weapon-bomb02-blue.png";
 
     return my;
 })();
 
 // ***** Initialization *****
-var syncRateGlobal = 600;       // ms
-
-// Generating random int number for fetching random image from array of dominator ships
-function getRandomInt(min, max) {
-    return Math.floor(Math.random() * (max - min + 1)) + min;
-}
+var syncRateDominatorBombs = 2000;       // ms
 
 // Timers for "setInterval" function
 var globalSpaceTimer = null;    // Timers for the sun and planets (server)
@@ -97,44 +133,39 @@ imgExplosion.src = GAME.ImagePath + "explosion.png";
 var imgExplosionSizeX = 384, imgExplosionSizeY = 256;   // Explosion Image size
 var imgExplosionStepX = imgExplosionSizeX / 3, imgExplosionStepY = imgExplosionSizeY / 4;   // Image step for "background shift"
 
-var imgDominatorSmersh = [];
-var imgDominatorSmershMax = 3;
-for (var i = 0; i < imgDominatorSmershMax; i++) {
-    imgDominatorSmersh[i] = new Image();
-    imgDominatorSmersh[i].src = GAME.ImagePath + "dominator-smersh0" + (i + 1) + ".png";
-}
-
-// *** Weapons ***
-var bombSize = 24;
-
-// Weapon images
-var imgRangerBomb = [];
-imgRangerBomb[0] = new Image();
-imgRangerBomb[0].src = GAME.ImagePath + "weapon-bomb02-green.png";
-var imgDominatorBomb = [];
-imgDominatorBomb[0] = new Image();
-imgDominatorBomb[0].src = GAME.ImagePath + "weapon-bomb02-blue.png";
-
-// *** Ships ***
-
+// *** Dominators ***
 var dominatorSmersh, dominatorSmershSpeed = 1, dominatorSmershAngle = 0.01;
 var arrDominators = [];         // Array of Dominators
-var arrDominatorTimers = [];    // Array of timers for Dominators
-var dominatorTimer, dominatorBombTimer;
+var dominatorTimer;
 
-var smershXStart = 1400, smershYStart = 100, smershAngleStart = 0;
-var smershSize = 70;
+var smershXStart = 1200, smershYStart = 100, smershAngleStart = 0;
 
 function InitDominators() {
     // Ship construstor: Ship(name, type, X, Y, angle, size, image, vectorMove, vectorRotate, delay)
-    // Generating dominator ships
-    var smersh, randomIndex, randomAngle;
-    for (var i = 1; i < 6; i++) {
-        randomIndex = getRandomInt(0, imgDominatorSmershMax - 1);
+    var dominatorsMax = 10;     //DominatorTypes
+    var randomIndexType, randomIndexImage;
+    var dominator, type, size, randomAngle;
+    for (var i = 0; i < dominatorsMax; i++) {
+        randomIndexType = UTILS.GetRandomInt(0, SHIP.DominatorTypesMax - 1);
+        randomIndexImage = UTILS.GetRandomInt(0, SHIP.DominatorImagesMax - 1);
+
+        type = SHIP.DominatorTypes.Type[randomIndexType];
+        size = SHIP.DominatorTypes.Size[randomIndexType];
         randomAngle = Math.random() * (2 * Math.PI);
-        smersh = new Ship('Smersh' + i, "dominator", smershXStart, smershYStart + (i - 1) * 100, randomAngle, smershSize, randomIndex, "MoveForward", "Stop", 0);
-        arrDominators.push(smersh);
-        arrDominatorTimers.push(null);
+
+        dominator = new Ship(
+            type,
+            "dominator-" + type,
+            smershXStart + randomIndexType * randomIndexImage * 10,
+            smershYStart + i * 100,
+            randomAngle,
+            size,
+            randomIndexImage,
+            "MoveForward",
+            "Stop",
+            0
+        );
+        arrDominators.push(dominator);
     }
 }
 
@@ -167,7 +198,7 @@ function GetShips(ships) {
     }
 
     // Generating my ship if it isn't found
-    randomIndex = getRandomInt(0, SHIP.RangerImagesMax - 1);
+    randomIndex = UTILS.GetRandomInt(0, SHIP.RangerImagesMax - 1);
     if (!isMyShipFound) {
         var shipX1 = 0, shipY1 = 0, shipAngle1 = 0;
         SHIP.MyShip = new Ship(GAME.SessionId, "ranger", shipX1, shipY1, shipAngle1, SHIP.ShipSize, randomIndex, "Stop", "Stop", 0);
@@ -183,8 +214,6 @@ function Synchronize() {
         for (var i = 0; i < SPACE.Planets.length; i++) {
             SPACE.Planets[i].GetOrbitAngle(data.timeFromStart);
         }
-
-        GenerateExplodes(); // !!!!!!!!!!! Рефакторинг !!!!!!!!!!
     }
 
     function SynchronizeShips(data) {
@@ -287,25 +316,31 @@ function Synchronize() {
     request.done(function (data) {
         SynchronizePlanets(data);
         SynchronizeShips(data);
+        GenerateExplodes();
         MoveMyShip();
     });
 }
 
 function SynchronizeDominatorShips() {
-    dominatorTimer = setInterval(function () {
-        for (var i = 0; i < arrDominators.length; i++) {
-            var state = arrDominators[i].VectorMove;
-            if (state == "Inactive" || state.indexOf("Explode") != -1) {
-                continue;
-            }
-
-            arrDominators[i].MoveForward(dominatorSmershSpeed);
+    var type, indexTyp, speed;
+    for (var i = 0; i < arrDominators.length; i++) {
+        // Cheching state
+        var state = arrDominators[i].VectorMove;
+        if (state == "Inactive" || state.indexOf("Explode") != -1) {
+            continue;
         }
-    }, GAME.SyncRate);
+
+        type = arrDominators[i].Type.slice(10);               // "smersh", "menok", "urgant", "ekventor"
+        indexType = SHIP.DominatorTypes.Type.indexOf(type);
+        speed = SHIP.DominatorTypes.Speed[indexType];
+
+        arrDominators[i].MoveForward(speed);
+    }
 }
 
 function GenerateDominatorBombs() {
     for (var i = 0; i < arrDominators.length; i++) {
+        // Cheching state
         var state = arrDominators[i].VectorMove;
         if (state == "Inactive" || state.indexOf("Explode") != -1) {
             continue;
@@ -313,7 +348,7 @@ function GenerateDominatorBombs() {
 
         var bombX = GetNewBombX(arrDominators[i]);
         var bombY = GetNewBombY(arrDominators[i]);
-        var bomb = new Bomb("dominator", bombX, bombY, arrDominators[i].Angle, bombSize, 0, SHIP.BombSpeed);
+        var bomb = new Bomb("dominator", bombX, bombY, arrDominators[i].Angle, SHIP.BombSize, 0, SHIP.BombSpeed);
         arrDominators[i].Bombs.push(bomb);
     }
 }
@@ -382,6 +417,13 @@ function ReloadGame() {
     }
 
     for (i = 0; i < arrDominators.length; i++) {
+        if (arrDominators[i].VectorMove == "Inactive") {
+            continue;
+        }
+        if (CheckSunAndShip(arrDominators[i])) {            // Проверяем, не налетели ли на Солнце
+            arrDominators[i].VectorMove = "Explode00";
+            arrDominators[i].VectorRotate = "Stop";
+        }
         arrDominators[i].Show();
     }
 
@@ -402,19 +444,6 @@ function ReloadGame() {
                 arrDominators[i].Bombs[j].Vector = "Inactive";
             }
         }
-    }
-
-    if (CheckSunAndShip(SHIP.MyShip)) {            // Проверяем, не налетели ли на Солнце
-        SHIP.MyShip.VectorMove = "Explode00";
-        SHIP.MyShip.VectorRotate = "Stop";
-    }
-    SHIP.MyShip.Show();
-    for (i = 0; i < SHIP.Ships.length; i++) {
-        SHIP.Ships[i].Show();
-    }
-
-    for (i = 0; i < arrDominators.length; i++) {
-        arrDominators[i].Show();
     }
 
     // Check colliding bombs with ships
@@ -463,17 +492,19 @@ function ReloadGame() {
 
 // *** Bombs ***
 function GetNewBombX(ship) {
-    return (ship.X + ship.Size / 2) + (Math.cos(ship.Angle)) * (ship.Size / 2) - (bombSize / 2);
+    return (ship.X + ship.Size / 2) + (Math.cos(ship.Angle)) * (ship.Size / 2) - (SHIP.BombSize / 2);
 }
 
 function GetNewBombY(ship) {
-    return (ship.Y + ship.Size / 2) + (Math.sin(ship.Angle)) * (ship.Size / 2) - (bombSize / 2);
+    return (ship.Y + ship.Size / 2) + (Math.sin(ship.Angle)) * (ship.Size / 2) - (SHIP.BombSize / 2);
 }
 
 // *** Explodes Animation and Changing Explosion State ***
 function GenerateExplodes() {
     for (var i = 0; i < arrDominators.length; i++) {
-        Generate(arrDominators[i]);
+        if (arrDominators[i].VectorMove != "Inactive") {
+            Generate(arrDominators[i]);
+        }
     }
 
     Generate(SHIP.MyShip);
@@ -489,8 +520,12 @@ function GenerateExplodes() {
             }
             if (Y > 3) {
                 if (ship.Name == SHIP.MyShip.Name) {  // If it's my ship, reload it after exploding.
-                    ship.X = 10;
-                    ship.Y = 10;
+                    var randomX = UTILS.GetRandomInt(200, 400);
+                    var randomLeft = UTILS.GetRandomInt(0, 1);
+                    var randomY = UTILS.GetRandomInt(200, 400);
+                    var randomTop = UTILS.GetRandomInt(0, 1);
+                    ship.X = (randomLeft) ? randomX : (GAME.Canvas.width - randomX);
+                    ship.Y = (randomTop) ? randomY : (GAME.Canvas.height - randomY);
                     ship.VectorMove = "Stop";
                 }
                 else {
@@ -507,14 +542,14 @@ function GenerateExplodes() {
 function StartGlobalSpaceTimer() {
     globalSpaceTimer = setInterval(function () {
         clearInterval(dominatorTimer);
-        SynchronizeDominatorShips();
         GenerateDominatorBombs();
-    }, syncRateGlobal);
+    }, syncRateDominatorBombs);
 }
 
 function StartGlobalShipTimer() {
     globalShipTimer = setInterval(function () {
         Synchronize();
+        SynchronizeDominatorShips();
         ReloadGame();
     }, GAME.SyncRate);
 }
@@ -581,7 +616,7 @@ window.onkeydown = function (key) {
             var bombX = GetNewBombX(SHIP.MyShip);
             var bombY = GetNewBombY(SHIP.MyShip);
             if (SHIP.MyShip.Bombs.length < 5) {
-                var bomb = new Bomb("ranger", bombX, bombY, SHIP.MyShip.Angle, bombSize, 0, SHIP.BombSpeed);
+                var bomb = new Bomb("ranger", bombX, bombY, SHIP.MyShip.Angle, SHIP.BombSize, 0, SHIP.BombSpeed);
                 SHIP.MyShip.Bombs.push(bomb);
             }
             break;
