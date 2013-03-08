@@ -5,7 +5,6 @@ using System.Linq;
 using System.Web;
 using System.Web.Mvc;
 using StarWars.Models;
-using Newtonsoft.Json.Linq;
 
 namespace StarWars.Controllers
 {
@@ -17,7 +16,23 @@ namespace StarWars.Controllers
 			return View();
 		}
 
-		public JsonResult GetSessionAndShips()
+		// Разделяем инициализацию для космоса (InitShips) и кораблей (InitSpace)
+		// (иначе не получится в Javascript развести их по модулям - SPACE и SHIPS)
+
+		public JsonResult InitSpace()
+		{
+			var response = new {
+				Sun = new {
+					Size = Space.Sun.Size,
+					RotationAngle = Space.Sun.RotationAngle,
+				},
+				Planets = Space.Planets
+			};
+
+			return Json(response, JsonRequestBehavior.AllowGet);
+		}
+
+		public JsonResult InitShips()
 		{
 			if (Session["Ship"] == null)
 			{
@@ -33,20 +48,19 @@ namespace StarWars.Controllers
 			}
 
 			// Для ID корабля (пока что Имя - это то же самое, что и id)
-			var response = new { sessionId = Session["Ship"], ships = Game.Instance.GetShipList };
+			var response = new { sessionId = Session["Ship"], ships = Game.Instance.ShipList };
 			return Json(response, JsonRequestBehavior.AllowGet);
 		}
 
-		public JsonResult SynchronizePlanets()
-		{
-			return Json(Game.Instance.TimeFromStart, JsonRequestBehavior.AllowGet);
-		}
-
 		[HttpPost]
-		public JsonResult SynchronizeShips(Ship newShip)
+		public JsonResult Synchronize(Ship newShip)
 		{
 			Game.Instance.UpdateShipList(newShip);
-			return Json(new { ships = Game.Instance.GetShipList});
+			var response = new {
+				timeFromStart = Game.Instance.TimeFromStart,
+				ships = Game.Instance.ShipList 
+			};
+			return Json(response);
 		}
 
 	}

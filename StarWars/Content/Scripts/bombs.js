@@ -16,7 +16,7 @@ Bomb.prototype.GetImage = function () {
     }
 
     return imgRangerBomb[this.Image];
-}
+};
 
 Bomb.prototype.Move = function () {
     var vx = Math.cos(this.Angle) * this.Speed;
@@ -26,13 +26,21 @@ Bomb.prototype.Move = function () {
     this.X = Math.round(this.X * 100) / 100;
     this.Y = Math.round(this.Y * 100) / 100;
 
-    // If the bomb reaches any border of the canvas, it disappears
-    if ((this.X < -this.Size) || (this.X > canvas.width) || (this.Y < -this.Size) || (this.Y > canvas.height + this.Size)) {
+    // If the bomb reaches any border of the GAME, it disappears
+    if ((this.X < -this.Size) || (this.X > GAME.Canvas.width) || (this.Y < -this.Size) || (this.Y > GAME.Canvas.height + this.Size)) {
         this.Vector = "Inactive";
     }
-}
+};
+
+Bomb.prototype.GetCenterX = function () {
+    return this.X + this.Size / 2;
+};
+
+Bomb.prototype.GetCenterY = function () {
+    return this.Y + this.Size / 2;
+};
 
 Bomb.prototype.Show = function () {
     // Don't need to rotate a bomb, because it doesn't make any sense :-)
-    context.drawImage(this.GetImage(), this.X, this.Y);
-}
+    GAME.Context.drawImage(this.GetImage(), this.X, this.Y);
+};
