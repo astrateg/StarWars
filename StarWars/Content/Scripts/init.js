@@ -6,9 +6,21 @@ var GAME = (function () {
     my.ImagePath = "http://" + my.ServerName + "/Game/Content/Images/";
     my.SyncRate = 20;
 
+    var totalWidth = document.documentElement.clientWidth;
+    var totalHeight = document.documentElement.clientHeight;
+    my.SidebarWidth = 225;
+
+    my.Sidebar = document.createElement('Div');
+    my.Sidebar.id = "Sidebar";
+    my.Sidebar.style.width = my.SidebarWidth + "px";
+    my.Sidebar.style.height = totalHeight + "px";
+    my.Sidebar.style.cssFloat = "left";
+    my.Sidebar.style.backgroundColor = "grey";
+    document.body.appendChild(my.Sidebar);
+
     my.Canvas = document.createElement('Canvas');
-    my.Canvas.width = document.documentElement.clientWidth;
-    my.Canvas.height = document.documentElement.clientHeight;
+    my.Canvas.width = totalWidth - my.SidebarWidth;
+    my.Canvas.height = totalHeight;
 
     my.Context = my.Canvas.getContext('2d');
     document.body.appendChild(my.Canvas);
@@ -75,22 +87,45 @@ var SHIP = (function () {
 
     // *** Ships ***
     // Rangers
-    my.ShipMaxHP = 100, my.ShipSize = 64, my.ShipSpeed = 5, my.ShipAngle = 0.05;
+    my.ShipMaxHP = 200, my.ShipSize = 64, my.ShipSpeed = 5, my.ShipAngle = 0.05;
     my.MyShip = {};   // Ship's speed & rotating angle
     my.Ships = [];    // Array of Ships
 
     my.RangerImages = [];
-    my.RangerImagesMax = 4;
+    my.RangerImagesMax = 9;
+
+    var selectShip = document.createElement('Div');
+    selectShip.id = "SelectShip";
+    GAME.Sidebar.appendChild(selectShip);
+
+    var currentShip = document.createElement('Div');
+    currentShip.id = "CurrentShip";
+    GAME.Sidebar.appendChild(currentShip);
+
     for (var i = 0; i < my.RangerImagesMax; i++) {
         my.RangerImages[i] = new Image();
-        my.RangerImages[i].src = GAME.ImagePath + "Rangers/ranger0" + (i + 1) + ".png";
+        my.RangerImages[i].src = GAME.ImagePath + "Rangers/ranger" + (i + 1) + ".png";
+
+        my.RangerImages[i].addEventListener("click", function (index) {
+            return function () {
+                my.RangerImages[index].classList.add("Selected");               // Добавляем класс "Selected" к выделенному
+                my.RangerImages[my.MyShip.Image].classList.remove("Selected");  // И убираем "Selected" у предыдущего
+
+                my.MyShip.Image = index;
+                my.MyShipImageFull.src = GAME.ImagePath + "Rangers/Original/ranger" + (index + 1) + ".png";
+            }
+        }(i));
+
+        selectShip.appendChild(my.RangerImages[i]);
     }
+    my.MyShipImageFull = new Image();
+    currentShip.appendChild(my.MyShipImageFull);
 
     // Dominators
     my.DominatorTypesMax = 4;
     my.DominatorTypes = {
         Type: ["smersh", "menok", "urgant", "ekventor"],
-        MaxHP: [80, 120, 160, 200],
+        MaxHP: [150, 200, 250, 300],
         Speed: [5, 4, 3, 2],
         Angle: [0.05, 0.04, 0.03, 0.02],
         Size: [70, 75, 85, 85],
@@ -107,7 +142,7 @@ var SHIP = (function () {
     }
 
     // *** Bombs ***
-    my.BombHP = 40;  // Ударная сила бомбы (1 столкновение)
+    my.BombHP = 50;  // Ударная сила бомбы (1 столкновение)
     my.SunHP = 1;    // Ударная сила Солнца (1 tick = GAME.SyncRate = 20ms)
     my.BombSize = 24, my.BombSpeed = 2.5;
 
@@ -198,6 +233,8 @@ function GetShips(ships) {
         SHIP.MyShip = new Ship(GAME.SessionId, "ranger", SHIP.ShipMaxHP, SHIP.ShipMaxHP, shipX1, shipY1, shipAngle1, SHIP.ShipSize, randomIndex, "Stop", "Stop", 0);
     }
 
+    SHIP.MyShipImageFull.src = GAME.ImagePath + "Rangers/Original/ranger" + (SHIP.MyShip.Image + 1) + ".png";   // При загрузке сразу показываем увеличенную копию
+
     // Свой корабль НЕ добавляем в общий массив SHIP.Ships! (нет смысла корректировать его положение - мы его и так знаем).
     // Но с сервера получаем весь список кораблей (включая и свой), т.к. удалять корабль на сервере (перед отправкой) из коллекции List будет, вероятно, дороже.
 }
@@ -225,6 +262,7 @@ function Synchronize() {
                         SHIP.Ships[j].X = data.ships[i].X;
                         SHIP.Ships[j].Y = data.ships[i].Y;
                         SHIP.Ships[j].Angle = data.ships[i].Angle;
+                        SHIP.Ships[j].Image = data.ships[i].Image;
                         SHIP.Ships[j].VectorMove = data.ships[i].VectorMove;
                         SHIP.Ships[j].VectorRotate = data.ships[i].VectorRotate;
                         SHIP.Ships[j].Delay = data.ships[i].Delay;
@@ -563,8 +601,11 @@ window.onresize = function () {
     clearInterval(globalShipTimer);
 
     // Recount sun coordinates after window resizing
-    GAME.Canvas.width = document.documentElement.clientWidth;
-    GAME.Canvas.height = document.documentElement.clientHeight;
+    var heightTotal = document.documentElement.clientHeight;
+    GAME.Sidebar.style.height = heightTotal;
+
+    GAME.Canvas.width = document.documentElement.clientWidth - GAME.SidebarWidth;
+    GAME.Canvas.height = heightTotal;
     SPACE.Sun.GetCenter();
 
     StartGlobalSpaceTimer();

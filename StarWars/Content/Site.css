@@ -3,7 +3,41 @@
 }
 
 body {
+    margin: 0;
+    padding: 0;
     background-image: url('Images/Space01.jpg');
     background-position: left top;
     background-repeat: no-repeat;
+}
+
+#Sidebar {
+
+}
+
+#SelectShip {
+    padding: 2px;
+}
+#SelectShip > img {
+    /*display: inline-block;*/  /*По умолчанию у тега img как раз установлен inline-block*/ 
+    margin: 2px;
+    padding-right: 5px;
+}
+
+#SelectShip > img:hover {
+    border: 2px solid #00ffdd;
+    border-radius: 5px;
+    margin: 0;
+}
+
+#SelectShip > img.Selected {
+    border: 2px solid #00ffdd;
+    background-color: #aaa;
+    border-radius: 5px;
+    margin: 0;
+}
+
+
+#CurrentShip {
+    width: 128px;
+    margin: 20px auto 10px;
 }

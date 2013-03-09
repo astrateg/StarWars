@@ -58,6 +58,7 @@ namespace StarWars.Models {
                 _ships[shipIndex].X = newShip.X;
                 _ships[shipIndex].Y = newShip.Y;
                 _ships[shipIndex].Angle = newShip.Angle;
+                _ships[shipIndex].Image = newShip.Image;
                 _ships[shipIndex].VectorMove = newShip.VectorMove;
                 _ships[shipIndex].VectorRotate = newShip.VectorRotate;
                 _ships[shipIndex].Bombs = newShip.Bombs;
