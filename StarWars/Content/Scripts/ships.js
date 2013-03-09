@@ -64,14 +64,14 @@ Ship.prototype.MoveBackward = function (speed) {
 };
 
 Ship.prototype.CheckReappear = function () {
-    if (this.X < -this.Size)
-        this.X = GAME.Canvas.width;
-    if (this.X > GAME.Canvas.width)
-        this.X = -this.Size;
-    if (this.Y < -this.Size)
-        this.Y = GAME.Canvas.height + this.Size;
-    if (this.Y > GAME.Canvas.height + this.Size)
-        this.Y = -this.Size;
+    if (this.X < - this.Size / 2)
+        this.X = GAME.Canvas.width - this.Size / 2;
+    if (this.X > GAME.Canvas.width - this.Size / 2)
+        this.X = -this.Size / 2;
+    if (this.Y < -this.Size / 2)
+        this.Y = GAME.Canvas.height - this.Size / 2;
+    if (this.Y > GAME.Canvas.height - this.Size / 2)
+        this.Y = -this.Size / 2;
 };
 
 Ship.prototype.GetCenterX = function () {

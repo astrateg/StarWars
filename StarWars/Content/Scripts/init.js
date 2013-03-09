@@ -142,7 +142,7 @@ var smershXStart = 1200, smershYStart = 100, smershAngleStart = 0;
 
 function InitDominators() {
     // Ship construstor: Ship(name, type, X, Y, angle, size, image, vectorMove, vectorRotate, delay)
-    var dominatorsMax = 10;     //DominatorTypes
+    var dominatorsMax = 10;
     var randomIndexType, randomIndexImage;
     var dominator, type, size, randomAngle;
     for (var i = 0; i < dominatorsMax; i++) {
@@ -310,7 +310,8 @@ function Synchronize() {
         data: stringified,
         dataType: "json",                               // !!!
         contentType: "application/json; charset=utf-8", // !!! (по умолчанию - "application/x-www-form-urlencoded; charset=UTF-8")
-        cache: false
+        cache: false,
+        timeout: GAME.SyncRate
     });
 
     request.done(function (data) {
@@ -629,7 +630,8 @@ window.onkeydown = function (key) {
 
 window.onkeyup = function (key) {
     var vectorMove = SHIP.MyShip.VectorMove;
-    if (vectorMove.indexOf("Explode") != -1) return;   // If my ship is in the explosion state, it cannot move.
+    if (vectorMove == null) return;                     // If key was up when MyShip wasn't created yet (i.e. when Ctrl+F5 was pressed in browser)
+    if (vectorMove.indexOf("Explode") != -1) return;    // If my ship is in the explosion state, it cannot move.
 
     switch (key.keyCode) {
         case 37:    // Left Arrow   (Rotate CCW)
