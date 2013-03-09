@@ -1,6 +1,8 @@
-﻿function Ship(name, type, X, Y, angle, size, image, vectorMove, vectorRotate, delay) {
+﻿function Ship(name, type, maxHP, HP, X, Y, angle, size, image, vectorMove, vectorRotate, delay) {
     this.Name = name;
     this.Type = type;
+    this.MaxHP = maxHP;
+    this.HP = HP;
     this.X = X;
     this.Y = Y;
     this.Angle = angle;
@@ -100,14 +102,30 @@ Ship.prototype.Show = function () {
         return;
     }
 
+    var centerShipX = this.GetCenterX();
+    var centerShipY = this.GetCenterY();
+    var lineHP = (this.HP / this.MaxHP) * this.Size;
+
+    if (this.Type.indexOf("dominator") != -1) {
+        GAME.Context.strokeStyle = "#00BBFF";
+        GAME.Context.fillStyle = "#00BBFF";
+    }
+    else {
+        GAME.Context.strokeStyle = "#00BB00";
+        GAME.Context.fillStyle = "#00BB00";
+    }
+    GAME.Context.strokeRect(centerShipX - this.Size / 2, centerShipY + this.Size / 2, this.Size, 5);  // fillRect(x, y, width, height)
+    GAME.Context.fillRect(centerShipX - this.Size / 2, centerShipY + this.Size / 2, lineHP, 5);  // fillRect(x, y, width, height)
+
     if (this.Angle == 0) {
         GAME.Context.drawImage(this.GetImage(), this.X, this.Y);
     } else {
         // If Angle <> 0, have to rotate the ship ("Angle" - direction for moving & shooting)
         GAME.Context.save();
-        GAME.Context.translate(this.GetCenterX(), this.GetCenterY());
+        GAME.Context.translate(centerShipX, centerShipY);
         GAME.Context.rotate(this.Angle);
         GAME.Context.drawImage(this.GetImage(), -this.Size / 2, -this.Size / 2);
         GAME.Context.restore();
     }
+
 };

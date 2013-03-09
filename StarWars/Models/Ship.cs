@@ -10,6 +10,8 @@ namespace StarWars.Models
     {
         public string Name { get; set; }
         public string Type { get; set; }
+        public double MaxHP { get; set; }
+        public double HP { get; set; }
         public double X { get; set; }
         public double Y { get; set; }
         public double Angle { get; set; }

@@ -73,8 +73,9 @@ var SPACE = (function () {
 var SHIP = (function () {
     var my = {};
 
-    // Ships
-    my.ShipSize = 64, my.ShipSpeed = 5, my.ShipAngle = 0.05;
+    // *** Ships ***
+    // Rangers
+    my.ShipMaxHP = 100, my.ShipSize = 64, my.ShipSpeed = 5, my.ShipAngle = 0.05;
     my.MyShip = {};   // Ship's speed & rotating angle
     my.Ships = [];    // Array of Ships
 
@@ -85,10 +86,11 @@ var SHIP = (function () {
         my.RangerImages[i].src = GAME.ImagePath + "Rangers/ranger0" + (i + 1) + ".png";
     }
 
-    //imgDominatorSmersh
+    // Dominators
     my.DominatorTypesMax = 4;
     my.DominatorTypes = {
         Type: ["smersh", "menok", "urgant", "ekventor"],
+        MaxHP: [80, 120, 160, 200],
         Speed: [5, 4, 3, 2],
         Angle: [0.05, 0.04, 0.03, 0.02],
         Size: [70, 75, 85, 85],
@@ -104,7 +106,9 @@ var SHIP = (function () {
         }
     }
 
-    // Bombs
+    // *** Bombs ***
+    my.BombHP = 40;  // Ударная сила бомбы (1 столкновение)
+    my.SunHP = 1;    // Ударная сила Солнца (1 tick = GAME.SyncRate = 20ms)
     my.BombSize = 24, my.BombSpeed = 2.5;
 
     my.RangerBombImages = [];
@@ -134,30 +138,31 @@ var imgExplosionSizeX = 384, imgExplosionSizeY = 256;   // Explosion Image size
 var imgExplosionStepX = imgExplosionSizeX / 3, imgExplosionStepY = imgExplosionSizeY / 4;   // Image step for "background shift"
 
 // *** Dominators ***
-var dominatorSmersh, dominatorSmershSpeed = 1, dominatorSmershAngle = 0.01;
 var arrDominators = [];         // Array of Dominators
 var dominatorTimer;
 
-var smershXStart = 1200, smershYStart = 100, smershAngleStart = 0;
-
 function InitDominators() {
-    // Ship construstor: Ship(name, type, X, Y, angle, size, image, vectorMove, vectorRotate, delay)
     var dominatorsMax = 10;
+    var XStart = 1200, YStart = 100;
     var randomIndexType, randomIndexImage;
-    var dominator, type, size, randomAngle;
+    var dominator, type, maxHP, size, randomAngle;
     for (var i = 0; i < dominatorsMax; i++) {
         randomIndexType = UTILS.GetRandomInt(0, SHIP.DominatorTypesMax - 1);
         randomIndexImage = UTILS.GetRandomInt(0, SHIP.DominatorImagesMax - 1);
 
         type = SHIP.DominatorTypes.Type[randomIndexType];
+        maxHP = SHIP.DominatorTypes.MaxHP[randomIndexType];
         size = SHIP.DominatorTypes.Size[randomIndexType];
         randomAngle = Math.random() * (2 * Math.PI);
 
+        // Ship construstor: Ship(name, type, maxHP, HP, X, Y, angle, size, image, vectorMove, vectorRotate, delay)
         dominator = new Ship(
             type,
             "dominator-" + type,
-            smershXStart + randomIndexType * randomIndexImage * 10,
-            smershYStart + i * 100,
+            maxHP,
+            maxHP,
+            XStart + randomIndexType * randomIndexImage * 10,
+            YStart + i * 100,
             randomAngle,
             size,
             randomIndexImage,
@@ -176,22 +181,11 @@ function GetShips(ships) {
             var imageIndex = parseInt(ships[i].Image);
             if (ships[i].Name == GAME.SessionId) {
                 isMyShipFound = true;
-                SHIP.MyShip = new Ship(ships[i].Name, "ranger", ships[i].X, ships[i].Y, ships[i].Angle, SHIP.ShipSize, imageIndex, "Stop", "Stop", 0);
+                SHIP.MyShip = new Ship(ships[i].Name, "ranger", ships[i].MaxHP, ships[i].HP, ships[i].X, ships[i].Y, ships[i].Angle, SHIP.ShipSize, imageIndex, "Stop", "Stop", 0);
             }
             else {
                 imageIndex = parseInt(ships[i].Image);
-                var otherShip = new Ship(
-                    ships[i].Name,
-                    ships[i].Type,
-                    ships[i].X,
-                    ships[i].Y,
-                    ships[i].Angle,
-                    SHIP.ShipSize,
-                    imageIndex,
-                    ships[i].VectorMove,
-                    ships[i].VectorRotate,
-                    ships[i].Delay
-                );
+                var otherShip = new Ship(ships[i].Name, ships[i].Type, ships[i].MaxHP, ships[i].HP, ships[i].X, ships[i].Y, ships[i].Angle, SHIP.ShipSize, imageIndex, ships[i].VectorMove, ships[i].VectorRotate, ships[i].Delay);
                 SHIP.Ships.push(otherShip);
             }
         }
@@ -200,8 +194,8 @@ function GetShips(ships) {
     // Generating my ship if it isn't found
     randomIndex = UTILS.GetRandomInt(0, SHIP.RangerImagesMax - 1);
     if (!isMyShipFound) {
-        var shipX1 = 0, shipY1 = 0, shipAngle1 = 0;
-        SHIP.MyShip = new Ship(GAME.SessionId, "ranger", shipX1, shipY1, shipAngle1, SHIP.ShipSize, randomIndex, "Stop", "Stop", 0);
+        var shipX1 = 0, shipY1 = 0, shipAngle1 = 0; // Стартовые координаты - генерировать случайные!
+        SHIP.MyShip = new Ship(GAME.SessionId, "ranger", SHIP.ShipMaxHP, SHIP.ShipMaxHP, shipX1, shipY1, shipAngle1, SHIP.ShipSize, randomIndex, "Stop", "Stop", 0);
     }
 
     // Свой корабль НЕ добавляем в общий массив SHIP.Ships! (нет смысла корректировать его положение - мы его и так знаем).
@@ -227,6 +221,7 @@ function Synchronize() {
                         continue;                                   // если не одинаковые имена - берем следующий
                     }
                     else {                                          // если корабль встретился в массиве JS - обновляем данные (только те, которые изменились)
+                        SHIP.Ships[j].HP = data.ships[i].HP;
                         SHIP.Ships[j].X = data.ships[i].X;
                         SHIP.Ships[j].Y = data.ships[i].Y;
                         SHIP.Ships[j].Angle = data.ships[i].Angle;
@@ -258,6 +253,8 @@ function Synchronize() {
                     var otherShip = new Ship(
                         data.ships[i].Name,
                         data.ships[i].Type,
+                        data.ships[i].MaxHP,
+                        data.ships[i].HP,
                         data.ships[i].X,
                         data.ships[i].Y,
                         data.ships[i].Angle,
@@ -366,10 +363,11 @@ function ReloadGame() {
     // *** My Bombs ***
     for (i = 0; i < SHIP.MyShip.Bombs.length; i++) {
         SHIP.MyShip.Bombs[i].Move();
+        CheckSunAndBomb(SHIP.MyShip.Bombs[i]);
     }
 
     // Функция Array.prototype.filter имеет аналог в jQuery: $.grep
-    SHIP.MyShip.Bombs = SHIP.MyShip.Bombs.filter(function (obj) { return obj.Vector !== "Inactive"; });   // Убираем из массива все бомбы, улетевшие за экран
+    SHIP.MyShip.Bombs = SHIP.MyShip.Bombs.filter(function (obj) { return obj.Vector !== "Inactive"; });   // Убираем из массива все неактивные бомбы (попавшие в корабль (или Солнце) / улетевшие за экран)
 
     for (i = 0; i < SHIP.MyShip.Bombs.length; i++) {               // Неактивных бомб в массиве нет
         SHIP.MyShip.Bombs[i].Show();
@@ -378,11 +376,7 @@ function ReloadGame() {
             if (state == "Inactive" || state.indexOf("Explode") != -1) {
                 continue;
             }
-            if (CheckBombAndShip(SHIP.MyShip.Bombs[i], arrDominators[j])) {            // Проверяем, не встретилась ли наша бомба с вражеским кораблем
-                arrDominators[j].VectorMove = "Explode00";                      // Взрыв проверяется только по свойству VectorMove (для определенности)
-                arrDominators[j].VectorRotate = "Inactive";
-                SHIP.MyShip.Bombs[i].Vector = "Inactive";
-            }
+            CheckBombAndShip(SHIP.MyShip.Bombs[i], arrDominators[j]);  // Проверяем, не встретилась ли наша бомба с вражеским кораблем
         }
     }
 
@@ -398,19 +392,12 @@ function ReloadGame() {
             for (var j = 0; j < SHIP.Ships[i].Bombs.length; j++) {
                 SHIP.Ships[i].Bombs[j].Show();
 
-                if (CheckBombAndShip(SHIP.Ships[i].Bombs[j], SHIP.MyShip)) {            // Проверяем, не встретилась ли рейнджерская бомба с нашим кораблем
-                    SHIP.MyShip.VectorMove = "Explode00";
-                    SHIP.MyShip.VectorRotate = "Stop";
-                    SHIP.Ships[i].Bombs[j].Vector = "Inactive";
-                }
+                CheckBombAndShip(SHIP.Ships[i].Bombs[j], SHIP.MyShip);  // Проверяем, не встретилась ли рейнджерская бомба с нашим кораблем
             }
         }
     }
 
-    if (CheckSunAndShip(SHIP.MyShip)) {            // Проверяем, не налетели ли на Солнце
-        SHIP.MyShip.VectorMove = "Explode00";
-        SHIP.MyShip.VectorRotate = "Stop";
-    }
+    CheckSunAndShip(SHIP.MyShip);            // Проверяем, не налетели ли на Солнце
     SHIP.MyShip.Show();
 
     for (i = 0; i < SHIP.Ships.length; i++) {
@@ -421,10 +408,7 @@ function ReloadGame() {
         if (arrDominators[i].VectorMove == "Inactive") {
             continue;
         }
-        if (CheckSunAndShip(arrDominators[i])) {            // Проверяем, не налетели ли на Солнце
-            arrDominators[i].VectorMove = "Explode00";
-            arrDominators[i].VectorRotate = "Stop";
-        }
+        CheckSunAndShip(arrDominators[i]);  // Проверяем, не налетел ли доминатор на Солнце
         arrDominators[i].Show();
     }
 
@@ -432,6 +416,7 @@ function ReloadGame() {
     for (i = 0; i < arrDominators.length; i++) {
         for (var j = 0; j < arrDominators[i].Bombs.length; j++) {
             arrDominators[i].Bombs[j].Move();
+            CheckSunAndBomb(arrDominators[i].Bombs[j]);
         }
         arrDominators[i].Bombs = arrDominators[i].Bombs.filter(function (obj) { return obj.Vector !== "Inactive"; });   // Убираем из массива все бомбы, улетевшие за экран
     }
@@ -439,54 +424,52 @@ function ReloadGame() {
     for (i = 0; i < arrDominators.length; i++) {
         for (var j = 0; j < arrDominators[i].Bombs.length; j++) {
             arrDominators[i].Bombs[j].Show();
-            if (CheckBombAndShip(arrDominators[i].Bombs[j], SHIP.MyShip)) {            // Проверяем, не встретилась ли вражеская бомба с нашим кораблем
-                SHIP.MyShip.VectorMove = "Explode00";
-                SHIP.MyShip.VectorRotate = "Stop";
-                arrDominators[i].Bombs[j].Vector = "Inactive";
-            }
+            CheckBombAndShip(arrDominators[i].Bombs[j], SHIP.MyShip);            // Проверяем, не встретилась ли вражеская бомба с нашим кораблем
         }
     }
 
     // Check colliding bombs with ships
     function CheckBombAndShip(bomb, ship) {
         if (ship.VectorMove.indexOf("Explode") != -1) {
-            return false;
+            return;
         }
         var checkX = (bomb.X >= ship.X - bomb.Size / 2) && (bomb.X <= ship.X + ship.Size - bomb.Size / 2);
         var checkY = (bomb.Y >= ship.Y - bomb.Size / 2) && (bomb.Y <= ship.Y + ship.Size - bomb.Size / 2);
         if (checkX && checkY) {
-            return true;
-        }
-        else {
-            return false;
+            ship.HP -= SHIP.BombHP;           // Если да, уменьшаем HP корабля
+            if (ship.HP <= 0) {
+                ship.HP = 0;
+                ship.VectorMove = "Explode00";              // Взрыв проверяется только по свойству VectorMove (для определенности)
+                ship.VectorRotate = "Stop";
+            }
+            bomb.Vector = "Inactive";
         }
     }
 
     // Check colliding ships with sun
     function CheckSunAndShip(ship) {
         if (ship.VectorMove.indexOf("Explode") != -1) {
-            return false;
+            return;
         }
 
         if (Math.sqrt(Math.pow(SPACE.Sun.CenterX - ship.GetCenterX(), 2) + Math.pow(SPACE.Sun.CenterY - ship.GetCenterY(), 2)) < SPACE.Sun.Size / 2) {
-            return true;
-        }
-        else {
-            return false;
+            ship.HP -= SHIP.SunHP;           // Если да, уменьшаем HP корабля
+            if (ship.HP <= 0) {
+                ship.HP = 0;
+                ship.VectorMove = "Explode00";              // Взрыв проверяется только по свойству VectorMove (для определенности)
+                ship.VectorRotate = "Stop";
+            }
         }
     }
 
     // Check colliding bombs with sun
     function CheckSunAndBomb(bomb) {
         if (bomb.Vector.indexOf("Explode") != -1) {
-            return false;
+            return;
         }
 
         if (Math.sqrt(Math.pow(SPACE.Sun.CenterX - bomb.GetCenterX(), 2) + Math.pow(SPACE.Sun.CenterY - bomb.GetCenterY(), 2)) < SPACE.Sun.Size / 2) {
-            return true;
-        }
-        else {
-            return false;
+            bomb.Vector = "Inactive";
         }
     }
 }
@@ -527,6 +510,7 @@ function GenerateExplodes() {
                     var randomTop = UTILS.GetRandomInt(0, 1);
                     ship.X = (randomLeft) ? randomX : (GAME.Canvas.width - randomX);
                     ship.Y = (randomTop) ? randomY : (GAME.Canvas.height - randomY);
+                    ship.HP = ship.MaxHP;
                     ship.VectorMove = "Stop";
                 }
                 else {
