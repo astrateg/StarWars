@@ -155,8 +155,8 @@ var SHIP = (function () {
     // *** Bombs ***
     my.BombHP = 50;  // Ударная сила бомбы (1 столкновение)
     my.SunHP = 1;    // Ударная сила Солнца (1 tick = GAME.SyncRate = 20ms)
-    my.RegenerateHP = 0.125;    // Регенерация (1 tick = GAME.SyncRate = 20ms)
-    my.BombSize = 24, my.BombSpeed = 2.5;
+    my.RegenerateHP = 0.1;    // Регенерация (1 tick = GAME.SyncRate = 20ms)
+    my.BombSize = 24, my.BombSpeed = 5;
 
     my.RangerBombImages = [];
     my.RangerBombImages[0] = new Image();
@@ -189,7 +189,7 @@ var arrDominators = [];         // Array of Dominators
 var dominatorTimer;
 
 function InitDominators() {
-    var dominatorsMax = 10;
+    var dominatorsMax = 5;
     var XStart = 1200, YStart = 100;
     var randomIndexType, randomIndexImage;
     var dominator, type, maxHP, size, randomAngle;
@@ -278,20 +278,8 @@ function Synchronize() {
                         SHIP.Ships[j].VectorMove = data.ships[i].VectorMove;
                         SHIP.Ships[j].VectorRotate = data.ships[i].VectorRotate;
                         SHIP.Ships[j].Delay = data.ships[i].Delay;
-                        SHIP.Ships[j].Bombs = [];                     // сначала обнуляем массив бомб для каждого рейнджера
-                        if (data.ships[i].Bombs != null) {          // а затем заполняем массив данными с сервера
-                            for (var k = 0; k < data.ships[i].Bombs.length; k++) {
-                                SHIP.Ships[j].Bombs[k] = new Bomb(
-                                    data.ships[i].Bombs[k].Type,
-                                    data.ships[i].Bombs[k].X,
-                                    data.ships[i].Bombs[k].Y,
-                                    data.ships[i].Bombs[k].Angle,
-                                    data.ships[i].Bombs[k].Size,
-                                    data.ships[i].Bombs[k].Image,
-                                    data.ships[i].Bombs[k].speed
-                                    );
-                            }
-                        }
+
+                        RefreshBombs(SHIP.Ships[j], data.ships[i].Bombs);   // обнуляем и заполняем массив данными с сервера
 
                         isShipFound = true;
                         break;
@@ -314,21 +302,27 @@ function Synchronize() {
                         data.ships[i].VectorRotate,
                         data.ships[i].Delay
                     );
-                    if (data.ships[i].Bombs != null) {
-                        for (var k = 0; k < data.ships[i].Bombs.length; k++) {
-                            otherShip.Bombs[k] = new Bomb(
-                                data.ships[i].Bombs[k].Type,
-                                data.ships[i].Bombs[k].X,
-                                data.ships[i].Bombs[k].Y,
-                                data.ships[i].Bombs[k].Angle,
-                                data.ships[i].Bombs[k].Size,
-                                data.ships[i].Bombs[k].Image,
-                                data.ships[i].Bombs[k].speed
-                            );
-                        }
-                    }   // иначе: otherShip.Bombs = [] (см. конструктор Bomb)
+
+                    RefreshBombs(otherShip, data.ships[i].Bombs);
                     SHIP.Ships.push(otherShip);
                 }
+            }
+        }
+    }
+
+    function RefreshBombs(ship, bombs) {
+        ship.Bombs = [];    // сначала обнуляем массив бомб для каждого рейнджера
+        if (bombs != null) {
+            for (var k = 0; k < bombs.length; k++) {
+                ship.Bombs[k] = new Bomb(
+                    bombs[k].Type,
+                    bombs[k].X,
+                    bombs[k].Y,
+                    bombs[k].Angle,
+                    bombs[k].Size,
+                    bombs[k].Image,
+                    bombs[k].Speed
+                );
             }
         }
     }
@@ -422,11 +416,12 @@ function ReloadGame() {
     for (i = 0; i < SHIP.MyShip.Bombs.length; i++) {               // Неактивных бомб в массиве нет
         SHIP.MyShip.Bombs[i].Show();
         for (var j = 0; j < arrDominators.length; j++) {    // А неактивные корабли - есть
-            var state = arrDominators[j].VectorMove;
-            if (state == "Inactive" || state.indexOf("Explode") != -1) {
-                continue;
+            CheckBombAndShip(SHIP.MyShip.Bombs[i], arrDominators[j]);       // Проверяем, не встретилась ли наша бомба с доминаторским кораблем
+        }
+        if (SHIP.MyShip.Bombs[i].Vector != "Inactive") {
+            for (var j = 0; j < SHIP.Ships.length; j++) {
+                CheckBombAndShip(SHIP.MyShip.Bombs[i], SHIP.Ships[j]);   // Проверяем, не встретилась ли наша бомба с рейнджерским кораблем
             }
-            CheckBombAndShip(SHIP.MyShip.Bombs[i], arrDominators[j]);  // Проверяем, не встретилась ли наша бомба с вражеским кораблем
         }
     }
 
@@ -484,9 +479,11 @@ function ReloadGame() {
 
     // Check colliding bombs with ships
     function CheckBombAndShip(bomb, ship) {
-        if (ship.VectorMove.indexOf("Explode") != -1) {
+        var state = ship.VectorMove;
+        if (state == "Inactive" || state.indexOf("Explode") != -1) {
             return;
         }
+
         var checkX = (bomb.X >= ship.X - bomb.Size / 2) && (bomb.X <= ship.X + ship.Size - bomb.Size / 2);
         var checkY = (bomb.Y >= ship.Y - bomb.Size / 2) && (bomb.Y <= ship.Y + ship.Size - bomb.Size / 2);
         if (checkX && checkY) {
@@ -518,10 +515,6 @@ function ReloadGame() {
 
     // Check colliding bombs with sun
     function CheckSunAndBomb(bomb) {
-        if (bomb.Vector.indexOf("Explode") != -1) {
-            return;
-        }
-
         if (Math.sqrt(Math.pow(SPACE.Sun.CenterX - bomb.GetCenterX(), 2) + Math.pow(SPACE.Sun.CenterY - bomb.GetCenterY(), 2)) < SPACE.Sun.Size / 2) {
             bomb.Vector = "Inactive";
         }
