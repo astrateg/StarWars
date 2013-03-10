@@ -94,13 +94,10 @@ var SHIP = (function () {
     my.RangerImages = [];
     my.RangerImagesMax = 9;
 
+    // Ranger ship types
     var selectShip = document.createElement('Div');
     selectShip.id = "SelectShip";
     GAME.Sidebar.appendChild(selectShip);
-
-    var currentShip = document.createElement('Div');
-    currentShip.id = "CurrentShip";
-    GAME.Sidebar.appendChild(currentShip);
 
     for (var i = 0; i < my.RangerImagesMax; i++) {
         my.RangerImages[i] = new Image();
@@ -118,8 +115,22 @@ var SHIP = (function () {
 
         selectShip.appendChild(my.RangerImages[i]);
     }
+
+    // My ship (image, HP)
+    var currentShip = document.createElement('Div');
+    currentShip.id = "CurrentShip";
+    GAME.Sidebar.appendChild(currentShip);
+
     my.MyShipImageFull = new Image();
     currentShip.appendChild(my.MyShipImageFull);
+
+    var currentShipHP = document.createElement('Div');
+    currentShipHP.id = "CurrentShipHP";
+    currentShip.appendChild(currentShipHP);
+
+    var currentShipHPValue = document.createElement('Div');
+    currentShipHPValue.id = "CurrentShipHPValue";
+    currentShipHP.appendChild(currentShipHPValue);
 
     // Dominators
     my.DominatorTypesMax = 4;
@@ -144,6 +155,7 @@ var SHIP = (function () {
     // *** Bombs ***
     my.BombHP = 50;  // Ударная сила бомбы (1 столкновение)
     my.SunHP = 1;    // Ударная сила Солнца (1 tick = GAME.SyncRate = 20ms)
+    my.RegenerateHP = 0.125;    // Регенерация (1 tick = GAME.SyncRate = 20ms)
     my.BombSize = 24, my.BombSpeed = 2.5;
 
     my.RangerBombImages = [];
@@ -435,8 +447,12 @@ function ReloadGame() {
         }
     }
 
-    CheckSunAndShip(SHIP.MyShip);            // Проверяем, не налетели ли на Солнце
+    CheckSunAndShip(SHIP.MyShip);           // Проверяем, не налетели ли на Солнце
+    if (SHIP.MyShip.HP < SHIP.MyShip.MaxHP) {
+        SHIP.MyShip.HP += SHIP.RegenerateHP;    // Регенерировали
+    }
     SHIP.MyShip.Show();
+
 
     for (i = 0; i < SHIP.Ships.length; i++) {
         SHIP.Ships[i].Show();
@@ -602,7 +618,7 @@ window.onresize = function () {
 
     // Recount sun coordinates after window resizing
     var heightTotal = document.documentElement.clientHeight;
-    GAME.Sidebar.style.height = heightTotal;
+    GAME.Sidebar.style.height = heightTotal + "px";
 
     GAME.Canvas.width = document.documentElement.clientWidth - GAME.SidebarWidth;
     GAME.Canvas.height = heightTotal;

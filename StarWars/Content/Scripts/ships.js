@@ -114,8 +114,33 @@ Ship.prototype.Show = function () {
         GAME.Context.strokeStyle = "#00BB00";
         GAME.Context.fillStyle = "#00BB00";
     }
-    GAME.Context.strokeRect(centerShipX - this.Size / 2, centerShipY + this.Size / 2, this.Size, 5);  // fillRect(x, y, width, height)
-    GAME.Context.fillRect(centerShipX - this.Size / 2, centerShipY + this.Size / 2, lineHP, 5);  // fillRect(x, y, width, height)
+
+    if (this.Name == SHIP.MyShip.Name) {    // Если наш корабль - подсвечиваем его
+        GAME.Context.beginPath();
+        GAME.Context.arc(centerShipX, centerShipY, this.Size * 0.8, -Math.PI / 4, -3 * Math.PI / 4, true);      // arc(x, y, radius, startAngle, endAngle)
+        GAME.Context.arc(centerShipX, centerShipY, this.Size * 0.75, -3 * Math.PI / 4, -Math.PI / 4);
+        GAME.Context.closePath();
+        GAME.Context.fill();
+
+
+        // Обновили полосу HP на панели Sidebar
+        var currentShipHPValue = document.getElementById('CurrentShipHPValue');
+        currentShipHPValue.style.width = (this.HP / this.MaxHP) * 124 + "px";    // 124 = 128 - 2 - 2 (размер рисунка с кораблем минус границы 2px)
+
+        if (this.HP <= (this.MaxHP / 4)) {
+            GAME.Context.fillStyle = "#FF0000";
+            currentShipHPValue.style.backgroundColor = "#FF0000";
+        } else if (this.HP <= (this.MaxHP / 2)) {
+            GAME.Context.fillStyle = "#FFBB00";
+            currentShipHPValue.style.backgroundColor = "#FFBB00";
+        } else {
+            currentShipHPValue.style.backgroundColor = "#00BB00";
+        }
+    }
+
+    GAME.Context.strokeRect(centerShipX - this.Size / 2, centerShipY + this.Size / 2, this.Size, 5);    // fillRect(x, y, width, height)
+    GAME.Context.fillRect(centerShipX - this.Size / 2, centerShipY + this.Size / 2, lineHP, 5);         // fillRect(x, y, width, height)
+
 
     if (this.Angle == 0) {
         GAME.Context.drawImage(this.GetImage(), this.X, this.Y);
