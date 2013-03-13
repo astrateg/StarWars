@@ -1,16 +1,21 @@
-﻿function Ship(name, type, maxHP, HP, X, Y, angle, size, image, vectorMove, vectorRotate, delay) {
+﻿function Ship(id, name, type, maxHP, HP, X, Y, speed, angle, angleSpeed, size, image, vectorMove, vectorRotate, delay, kill, death) {
+    this.ID = id;
     this.Name = name;
     this.Type = type;
     this.MaxHP = maxHP;
     this.HP = HP;
     this.X = X;
     this.Y = Y;
+    this.Speed = speed;
     this.Angle = angle;
+    this.AngleSpeed = angleSpeed;
     this.Size = size;
     this.Image = image;                     // Индекс имени файла-изображения (для массива imgShipShortName)
     this.VectorMove = vectorMove;
     this.VectorRotate = vectorRotate;
     this.Delay = delay;
+    this.Kill = kill || 0;
+    this.Death = death || 0;
     this.Bombs = [];
 }
 
@@ -45,9 +50,9 @@ Ship.prototype.RotateCW = function (angle) {
     GAME.Context.restore();
 };
 
-Ship.prototype.MoveForward = function (speed) {
-    var vx = Math.cos(this.Angle) * speed;
-    var vy = Math.sin(this.Angle) * speed;
+Ship.prototype.MoveForward = function () {
+    var vx = Math.cos(this.Angle) * this.Speed;
+    var vy = Math.sin(this.Angle) * this.Speed;
     this.X += vx;
     this.Y += vy;
     this.X = Math.round(this.X * 100) / 100;
@@ -55,9 +60,9 @@ Ship.prototype.MoveForward = function (speed) {
     this.CheckReappear();   // If the ship reaches any border of the GAME, it appears on the opposite side of the GAME
 };
 
-Ship.prototype.MoveBackward = function (speed) {
-    var vx = Math.cos(this.Angle) * speed;
-    var vy = Math.sin(this.Angle) * speed;
+Ship.prototype.MoveBackward = function () {
+    var vx = Math.cos(this.Angle) * this.Speed;
+    var vy = Math.sin(this.Angle) * this.Speed;
     this.X -= vx;
     this.Y -= vy;
     this.X = Math.round(this.X * 100) / 100;
@@ -104,6 +109,7 @@ Ship.prototype.Show = function () {
 
     var centerShipX = this.GetCenterX();
     var centerShipY = this.GetCenterY();
+
     var lineHP = (this.HP / this.MaxHP) * this.Size;
 
     if (this.Type.indexOf("dominator") != -1) {
@@ -116,12 +122,21 @@ Ship.prototype.Show = function () {
     }
 
     if (this.Name == SHIP.MyShip.Name) {    // Если наш корабль - подсвечиваем его
-        GAME.Context.beginPath();
-        GAME.Context.arc(centerShipX, centerShipY, this.Size * 0.8, -Math.PI / 4, -3 * Math.PI / 4, true);      // arc(x, y, radius, startAngle, endAngle)
-        GAME.Context.arc(centerShipX, centerShipY, this.Size * 0.75, -3 * Math.PI / 4, -Math.PI / 4);
-        GAME.Context.closePath();
-        GAME.Context.fill();
-
+        if (state.indexOf("Start") != -1) { // Если reloading - то сначала концентрические круги
+            var step = parseInt(state.slice(5));
+            //GAME.Context.arc(centerShipX, centerShipY, this.Size * (20 - step) / 10, 0, 2 * Math.PI, false);
+            GAME.Context.beginPath();
+            GAME.Context.arc(centerShipX, centerShipY, this.Size * (25 - step) / 5, 0, 2 * Math.PI);      // arc(x, y, radius, startAngle, endAngle, CCW)
+            GAME.Context.closePath();
+            GAME.Context.fill();
+        }
+        else {
+            GAME.Context.beginPath();
+            GAME.Context.arc(centerShipX, centerShipY, this.Size * 0.8, -Math.PI / 4, -3 * Math.PI / 4, true);      // arc(x, y, radius, startAngle, endAngle)
+            GAME.Context.arc(centerShipX, centerShipY, this.Size * 0.75, -3 * Math.PI / 4, -Math.PI / 4);
+            GAME.Context.closePath();
+            GAME.Context.fill();
+        }
 
         // Обновили полосу HP на панели Sidebar
         var currentShipHPValue = document.getElementById('CurrentShipHPValue');
