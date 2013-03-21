@@ -114,7 +114,7 @@ Ship.prototype.Show = function () {
         GAME.Context.fillStyle = "#00BB00";
     }
 
-    if (this.ID == GAME.SessionId) {    // Если наш корабль - подсвечиваем его
+    if (this.ID == SHIP.MyShip.ID) {    // Если наш корабль - подсвечиваем его
         if (state.indexOf("Start") != -1) { // Если reloading - то сначала концентрические круги
             var step = parseInt(state.slice(5));
             //GAME.Context.arc(centerShipX, centerShipY, this.Size * (20 - step) / 10, 0, 2 * Math.PI, false);

@@ -1,7 +1,6 @@
 ﻿var GAME = (function () {
     var my = {};
     my.ServerName = $('body').attr('data-server');
-    my.SessionId = "";
     my.ImagePath = "http://" + my.ServerName + "/Game/Content/Images/";
     my.SyncRate = 16;
     my.IntervalID = 0;    // для setInterval

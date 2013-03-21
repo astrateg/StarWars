@@ -50,16 +50,16 @@ function InitDominators() {
 // Ship construstor: Ship(id, name, type, maxHP, HP, X, Y, speed, angle, angleSpeed, size, image, vectorMove, vectorRotate, delay, shoot, kill, death)
 // delay, shoot, kill, death - not required parameters
 
-function LoadShips(ships) {
+function LoadShips(ships, id) {
     if (ships[0] != null) {
         for (var i = 0; i < ships.length; i++) {
             // Если корабль неактивен, пропускаем его - не показываем на карте и на левой панели
-            if (ships[i].VectorMove == "Inactive") {
-                continue;
-            }
+            //if (ships[i].VectorMove == "Inactive") {
+            //    continue;
+            //}
             var imageIndex = parseInt(ships[i].Image);
             var userName = ships[i].Name;
-            if (ships[i].ID == GAME.SessionId) {
+            if (ships[i].ID == id) {
                 if (userName.length == 0) {
                     userName = prompt("Введите свое имя (не более 8 символов)");
                     if (userName.length > 8) {
@@ -69,6 +69,7 @@ function LoadShips(ships) {
                     REQUESTS.UpdateUserName(userName);
                 }
 
+                SHIP.MyShip.ID = id;
                 SHIP.MyShip.Name = userName;
                 SHIP.MyShip.X = ships[i].X; // X, Y - для центрирования карты по кораблю
                 SHIP.MyShip.Y = ships[i].Y;
@@ -195,7 +196,7 @@ function Synchronize() {
         for (var i = 0; i < serverShipsCount; i++) {
 
             // *** Смещение карты (если это наш корабль) ***
-            if (data.ships[i].ID == GAME.SessionId) {
+            if (data.ships[i].ID == SHIP.MyShip.ID) {
 
                 // Старые координаты ЦЕНТРА корабля
                 var x = SHIP.MyShip.X + SHIP.ShipSize / 2 - GAME.SpaceShiftX;
@@ -564,8 +565,7 @@ window.onload = function () {
     var request = REQUESTS.InitShips();
 
     request.done(function (data) {
-        GAME.SessionId = data.sessionId;
-        LoadShips(data.ships);
+        LoadShips(data.ships, data.id);
         CenterSpaceToShip();
         //InitDominators();
 
