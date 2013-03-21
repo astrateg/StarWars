@@ -112,6 +112,7 @@
     <Compile Include="Models\Game.cs" />
     <Compile Include="Models\Ship.cs" />
     <Compile Include="Models\Space.cs" />
+    <Compile Include="Models\Utils.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
@@ -164,16 +165,21 @@
     <Content Include="Content\Images\Weapons\weapon-bomb02-green.png" />
     <Content Include="Content\Images\Weapons\weapon-missile01-blue.png" />
     <Content Include="Content\Images\Weapons\weapon-missile01-green.png" />
-    <Content Include="Content\Scripts\bombs.js" />
+    <Content Include="Content\Scripts\Prototypes\bombs.js" />
     <Content Include="Content\Scripts\init.js" />
-    <Content Include="Content\Scripts\jquery-1.8.0.js" />
-    <Content Include="Content\Scripts\jquery-1.8.0.min.js" />
-    <Content Include="Content\Scripts\planets.js" />
-    <Content Include="Content\Scripts\ships.js" />
+    <Content Include="Content\Scripts\Modules\game.js" />
+    <Content Include="Content\Scripts\Modules\ship.js" />
+    <Content Include="Content\Scripts\Modules\space.js" />
+    <Content Include="Content\Scripts\Modules\utils.js" />
+    <Content Include="Content\Scripts\Prototypes\planets.js" />
+    <Content Include="Content\Scripts\Modules\requests.js" />
+    <Content Include="Content\Scripts\Prototypes\ships.js" />
     <Content Include="Content\Site.css" />
     <Content Include="Content\ToDoList.txt" />
     <Content Include="Global.asax" />
-    <Content Include="Web.config" />
+    <Content Include="Web.config">
+      <SubType>Designer</SubType>
+    </Content>
     <Content Include="Web.Debug.config">
       <DependentUpon>Web.config</DependentUpon>
     </Content>

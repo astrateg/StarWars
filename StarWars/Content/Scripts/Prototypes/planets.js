@@ -6,16 +6,16 @@
 function Sun(name, size, image, rotationAngle) {
     this.Name = name;
     this.Size = size;
-    this.CenterX = GAME.Canvas.width / 2;
-    this.CenterY = GAME.Canvas.height / 2;
+    this.CenterX = GAME.SpaceWidth / 2 - GAME.SpaceShiftX;
+    this.CenterY = GAME.SpaceHeight / 2 - GAME.SpaceShiftY;
     this.Image = image;
     this.AngleStart = 0;
     this.RotationAngle = rotationAngle;
 }
 
 Sun.prototype.GetCenter = function () {
-    this.CenterX = GAME.Canvas.width / 2;
-    this.CenterY = GAME.Canvas.height / 2;
+    this.CenterX = GAME.SpaceWidth / 2 - GAME.SpaceShiftX;
+    this.CenterY = GAME.SpaceHeight / 2 - GAME.SpaceShiftY;
 };
 
 Sun.prototype.GetAngle = function (dateDelta) {

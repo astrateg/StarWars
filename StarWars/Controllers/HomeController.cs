@@ -44,35 +44,83 @@ namespace StarWars.Controllers {
         }
 
         public JsonResult InitShips() {
+            Ship myShip;
             if (Session["Ship"] == null) {
                 HttpCookie cookie = Request.Cookies["Ship"];
                 if (cookie == null) {
                     cookie = new HttpCookie("Ship");
                     cookie.Value = Session.SessionID;
                     cookie.Expires = DateTime.Now.AddDays(1);
-                    this.ControllerContext.HttpContext.Response.Cookies.Add(cookie);
+                    Response.Cookies.Add(cookie);
                 }
                 Session["Ship"] = cookie.Value;
+                myShip = CreateShip(Session["Ship"].ToString());
+                Game.Instance.AddShip(myShip);
+            }
+            else {
+                myShip = Game.Instance.ShipList.FirstOrDefault(s => s.ID == Session["Ship"].ToString());
+                if (myShip != null) {
+                    myShip.VectorMove = "Stop";
+                    myShip.VectorRotate = "Stop";
+                }
+                else {
+                    myShip = CreateShip(Session["Ship"].ToString());
+                    Game.Instance.AddShip(myShip);
+                }
             }
 
-            // Для ID корабля (пока что Имя - это то же самое, что и id)
             var response = new {
                 sessionId = Session["Ship"],
-                ships = Game.Instance.ShipList
+                ships = Game.Instance.ShipListActive,
             };
             return Json(response, JsonRequestBehavior.AllowGet);
         }
 
         [HttpPost]
-        public JsonResult Synchronize(Ship newShip) {
-            var cheat = Game.Instance.UpdateShipList(newShip);
-            var response = new {
-                timeFromStart = Game.Instance.TimeFromStart,
-                ships = Game.Instance.ShipList,
-                c = (cheat) ? 1 : 0
-            };
-            return Json(response);
+        public void UpdateUserName(string userName) {
+            string id = Session["Ship"].ToString();
+            Game.Instance.UpdateShipList(id, "Name", userName);
         }
 
+        [HttpPost]
+        public void UpdateUserShip(string name, string value) {
+            string id = Session["Ship"].ToString();
+            Game.Instance.UpdateShipList(id, name, value);
+        }
+
+        [HttpPost]
+        public void DeactivateUserShip() {
+            string id = Session["Ship"].ToString();
+            Game.Instance.UpdateShipList(id, "VectorMove", "Inactive");
+            Game.Instance.UpdateShipList(id, "VectorRotate", "Inactive");
+        }
+
+        public JsonResult GetShips() {
+            var response = new {
+                timeFromStart = Game.Instance.TimeFromStart,
+                ships = Game.Instance.ShipListActive
+            };
+            return Json(response, JsonRequestBehavior.AllowGet);
+        }
+
+        [NonAction]
+        public Ship CreateShip(string id) {
+            string name = "";
+            string type = "ranger";
+            double maxHP = Ship.ShipMaxHP;
+            double HP = Ship.ShipMaxHP;
+            double X = 0;
+            double Y = 0;
+            int speed = Ship.ShipSpeed;
+            double angle = 0;
+            double angleSpeed = Ship.ShipAngleSpeed;
+            int size = Ship.ShipSize;
+            int image = 0;
+            string vectorMove = "Stop";
+            string vectorRotate = "Stop";
+            Ship ship = new Ship(id, name, type, maxHP, HP, X, Y, speed, angle, angleSpeed, size, image, vectorMove, vectorRotate, null, null, null, null);
+
+            return ship;
+        }
     }
 }
