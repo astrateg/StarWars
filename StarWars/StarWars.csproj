@@ -110,6 +110,7 @@
     </Compile>
     <Compile Include="Models\Bomb.cs" />
     <Compile Include="Models\Game.cs" />
+    <Compile Include="Models\Logger.cs" />
     <Compile Include="Models\Ship.cs" />
     <Compile Include="Models\Space.cs" />
     <Compile Include="Models\Utils.cs" />
@@ -165,18 +166,19 @@
     <Content Include="Content\Images\Weapons\weapon-bomb02-green.png" />
     <Content Include="Content\Images\Weapons\weapon-missile01-blue.png" />
     <Content Include="Content\Images\Weapons\weapon-missile01-green.png" />
-    <Content Include="Content\Scripts\Prototypes\bombs.js" />
-    <Content Include="Content\Scripts\init.js" />
-    <Content Include="Content\Scripts\Modules\game.js" />
-    <Content Include="Content\Scripts\Modules\ship.js" />
-    <Content Include="Content\Scripts\Modules\space.js" />
-    <Content Include="Content\Scripts\Modules\utils.js" />
-    <Content Include="Content\Scripts\Prototypes\planets.js" />
-    <Content Include="Content\Scripts\Modules\requests.js" />
-    <Content Include="Content\Scripts\Prototypes\ships.js" />
+    <Content Include="Scripts\main.js" />
+    <Content Include="Scripts\Prototypes\bombs.js" />
+    <Content Include="Scripts\Modules\game.js" />
+    <Content Include="Scripts\Modules\ship.js" />
+    <Content Include="Scripts\Modules\space.js" />
+    <Content Include="Scripts\Modules\utils.js" />
+    <Content Include="Scripts\Modules\requests.js" />
+    <Content Include="Scripts\Prototypes\ships.js" />
     <Content Include="Content\Site.css" />
     <Content Include="Content\ToDoList.txt" />
     <Content Include="Global.asax" />
+    <Content Include="Scripts\r.js" />
+    <Content Include="Scripts\require.js" />
     <Content Include="Web.config">
       <SubType>Designer</SubType>
     </Content>

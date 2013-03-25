@@ -8,22 +8,32 @@
 <head>
 	<meta name="viewport" content="width=device-width" />
 	<link rel="stylesheet" type="text/css" href="~/Content/Site.css">
-	<script src="http://code.jquery.com/jquery-latest.min.js" type="text/javascript"></script>
 	<title>Star Wars</title>
 </head>
-<body data-server="@ViewBag.ServerName">
-	<script src="~/Content/Scripts/Prototypes/planets.js"></script>
-	<script src="~/Content/Scripts/Prototypes/ships.js"></script>
-	<script src="~/Content/Scripts/Prototypes/bombs.js"></script>
+<body>
+    <div id="Sidebar">
+        <div id="SelectShip"></div>
+        <div id="CurrentShip">
+            <div id="CurrentShipHP">
+                <div id="CurrentShipHPValue">
 
-	<script src="~/Content/Scripts/Modules/requests.js"></script>
-	<script src="~/Content/Scripts/Modules/utils.js"></script>
+                </div>
+            </div>
+        </div>
 
-	<script src="~/Content/Scripts/Modules/game.js"></script>
-	<script src="~/Content/Scripts/Modules/space.js"></script>
-	<script src="~/Content/Scripts/Modules/ship.js"></script>
+        <table id="Statistics">
+            <tbody>
+                <tr id="StatHeader">
+                    <td class="StatShip">Ship</td>
+                    <td class="StatPlayer">Player</td>
+                    <td class="StatKill">+</td>
+                    <td class="StatDeath">-</td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
 
-	<script src="~/Content/Scripts/init.js"></script>
+    <script data-main="Game/Scripts/main" src="~/Scripts/require.js"></script>
 </body>
 
 </html>

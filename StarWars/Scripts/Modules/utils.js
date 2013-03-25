@@ -1,4 +1,4 @@
-﻿var UTILS = (function () {
+﻿define(['Modules/game'], function (GAME) {
     var my = {};
 
     // Generating random int number for fetching random image from array of dominator ships
@@ -8,15 +8,15 @@
 
     // Generating random X-coordinate in one of the 4th corners (i.e. Left or Right)
     my.RandomStartX = function () {
-        var randomX = UTILS.GetRandomInt(200, 400);
-        var randomLeft = UTILS.GetRandomInt(0, 1);
+        var randomX = my.GetRandomInt(200, 400);
+        var randomLeft = my.GetRandomInt(0, 1);
         return (randomLeft) ? randomX : (GAME.Canvas.width - randomX);
     }
 
     // Generating random Y-coordinate in one of the 4th corners (i.e. Top or Bottom)
     my.RandomStartY = function () {
-        var randomY = UTILS.GetRandomInt(200, 400);
-        var randomTop = UTILS.GetRandomInt(0, 1);
+        var randomY = my.GetRandomInt(200, 400);
+        var randomTop = my.GetRandomInt(0, 1);
         return (randomTop) ? randomY : (GAME.Canvas.height - randomY);
     }
 
@@ -33,4 +33,4 @@
     //}
 
     return my;
-})();
+});

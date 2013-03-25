@@ -9,14 +9,15 @@ namespace StarWars.Models {
     public sealed class Game {
         //Singleton Pattern
         private static readonly Game _instance = new Game();
-        public static int SyncRate { get { return 10; } }
-        public static int SpaceWidth { get { return 2560; } }
-        public static int SpaceHeight { get { return 1600; } }
+        public static int SyncRate      { get { return 10; } }
+        public static int SidebarWidth  { get { return 225; } }
+        public static int SpaceWidth    { get { return 2560; } }
+        public static int SpaceHeight   { get { return 1600; } }
 
         private static Timer _timer;
         private static DateTime _startTime;
         private static List<Ship> _ships;
-        private static Dictionary<string, DateTime> _timesOfLastActivity = new Dictionary<string, DateTime>();
+        private Object thisLock = new Object();
 
         private Game() { 
             _startTime = DateTime.Now;
@@ -45,7 +46,7 @@ namespace StarWars.Models {
         public IEnumerable<Ship> ShipListActive {
             get {
                 var ships = _ships
-                    .Where(s => s.VectorMove != "Inactive")
+                    .Where(s => s.State != "Inactive")
                     .Select(s => { s.Clone(); return s; });
                 return ships;
             }
@@ -58,79 +59,61 @@ namespace StarWars.Models {
         }
 
         public void AddShip(Ship ship) {
-            _ships.Add(ship);
+            lock (thisLock) {
+                _ships.Add(ship);
+            }
         }
 
-        public void UpdateShipList(string id, string propertyName, string propertyValue) {
+        public void UpdateUserName(int id, string name) {
             Ship oldShip = _ships.FirstOrDefault(s => s.ID == id);
+            oldShip.Name = name;
+        }
+
+        public void UpdateUserShip(int id, string propertyName, int propertyValue) {
+            Ship ship = _ships.FirstOrDefault(s => s.ID == id);
+            ship.LastActivity = DateTime.Now;
 
             switch (propertyName) {
-                case "Name":
-                    oldShip.Name = propertyValue;
-                    break;
                 case "VectorMove":
-                    oldShip.VectorMove = propertyValue;
+                    ship.VectorMove = propertyValue;
                     break;
                 case "VectorRotate":
-                    oldShip.VectorRotate = propertyValue;
+                    ship.VectorRotate = propertyValue;
                     break;
                 case "Shoot":
-                    oldShip.Shoot = int.Parse(propertyValue);
+                    ship.Shoot = propertyValue;
                     break;
                 case "Image":
-                    oldShip.Image = int.Parse(propertyValue);
+                    ship.Image = propertyValue;
                     break;
                 default:
                     break;
-            }
-            // *** Reflection - отменяется для повышения производительности ***
-            //PropertyInfo propertyInfo = oldShip.GetType().GetProperty(propertyName);
-            //propertyInfo.SetValue(oldShip, Convert.ChangeType(propertyValue, propertyInfo.PropertyType));   // Конвертируем, т.к. не все свойства имеют тип string (Image - int)
-
-            if (propertyValue != "Inactive") {
-                _timesOfLastActivity[id] = DateTime.Now;
-
-                foreach (var ship in _ships) {
-                    var delayInMilliseconds = (int)(DateTime.Now - _timesOfLastActivity[ship.ID]).TotalMilliseconds;
-                    ship.Delay = delayInMilliseconds;
-
-                    // Если задержка больше 1 сек, останавливаем этот корабль
-                    if (delayInMilliseconds > 1000) {
-                        ship.VectorMove = "Stop";
-                        ship.VectorRotate = "Stop";
-                    }
-
-                    // Inactive не делаем - корабль станет неактивным, когда закрыта вкладка браузера (событие window.beforeunload)
-                    //if (delayInMilliseconds > 30000) {
-                    //    ship.VectorMove = "Inactive";
-                    //    ship.VectorMove = "Inactive";
-                    //}
-                }
             }
         }
 
         // Timer
         public void UpdateGameState(object state) {
-            foreach (Ship ship in _ships) {
-                string vectorMove = ship.VectorMove;
-                string vectorRotate = ship.VectorRotate;
+            lock (thisLock) {
+                foreach (Ship ship in _ships) {
 
-                switch (vectorMove) {
-                    case "MoveForward":
-                        ship.MoveForward();
-                        break;
-                    case "MoveBackward":
-                        ship.MoveBackward();
-                        break;
-                }
+                    var delayInMilliseconds = (int)(DateTime.Now - ship.LastActivity).TotalMilliseconds;
 
-                switch (vectorRotate) {
-                    case "RotateCW":
-                        ship.RotateCW();
-                        break;
-                    case "RotateCCW":
-                        ship.RotateCCW();
-                        break;
+                    if (delayInMilliseconds > 1000) {
+                        ship.State = "Inactive";
+                        continue;
+                    }
+
+                    if (ship.State == "Active") {
+                        ship.CheckSunAndShip();
+                    }
+
+                    ship.GenerateExplodes();
+
+                    if (ship.State == "Active") {
+                        ship.Move(ship.VectorMove);
+                        ship.Rotate(ship.VectorRotate);
+                        ship.Regenerate();
+                    }
                 }
             }
         }

@@ -11,12 +11,23 @@ namespace StarWars.Controllers {
     [SessionState(SessionStateBehavior.Disabled)]
     public class HomeController : Controller {
         public ActionResult Index() {
-            ViewBag.ServerName = Game.Instance.ServerName;
+            //ViewBag.ServerName = Game.Instance.ServerName;
             return View();
         }
 
         // Разделяем инициализацию для космоса (InitShips) и кораблей (InitSpace)
         // (иначе не получится в Javascript развести их по модулям - SPACE и SHIPS)
+
+        public JsonResult InitGame() {
+            var response = new {
+                syncRate = Game.SyncRate,
+                sidebarWidth = Game.SidebarWidth,
+                spaceWidth = Game.SpaceWidth,
+                spaceHeight = Game.SpaceHeight
+            };
+
+            return Json(response, JsonRequestBehavior.AllowGet);
+        }
 
         public JsonResult InitSpace() {
             var response = new {
@@ -40,7 +51,8 @@ namespace StarWars.Controllers {
                 bombSize = Ship.BombSize,
                 bombSpeed = Ship.BombSpeed,
                 sunHP = Ship.SunHP,
-                regenerateHP = Ship.RegenerateHP
+                regenerateHP = Ship.RegenerateHP,
+                syncRate = Game.SyncRate
             };
             return Json(response, JsonRequestBehavior.AllowGet);
         }
@@ -54,17 +66,19 @@ namespace StarWars.Controllers {
                 cookie.Value = Game.Instance.TimeFromStart.ToString();
                 cookie.Expires = DateTime.Now.AddDays(1);
                 Response.Cookies.Add(cookie);
-                myShip = CreateShip(cookie.Value);
+                myShip = CreateShip(int.Parse(cookie.Value));
                 Game.Instance.AddShip(myShip);
             }
             else {
-                myShip = Game.Instance.ShipList.FirstOrDefault(s => s.ID == cookie.Value);
+                myShip = Game.Instance.ShipList.FirstOrDefault(s => s.ID == int.Parse(cookie.Value));
                 if (myShip != null) {
-                    myShip.VectorMove = "Stop";
-                    myShip.VectorRotate = "Stop";
+                    myShip.VectorMove = 0;
+                    myShip.VectorRotate = 0;
+                    myShip.State = "Active";
+                    myShip.LastActivity = DateTime.Now;
                 }
                 else {
-                    myShip = CreateShip(cookie.Value);
+                    myShip = CreateShip(int.Parse(cookie.Value));
                     Game.Instance.AddShip(myShip);
                 }
             }
@@ -78,36 +92,38 @@ namespace StarWars.Controllers {
 
         [HttpPost]
         public void UpdateUserName(string userName) {
-            HttpCookie cookie = Request.Cookies["Ship"];
-            string id = cookie.Value;
-            Game.Instance.UpdateShipList(id, "Name", userName);
+            int id = GetIdByCookie();
+            Game.Instance.UpdateUserName(id, userName);
         }
 
         [HttpPost]
-        public void UpdateUserShip(string name, string value) {
-            HttpCookie cookie = Request.Cookies["Ship"];
-            string id = cookie.Value;
-            Game.Instance.UpdateShipList(id, name, value);
+        public void UpdateUserShip(string name, int value) {
+            int id = GetIdByCookie();
+            Game.Instance.UpdateUserShip(id, name, value);
         }
 
         [HttpPost]
         public void DeactivateUserShip() {
-            HttpCookie cookie = Request.Cookies["Ship"];
-            string id = cookie.Value;
-            Game.Instance.UpdateShipList(id, "VectorMove", "Inactive");
-            Game.Instance.UpdateShipList(id, "VectorRotate", "Inactive");
+            Ship myShip = GetShipByCookie();
+            myShip.VectorMove = 0;
+            myShip.VectorRotate = 0;
+            myShip.State = "Inactive";
         }
 
         public JsonResult GetShips() {
+            Ship myShip = GetShipByCookie();
+            myShip.LastActivity = DateTime.Now;
+
             var response = new {
                 timeFromStart = Game.Instance.TimeFromStart,
                 ships = Game.Instance.ShipListActive
             };
+            //Logger.WriteToLogFile(dateBegin, DateTime.Now);
             return Json(response, JsonRequestBehavior.AllowGet);
         }
 
         [NonAction]
-        public Ship CreateShip(string id) {
+        public Ship CreateShip(int id) {
             string name = "";
             string type = "ranger";
             double maxHP = Ship.ShipMaxHP;
@@ -119,11 +135,21 @@ namespace StarWars.Controllers {
             double angleSpeed = Ship.ShipAngleSpeed;
             int size = Ship.ShipSize;
             int image = 0;
-            string vectorMove = "Stop";
-            string vectorRotate = "Stop";
-            Ship ship = new Ship(id, name, type, maxHP, HP, X, Y, speed, angle, angleSpeed, size, image, vectorMove, vectorRotate, null, null, null, null);
+            Ship ship = new Ship(id, name, type, maxHP, HP, X, Y, speed, angle, angleSpeed, size, image);
 
             return ship;
+        }
+
+        [NonAction]
+        public Ship GetShipByCookie() {
+            HttpCookie cookie = Request.Cookies["Ship"];
+            return Game.Instance.ShipList.FirstOrDefault(s => s.ID == int.Parse(cookie.Value));
+        }
+
+        [NonAction]
+        public int GetIdByCookie() {
+            HttpCookie cookie = Request.Cookies["Ship"];
+            return int.Parse(cookie.Value);
         }
     }
 }

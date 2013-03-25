@@ -7,8 +7,8 @@ using System.Web.Optimization;
 namespace StarWars {
     public class BundleConfig {
         public static void RegisterBundles(BundleCollection bundles) {
-            bundles.Add(new ScriptBundle("~/bundles/jquery").Include(
-                        "~/Content/Scripts/jquery-{version}.js"));
+            //bundles.Add(new ScriptBundle("~/bundles/jquery").Include(
+            //            "~/Content/Scripts/jquery-{version}.js"));
 
             //bundles.Add(new StyleBundle("~/Content/css").Include("~/Content/site.css"));
         }

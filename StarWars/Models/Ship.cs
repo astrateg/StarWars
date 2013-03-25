@@ -1,8 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Runtime.Serialization;
+//using System.Runtime.Serialization;
 using System.Web;
+using System.Web.Script.Serialization;
 
 namespace StarWars.Models
 {
@@ -16,40 +17,53 @@ namespace StarWars.Models
 
 		public static int BombHP { get { return 50;} }
 		public static int BombSize { get { return 24;} }
-		public static int BombSpeed { get { return 10;} }
+		public static int BombSpeed { get { return 5;} }
 		public static int BombMaxCount { get { return 5; } }
 
 		public static int SunHP { get { return 1;} }
 		public static double RegenerateHP { get { return 0.1;} }
 
 		// Properties
-		public string ID { get; set; }
+		public int ID { get; set; }
 		public string Name { get; set; }
 		public string Type { get; set; }
+        public string State { get; set; }
 		public double MaxHP { get; set; }
 		public double HP { get; set; }
 		public double X { get; set; }
 		public double Y { get; set; }
-		public int Speed { get; set; }
-		public double Angle { get; set; }
-		public double AngleSpeed { get; set; }
-		public double Start { get; set; }
+        [ScriptIgnore]
+        public int Speed { get; set; }
+        public double Angle { get; set; }
+        [ScriptIgnore]
+        public double AngleSpeed { get; set; }
+		//public double Start { get; set; }
 		public int Size { get; set; }
 		public int Image { get; set; }
-		public string VectorMove { get; set; }
-		public string VectorRotate { get; set; }
-		public int Delay { get; set; }
-		public int Shoot { get; set; }
+        [ScriptIgnore]
+        public int VectorMove { get; set; }      // 1 (Forward) | -1 (Backward) | 0 (Stop)
+        [ScriptIgnore]
+        public int VectorRotate { get; set; }    // 1 (CW) | -1 (CCW) | 0 (Stop)
+        [ScriptIgnore]
+        public DateTime LastActivity { get; set; }
+        [ScriptIgnore]
+        public int Shoot { get; set; }              // 1 (Shoot) | 0
 		public int Kill { get; set; }
 		public int Death { get; set; }
 		public List<Bomb> Bombs { get; set; }
 
-		public Ship(string id, string name, string type, double maxHP, double HP, double X, double Y, int speed, double angle, double angleSpeed, 
-					int size, int image, string vectorMove, string vectorRotate, int? delay, int? shoot, int? kill, int? death) {
+        // *** Ship Center Coordinates ***
+        [ScriptIgnore]
+        public double GetCenterX { get { return this.X + this.Size / 2; } }
+        [ScriptIgnore]
+        public double GetCenterY { get { return this.Y + this.Size / 2; } }
+
+        public Ship(int id, string name, string type, double maxHP, double HP, double X, double Y, int speed, double angle, double angleSpeed, int size, int image) {
 			this.ID = id;
 			this.Name = name;
 			this.Type = type;
-			this.MaxHP = maxHP;
+            this.State = "Active";
+            this.MaxHP = maxHP;
 			this.HP = HP;
 			this.X = X;
 			this.Y = Y;
@@ -58,25 +72,17 @@ namespace StarWars.Models
 			this.AngleSpeed = angleSpeed;
 			this.Size = size;
 			this.Image = image;                     // Индекс имени файла-изображения (для массива imgShipShortName)
-			this.VectorMove = vectorMove;
-			this.VectorRotate = vectorRotate;
-			this.Delay = (delay != null) ? (int)delay : 0;
-			this.Shoot = (shoot != null) ? (int)shoot : 0;
-			this.Kill = (kill != null) ? (int)kill : 0;
-			this.Death = (death != null) ? (int)death : 0;
+			this.VectorMove = 0;
+			this.VectorRotate = 0;
+			this.LastActivity = DateTime.Now;
+			this.Shoot = 0;
+			this.Kill = 0;
+			this.Death = 0;
 			this.Bombs = new List<Bomb>();
 		}
 
 		// *** Move & Rotate ***
-		public void MoveForward() {
-			this.TryMove(1);
-		}
-
-		public void MoveBackward() {
-			this.TryMove(-1);
-		}
-
-		public void TryMove(int direction) {
+		public void Move(int direction) {
 			var vx = Math.Cos(this.Angle) * this.Speed;
 			var vy = Math.Sin(this.Angle) * this.Speed;
 			
@@ -113,15 +119,10 @@ namespace StarWars.Models
 			}
 		}
 
-		public void RotateCW() {
-			this.Angle += this.AngleSpeed;
-			this.Angle = Math.Round(this.Angle, 2);
-		}
-
-		public void RotateCCW() {
-			this.Angle -= this.AngleSpeed;
-			this.Angle = Math.Round(this.Angle, 2);
-		}
+        public void Rotate(int direction) {
+            this.Angle += this.AngleSpeed * direction;
+            this.Angle = Math.Round(this.Angle, 2);
+        }
 
 		// *** Bombs ***
 		public double GetNewBombX() {
@@ -141,7 +142,24 @@ namespace StarWars.Models
 			}
 		}
 
+		// Check colliding ships with sun
+		public void CheckSunAndShip() {
+			if (this.State.Contains("Explode")) {
+				return;
+			}
 
+			double distance = Math.Sqrt(Math.Pow(Space.Sun.CenterX - this.GetCenterX, 2) + Math.Pow(Space.Sun.CenterY - this.GetCenterY, 2));
+			if (distance < Space.Sun.Size / 2) {
+				this.HP -= Ship.SunHP;           // Если да, уменьшаем HP корабля
+				if (this.HP <= 0) {
+					this.HP = 0;
+					this.Death++;
+					this.State = "Explode000";              // Взрыв проверяется только по свойству VectorMove (для определенности)
+                    this.VectorMove = 0;
+                    this.VectorRotate = 0;
+				}
+			}
+		}
 
 			// Generating my ship if it isn't found
 			//randomIndex = UTILS.GetRandomInt(0, SHIP.RangerImagesMax - 1);
@@ -154,12 +172,65 @@ namespace StarWars.Models
 			//        userName = userName.slice(0, 8);
 			//    }
 			//    userName = encodeURIComponent(userName);
-			//    SHIP.MyShip = new Ship(GAME.SessionId, userName, "ranger", SHIP.ShipMaxHP, SHIP.ShipMaxHP, shipX1, shipY1, SHIP.ShipSpeed, shipAngle1, SHIP.ShipAngleSpeed, SHIP.ShipSize, randomIndex, "Stop", "Stop", 0);
+			//    this = new Ship(GAME.SessionId, userName, "ranger", SHIP.ShipMaxHP, SHIP.ShipMaxHP, shipX1, shipY1, SHIP.ShipSpeed, shipAngle1, SHIP.ShipAngleSpeed, SHIP.ShipSize, randomIndex, "Stop", "Stop", 0);
 
 			//}
 
 		public object Clone() {
 			return this.MemberwiseClone();
 		}
+
+		public void Regenerate() {
+			if (this.HP < this.MaxHP) {
+				this.HP += Ship.RegenerateHP;    // Регенерировали
+			}
+			if (this.HP > this.MaxHP) {
+				this.HP = this.MaxHP;
+			}
+			else {
+				this.HP = Math.Round(this.HP, 2);
+			}
+		}
+
+        // *** Explodes Animation and Changing Explosion State ***
+        public void GenerateExplodes() {
+            string state = this.State;
+            if (state.Contains("Explode")) {    // If this ship is in the explosion state, increment explosion step (00 -> 01, 01 -> 02, etc.)
+                int Delay = state[9] - '0';
+                int X = state[8] - '0';
+                int Y = state[7] - '0';         // Converting from Char to Int. Another way: int X = int.Parse(state[0].ToString());
+
+                Delay++;
+                int DelayMax = 40 / Game.SyncRate;  // Result: int
+                if (Delay % DelayMax == 0) {
+                    X++;
+                    if (X % 3 == 0) {
+                        X = 0; Y++;
+                        if (Y > 3) {
+                            //this.X = UTILS.RandomStartX();
+                            //this.Y = UTILS.RandomStartY();
+                            this.X = 0;
+                            this.Y = 0;
+                            this.HP = this.MaxHP;
+                            this.State = "Start0";
+                            return;
+                        }
+                    }
+                }
+                this.State = "Explode" + Y + X + Delay;    // Next step of explosion
+            }
+            else if (state.Contains("Start")) {
+                int step = int.Parse(state.Substring(5));   // (00 -> 0, 01 -> 1, etc.)
+                step++;
+                if (step < 20) {
+                    this.State = "Start" + step;       // Next step of reloading
+                }
+                else {
+                    this.State = "Active";               // Reloading is finished
+                }
+            }
+        }
+
+
 	}
 }

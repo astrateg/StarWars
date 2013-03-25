@@ -10,12 +10,14 @@ namespace StarWars.Models
         public static class Sun
         {
             public static int Size { get { return 220; } }
-            public static double RotationAngle { get { return 0.002; } }
+            public static double RotationAngle { get { return 0.001; } }
+            public static double CenterX { get { return Game.SpaceWidth / 2; } }
+            public static double CenterY { get { return Game.SpaceHeight / 2; } }
         }
 
         private static int earthOrbitRadius = 200, marsOrbitRadius = 330, jupiterOrbitRadius = 460;
         private static double earthOrbitAngleStart = 0, marsOrbitAngleStart = Math.PI / 2, jupiterOrbitAngleStart = Math.PI;
-        private static double earthMoveAngle = 0.004, marsMoveAngle = -0.003, jupiterMoveAngle = 0.001;
+        private static double earthMoveAngle = 0.0004, marsMoveAngle = -0.0003, jupiterMoveAngle = 0.0001;
         //private static int earthSize = 50, marsSize = 40, jupiterSize = 95;
 
         public static List<Planet> Planets = new List<Planet>
