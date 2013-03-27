@@ -9,7 +9,7 @@ namespace StarWars.Models {
     public sealed class Game {
         //Singleton Pattern
         private static readonly Game _instance = new Game();
-        public static int SyncRate      { get { return 10; } }
+        public static int SyncRate      { get { return 5; } }
         public static int SidebarWidth  { get { return 225; } }
         public static int SpaceWidth    { get { return 2560; } }
         public static int SpaceHeight   { get { return 1600; } }
@@ -98,7 +98,7 @@ namespace StarWars.Models {
 
                     var delayInMilliseconds = (int)(DateTime.Now - ship.LastActivity).TotalMilliseconds;
 
-                    if (delayInMilliseconds > 2000) {
+                    if (delayInMilliseconds > 60000) {
                         ship.State = "Inactive";
                         continue;
                     }

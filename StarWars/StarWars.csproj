@@ -167,6 +167,7 @@
     <Content Include="Content\Images\Weapons\weapon-missile01-blue.png" />
     <Content Include="Content\Images\Weapons\weapon-missile01-green.png" />
     <Content Include="Scripts\main.js" />
+    <Content Include="Scripts\Modules\dominators.js" />
     <Content Include="Scripts\Prototypes\bombs.js" />
     <Content Include="Scripts\Modules\game.js" />
     <Content Include="Scripts\Modules\ship.js" />

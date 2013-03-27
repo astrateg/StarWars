@@ -36,10 +36,11 @@
 
     // Первый "корабельный" запрос к серверу для получения текущего списка кораблей и заполнения массива SHIP.Ships
     // (если нашего корабля еще нет, то он будет создан)
-    my.InitShips = function () {
+    my.InitShips = function (index) {
         var request = $.ajax({
             url: "http://" + location.hostname + "/game/Home/InitShips/",
-            type: "GET",
+            type: "POST",
+            data: { index: index },
             dataType: "json",
             cache: false
         });

@@ -155,7 +155,7 @@
 
 
         if (this.Angle == 0) {
-            GAME.Context.drawImage(this.GetImage(), this.X, this.Y);
+            GAME.Context.drawImage(this.GetImage(), this.X - GAME.SpaceShiftX, this.Y - GAME.SpaceShiftY);
         } else {
             // If Angle <> 0, have to rotate the ship ("Angle" - direction for moving & shooting)
             GAME.Context.save();

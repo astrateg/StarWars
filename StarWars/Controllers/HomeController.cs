@@ -43,44 +43,16 @@ namespace StarWars.Controllers {
         }
 
         public JsonResult InitShipConstants() {
-            var serializer = new JavaScriptSerializer();
-            var response = new {
-                Types = new {
-                    Type = serializer.Serialize(Ship.Ranger.Types.Type),
-                    HPStart = serializer.Serialize(Ship.Ranger.Types.HPStart),
-                    HPLimit = serializer.Serialize(Ship.Ranger.Types.HPLimit),
-                    SpeedStart = serializer.Serialize(Ship.Ranger.Types.SpeedStart),
-                    SpeedLimit = serializer.Serialize(Ship.Ranger.Types.SpeedLimit),
-                    AngleSpeedStart = serializer.Serialize(Ship.Ranger.Types.AngleSpeedStart),
-                    AngleSpeedLimit = serializer.Serialize(Ship.Ranger.Types.AngleSpeedLimit)
-                },
-                HPMult = Ship.Ranger.Mult.HPMult,
-                SpeedMult = Ship.Ranger.Mult.SpeedMult,
-                AngleSpeedMult = Ship.Ranger.Mult.AngleSpeedMult,
-                shipSize = Ship.ShipSize,
-
-                //bombHP = Ship.BombHP,
-                //bombSize = Ship.BombSize,
-                //bombSpeed = Ship.BombSpeed,
-
-                sunHP = Ship.SunHP,
-                regenerateHP = Ship.RegenerateHP,
-                syncRate = Game.SyncRate,
-            };
-            return Json(response, JsonRequestBehavior.AllowGet);
-        }
-
-        public JsonResult InitShips() {
             Ship myShip;
             HttpCookie cookie = Request.Cookies["Ship"];
+            int MyShipExists = 0;
+            int MyShipImageIndex = -1;
 
             if (cookie == null) {
                 cookie = new HttpCookie("Ship");
                 cookie.Value = Game.Instance.TimeFromStart.ToString();
                 cookie.Expires = DateTime.Now.AddDays(1);
                 Response.Cookies.Add(cookie);
-                myShip = CreateShip(int.Parse(cookie.Value));
-                Game.Instance.AddShip(myShip);
             }
             else {
                 myShip = Game.Instance.ShipList.FirstOrDefault(s => s.ID == int.Parse(cookie.Value));
@@ -89,18 +61,56 @@ namespace StarWars.Controllers {
                     myShip.VectorRotate = 0;
                     myShip.State = "Active";
                     myShip.LastActivity = DateTime.Now;
+                    MyShipExists = 1;
+                    MyShipImageIndex = myShip.Image;
                 }
-                else {
-                    myShip = CreateShip(int.Parse(cookie.Value));
-                    Game.Instance.AddShip(myShip);
-                }
+            }
+
+            //var serializer = new JavaScriptSerializer();
+            var response = new {
+                MyShipExists = MyShipExists,
+                MyShipImageIndex = MyShipImageIndex,
+                Types = new {
+                    Type = Ship.Ranger.Types.Type,
+                    HPStart = Ship.Ranger.Types.HPStart,
+                    HPLimit = Ship.Ranger.Types.HPLimit,
+                    SpeedStart = Ship.Ranger.Types.SpeedStart,
+                    SpeedLimit = Ship.Ranger.Types.SpeedLimit,
+                    AngleSpeedStart = Ship.Ranger.Types.AngleSpeedStart,
+                    AngleSpeedLimit = Ship.Ranger.Types.AngleSpeedLimit
+                    //Type = serializer.Serialize(Ship.Ranger.Types.Type),
+                    //...
+                },
+                HPMult = Ship.Ranger.Mult.HPMult,
+                SpeedMult = Ship.Ranger.Mult.SpeedMult,
+                AngleSpeedMult = Ship.Ranger.Mult.AngleSpeedMult,
+                ShipSize = Ship.ShipSize,
+
+                //bombHP = Ship.BombHP,
+                //bombSize = Ship.BombSize,
+                //bombSpeed = Ship.BombSpeed,
+
+                SunHP = Ship.SunHP,
+                RegenerateHP = Ship.RegenerateHP,
+                SyncRate = Game.SyncRate,
+            };
+            return Json(response, JsonRequestBehavior.AllowGet);
+        }
+
+        [HttpPost]
+        public JsonResult InitShips(int index) {
+            Ship myShip;
+            HttpCookie cookie = Request.Cookies["Ship"];
+            if (index > -1) {
+                myShip = CreateShip(int.Parse(cookie.Value), "noname", index);
+                Game.Instance.AddShip(myShip);
             }
 
             var response = new {
                 id = cookie.Value,
                 ships = Game.Instance.ShipListActive,
             };
-            return Json(response, JsonRequestBehavior.AllowGet);
+            return Json(response);
         }
 
         [HttpPost]
@@ -136,15 +146,13 @@ namespace StarWars.Controllers {
         }
 
         [NonAction]
-        public Ship CreateShip(int id) {
-            string name = "";
+        public Ship CreateShip(int id, string name, int index) {
             string type = "ranger";
-            int indexRanger = (new Random()).Next(9);
             double X = 0;
             double Y = 0;
             double angle = 0;
             int size = Ship.ShipSize;
-            Ship ship = new Ship(id, name, type, indexRanger, X, Y, angle, size);
+            Ship ship = new Ship(id, name, type, index, X, Y, angle, size);
 
             return ship;
         }
