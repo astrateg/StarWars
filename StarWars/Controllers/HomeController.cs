@@ -4,6 +4,7 @@ using System.Globalization;
 using System.Linq;
 using System.Web;
 using System.Web.Mvc;
+using System.Web.Script.Serialization;
 using System.Web.SessionState;
 using StarWars.Models;
 
@@ -42,17 +43,29 @@ namespace StarWars.Controllers {
         }
 
         public JsonResult InitShipConstants() {
+            var serializer = new JavaScriptSerializer();
             var response = new {
-                shipMaxHP = Ship.ShipMaxHP,
+                Types = new {
+                    Type = serializer.Serialize(Ship.Ranger.Types.Type),
+                    HPStart = serializer.Serialize(Ship.Ranger.Types.HPStart),
+                    HPLimit = serializer.Serialize(Ship.Ranger.Types.HPLimit),
+                    SpeedStart = serializer.Serialize(Ship.Ranger.Types.SpeedStart),
+                    SpeedLimit = serializer.Serialize(Ship.Ranger.Types.SpeedLimit),
+                    AngleSpeedStart = serializer.Serialize(Ship.Ranger.Types.AngleSpeedStart),
+                    AngleSpeedLimit = serializer.Serialize(Ship.Ranger.Types.AngleSpeedLimit)
+                },
+                HPMult = Ship.Ranger.Mult.HPMult,
+                SpeedMult = Ship.Ranger.Mult.SpeedMult,
+                AngleSpeedMult = Ship.Ranger.Mult.AngleSpeedMult,
                 shipSize = Ship.ShipSize,
-                shipSpeed = Ship.ShipSpeed,
-                shipAngleSpeed = Ship.ShipAngleSpeed,
-                bombHP = Ship.BombHP,
-                bombSize = Ship.BombSize,
-                bombSpeed = Ship.BombSpeed,
+
+                //bombHP = Ship.BombHP,
+                //bombSize = Ship.BombSize,
+                //bombSpeed = Ship.BombSpeed,
+
                 sunHP = Ship.SunHP,
                 regenerateHP = Ship.RegenerateHP,
-                syncRate = Game.SyncRate
+                syncRate = Game.SyncRate,
             };
             return Json(response, JsonRequestBehavior.AllowGet);
         }
@@ -126,16 +139,12 @@ namespace StarWars.Controllers {
         public Ship CreateShip(int id) {
             string name = "";
             string type = "ranger";
-            double maxHP = Ship.ShipMaxHP;
-            double HP = Ship.ShipMaxHP;
+            int indexRanger = (new Random()).Next(9);
             double X = 0;
             double Y = 0;
-            int speed = Ship.ShipSpeed;
             double angle = 0;
-            double angleSpeed = Ship.ShipAngleSpeed;
             int size = Ship.ShipSize;
-            int image = 0;
-            Ship ship = new Ship(id, name, type, maxHP, HP, X, Y, speed, angle, angleSpeed, size, image);
+            Ship ship = new Ship(id, name, type, indexRanger, X, Y, angle, size);
 
             return ship;
         }

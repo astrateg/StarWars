@@ -1,25 +1,24 @@
 ﻿define(['Modules/game', 'Modules/ship'], function (GAME, SHIP) {
-    //function Ship(id, name, type, maxHP, HP, X, Y, speed, angle, angleSpeed, size, image, vectorMove, vectorRotate, delay, shoot, kill, death) {
-    function Ship(id, name, type, state, maxHP, HP, X, Y, angle, size, image, kill, death) {
-        this.ID = id;
-        this.Name = name;
-        this.Type = type;
-        this.State = state;
-        this.MaxHP = maxHP;
-        this.HP = HP;
-        this.X = X;
-        this.Y = Y;
+    function Ship(args) {
+        this.ID = args.ID;
+        this.Name = args.Name;
+        this.Type = args.Type;
+        this.State = args.State;
+        this.HP = args.HP;
+        this.MaxHP = args.HPCurrent * SHIP.HPMult;
+        this.X = args.X;
+        this.Y = args.Y;
         //this.Speed = speed;
-        this.Angle = angle;
+        this.Angle = args.Angle;
         //this.AngleSpeed = angleSpeed;
-        this.Size = size;
-        this.Image = image;                     // Индекс имени файла-изображения (для массива imgShipShortName)
+        this.Size = args.Size;
+        this.Image = args.Image;                     // Индекс имени файла-изображения (для массива imgShipShortName)
         //this.VectorMove = vectorMove;
         //this.VectorRotate = vectorRotate;
         //this.Delay = delay || 0;
         //this.Shoot = shoot || 0;
-        this.Kill = kill || 0;
-        this.Death = death || 0;
+        this.Kill = args.Kill || 0;
+        this.Death = args.Death || 0;
         this.Bombs = [];
     }
 
@@ -31,7 +30,7 @@
         //    return SHIP.DominatorTypes.Images[indexType][this.Image];
         //}
 
-        return SHIP.RangerImages[this.Image];
+        return SHIP.Ranger.ImagesSmall[this.Image];
     };
 
     // *** Отработка движения корабля в случае, если очередной запрос не вернулся с сервера ***

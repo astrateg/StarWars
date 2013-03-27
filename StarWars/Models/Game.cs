@@ -98,7 +98,7 @@ namespace StarWars.Models {
 
                     var delayInMilliseconds = (int)(DateTime.Now - ship.LastActivity).TotalMilliseconds;
 
-                    if (delayInMilliseconds > 1000) {
+                    if (delayInMilliseconds > 2000) {
                         ship.State = "Inactive";
                         continue;
                     }

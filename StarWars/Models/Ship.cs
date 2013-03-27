@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-//using System.Runtime.Serialization;
 using System.Web;
 using System.Web.Script.Serialization;
 
@@ -10,10 +9,26 @@ namespace StarWars.Models
 	public class Ship : ICloneable
 	{
 		// Constants
-		public static int ShipMaxHP { get { return 200;} }
+
+        public static class Ranger {
+            public static class Mult {
+                public static int HPMult { get { return 50; } }
+                public static double SpeedMult { get { return 0.5; } }
+                public static double AngleSpeedMult { get { return 0.01; } }
+            }
+
+            public static class Types {
+                public static string[] Type = new string[] { "obiwan", "anakin", "naboo", "assault", "gunship", "jedi", "droid", "wasp", "dragon" };
+                public static int[] HPStart = new int[] { 5, 6, 3, 4, 3, 4, 6, 5, 5 };
+                public static int[] HPLimit = new int[] { 9, 10, 7, 8, 7, 8, 10, 9, 9 };
+                public static int[] SpeedStart = new int[] { 4, 3, 6, 5, 6, 5, 3, 4, 4 };
+                public static int[] SpeedLimit = new int[] { 8, 7, 10, 9, 10, 9, 7, 8, 8 };
+                public static int[] AngleSpeedStart = new int[] { 4, 3, 6, 5, 6, 5, 3, 4, 4 };
+                public static int[] AngleSpeedLimit = new int[] { 8, 7, 10, 9, 10, 9, 7, 8, 8 };
+            }
+        }
+
 		public static int ShipSize { get { return 64;} }
-		public static int ShipSpeed { get { return 5;} }
-		public static double ShipAngleSpeed { get { return 0.02;} }
 
 		public static int BombHP { get { return 50;} }
 		public static int BombSize { get { return 24;} }
@@ -29,17 +44,28 @@ namespace StarWars.Models
 		public string Type { get; set; }
         public string State { get; set; }
 		public double MaxHP { get; set; }
-		public double HP { get; set; }
-		public double X { get; set; }
-		public double Y { get; set; }
-        [ScriptIgnore]
-        public int Speed { get; set; }
-        public double Angle { get; set; }
-        [ScriptIgnore]
+
+        // HP & Multiplyers
+        public double HP { get; set; }
+        public int HPCurrent { get; set; }
+        public int HPLimit { get; set; }
+
+        // Speed & Multiplyers
+        public double Speed { get; set; }
+        public int SpeedCurrent { get; set; }
+        public int SpeedLimit { get; set; }
+
+        // AngleSpeed & Multiplyers
         public double AngleSpeed { get; set; }
-		//public double Start { get; set; }
+        public int AngleSpeedCurrent { get; set; }
+        public int AngleSpeedLimit { get; set; }
+
+        public double X { get; set; }
+		public double Y { get; set; }
+        public double Angle { get; set; }
 		public int Size { get; set; }
 		public int Image { get; set; }
+
         [ScriptIgnore]
         public int VectorMove { get; set; }      // 1 (Forward) | -1 (Backward) | 0 (Stop)
         [ScriptIgnore]
@@ -48,30 +74,46 @@ namespace StarWars.Models
         public DateTime LastActivity { get; set; }
         [ScriptIgnore]
         public int Shoot { get; set; }              // 1 (Shoot) | 0
-		public int Kill { get; set; }
+		
+        public int Kill { get; set; }
 		public int Death { get; set; }
 		public List<Bomb> Bombs { get; set; }
 
-        // *** Ship Center Coordinates ***
+        // Ship Center Coordinates
         [ScriptIgnore]
         public double GetCenterX { get { return this.X + this.Size / 2; } }
         [ScriptIgnore]
         public double GetCenterY { get { return this.Y + this.Size / 2; } }
 
-        public Ship(int id, string name, string type, double maxHP, double HP, double X, double Y, int speed, double angle, double angleSpeed, int size, int image) {
+        // *** Ship Constructor ***
+        public Ship(int id, string name, string type, int indexRanger, double X, double Y, double angle, int size) {
 			this.ID = id;
 			this.Name = name;
 			this.Type = type;
             this.State = "Active";
-            this.MaxHP = maxHP;
-			this.HP = HP;
+
+            if (indexRanger < 0 || 9 < indexRanger) {
+                indexRanger = 0;
+            }
+
+            // HP
+            this.HPCurrent = Ship.Ranger.Types.HPStart[indexRanger];
+            this.HPLimit = Ship.Ranger.Types.HPLimit[indexRanger];
+            this.HP = this.HPCurrent * Ship.Ranger.Mult.HPMult;
+            // Speed
+            this.SpeedCurrent = Ship.Ranger.Types.SpeedStart[indexRanger];
+            this.SpeedLimit = Ship.Ranger.Types.SpeedLimit[indexRanger];
+            this.Speed = this.SpeedCurrent * Ship.Ranger.Mult.SpeedMult;
+            // AngleSpeed
+            this.AngleSpeedCurrent = Ship.Ranger.Types.AngleSpeedStart[indexRanger];
+            this.AngleSpeedLimit = Ship.Ranger.Types.AngleSpeedLimit[indexRanger];
+            this.AngleSpeed = this.AngleSpeedCurrent * Ship.Ranger.Mult.AngleSpeedMult;
+
 			this.X = X;
 			this.Y = Y;
-			this.Speed = speed;
 			this.Angle = angle;
-			this.AngleSpeed = angleSpeed;
 			this.Size = size;
-			this.Image = image;                     // Индекс имени файла-изображения (для массива imgShipShortName)
+			this.Image = indexRanger;                     // Индекс файла-изображения
 			this.VectorMove = 0;
 			this.VectorRotate = 0;
 			this.LastActivity = DateTime.Now;
@@ -181,11 +223,11 @@ namespace StarWars.Models
 		}
 
 		public void Regenerate() {
-			if (this.HP < this.MaxHP) {
+			if (this.HP < this.HPCurrent * Ship.Ranger.Mult.HPMult) {
 				this.HP += Ship.RegenerateHP;    // Регенерировали
 			}
-			if (this.HP > this.MaxHP) {
-				this.HP = this.MaxHP;
+            if (this.HP > this.HPCurrent * Ship.Ranger.Mult.HPMult) {
+                this.HP = this.HPCurrent * Ship.Ranger.Mult.HPMult;
 			}
 			else {
 				this.HP = Math.Round(this.HP, 2);
@@ -211,7 +253,7 @@ namespace StarWars.Models
                             //this.Y = UTILS.RandomStartY();
                             this.X = 0;
                             this.Y = 0;
-                            this.HP = this.MaxHP;
+                            this.HP = this.HPCurrent * Ship.Ranger.Mult.HPMult;
                             this.State = "Start0";
                             return;
                         }

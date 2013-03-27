@@ -1,78 +1,115 @@
 ﻿// *** MODULE for Ships & Bombs ***
-define(['Modules/requests'], function (REQUESTS) {
+define(['jquery', 'Modules/requests'], function ($, REQUESTS) {
     var my = {};
-    var request = REQUESTS.InitShipConstants();
-
-    request.done(function (data) {
-        my.ShipMaxHP = data.shipMaxHP;
-        my.ShipSize = data.shipSize;
-        my.ShipSpeed = data.shipSpeed;
-        my.ShipAngleSpeed = data.shipAngleSpeed;
-
-        my.BombHP = data.bombHP;  // Ударная сила бомбы (1 столкновение)
-        my.BombSize = data.bombSize;
-        my.BombSpeed = data.bombSpeed;
-
-        my.SunHP = data.sunHP;    // Ударная сила Солнца (1 tick = GAME.SyncRate = 20ms)
-        my.RegenerateHP = data.regenerateHP;    // Регенерация (1 tick = GAME.SyncRate = 20ms)
-    });
 
     // *** Ships ***
-    // Rangers
     my.MyShip = {};   // Ship's speed & rotating angle
     my.Ships = [];    // Array of Ships
 
+    var request = REQUESTS.InitShipConstants();
+
+    request.done(function (data) {
+        my.Types = {};
+        my.Types.Type = JSON.parse(data.Types.Type);
+        my.Types.HPStart = JSON.parse(data.Types.HPStart);
+        my.Types.HPLimit = JSON.parse(data.Types.HPLimit);
+        my.Types.SpeedStart = JSON.parse(data.Types.SpeedStart);
+        my.Types.SpeedLimit = JSON.parse(data.Types.SpeedLimit);
+        my.Types.AngleSpeedStart = JSON.parse(data.Types.AngleSpeedStart);
+        my.Types.AngleSpeedLimit = JSON.parse(data.Types.AngleSpeedLimit);
+
+        my.HPMult = data.HPMult,
+        my.SpeedMult = data.SpeedMult,
+        my.AngleSpeedMult = data.AngleSpeedMult,
+
+        my.ShipSize = data.shipSize;
+        //my.BombHP = data.bombHP;  // Ударная сила бомбы (1 столкновение)
+        //my.BombSize = data.bombSize;
+        //my.BombSpeed = data.bombSpeed;
+
+        my.SunHP = data.sunHP;    // Ударная сила Солнца (1 tick = GAME.SyncRate = 20ms)
+        my.RegenerateHP = data.regenerateHP;    // Регенерация (1 tick = GAME.SyncRate)
+    });
+
     // Rangers
-    //my.Rangers = {};
-    //my.RangerTypesMax = 9;
-    //my.RangerTypes = {
-    //    Type: ["smersh", "menok", "urgant", "ekventor"],
-    //    MaxHP: [150, 200, 250, 300],
-    //    Speed: [5, 4, 3, 2],
-    //    Angle: [0.05, 0.04, 0.03, 0.02],
-    //    Size: [70, 75, 85, 85],
-    //    Images: new Array(my.DominatorTypesMax)
-    //};
+    my.Ranger = {};
+    my.Ranger.TypesMax = 9;
 
 
     // *** My ship (add image) ***
     var currentShip = document.getElementById("CurrentShip");
-    my.MyShipImageFull = new Image();
-    currentShip.appendChild(my.MyShipImageFull);
+    var currentShipHP = document.getElementById("CurrentShipHP");
+    my.MyShip.ImageSmall = new Image();
+    my.MyShip.ImageBig = new Image();
+    currentShip.insertBefore(my.MyShip.ImageBig, currentShipHP);
 
     // *** Ranger ship types ***
-    my.RangerImages = [];
-    my.RangerImagesMax = 9;
+    my.Ranger.ImagesBig = [];
+    my.Ranger.ImagesSmall = [];
+    my.Ranger.ImagesMax = 9;
 
-    var selectShip = document.getElementById("SelectShip");
+    var selectShip = document.getElementById("SelectShipIcon");
     var imagePath = "http://" + location.hostname + "/Game/Content/Images/";    // Чтобы не ссылаться на GAME (иначе будет циклическая ссылка)
 
-    for (var i = 0; i < my.RangerImagesMax; i++) {
-        my.RangerImages[i] = new Image();
-        my.RangerImages[i].src = imagePath + "Rangers/ranger" + (i + 1) + ".png";
+    for (var i = 0; i < my.Ranger.ImagesMax; i++) {
+        my.Ranger.ImagesSmall[i] = new Image();
+        my.Ranger.ImagesSmall[i].src = imagePath + "Rangers/ranger" + (i + 1) + ".png";
 
-        my.RangerImages[i].addEventListener("click", function (index) {
+        my.Ranger.ImagesBig[i] = new Image();
+        my.Ranger.ImagesBig[i].src = imagePath + "Rangers/Original/ranger" + (i + 1) + ".png";
+        my.Ranger.ImagesBig[i].className = "Rounded";
+
+        my.Ranger.ImagesBig[i].addEventListener("click", function (index) {
             return function () {
                 // (!) Метод classList не работает в IE9-
-                //my.RangerImages[index].classList.add("Selected");             // Добавляем класс "Selected" к выделенному
-                //my.RangerImages[this.Image].classList.remove("Selected");     // И убираем "Selected" у предыдущего
+                //my.Ranger.Images[index].classList.add("Selected");             // Добавляем класс "Selected" к выделенному
+                //my.Ranger.Images[this.Image].classList.remove("Selected");     // И убираем "Selected" у предыдущего
 
-                $(my.RangerImages[index]).addClass("Selected");
-                $(my.RangerImages[my.MyShip.Image]).removeClass("Selected");
+                $(my.Ranger.ImagesBig[index]).addClass("Selected");
+                $(my.Ranger.ImagesBig[my.MyShip.ImageIndex]).removeClass("Selected");
 
-                my.MyShip.Image = index;
-                my.MyShipImageFull.src = imagePath + "Rangers/Original/ranger" + (index + 1) + ".png";
+                my.MyShip.ImageIndex = index;
+                my.MyShip.ImageSmall.src = imagePath + "Rangers/ranger" + (index + 1) + ".png";
+                my.MyShip.ImageBig.src = imagePath + "Rangers/Original/ranger" + (index + 1) + ".png";
 
-                REQUESTS.UpdateUserShip("Image", index);     // Обновление моего корабля на сервере
+                var type = $("#SelectShipParameters .Type .Value").eq(0);
+                type.text(my.Types.Type[index]);
+
+                var hp = $("#SelectShipParameters .HP .Point");
+                ShowParameters(my.Types.HPStart, my.Types.HPLimit, index, hp);
+
+                var speed = $("#SelectShipParameters .Speed .Point");
+                ShowParameters(my.Types.SpeedStart, my.Types.SpeedLimit, index, speed);
+
+                var angleSpeed = $("#SelectShipParameters .AngleSpeed .Point");
+                ShowParameters(my.Types.AngleSpeedStart, my.Types.AngleSpeedLimit, index, angleSpeed);
+
+                //REQUESTS.UpdateUserShip("Image", index);     // Обновление моего корабля на сервере
             }
         }(i));
 
-        selectShip.appendChild(my.RangerImages[i]);
+        selectShip.appendChild(my.Ranger.ImagesBig[i]);
+    }
+
+    function ShowParameters(arrStart, arrLimit, index, obj) {
+        for (var i = 0; i < arrStart[index]; i++) {
+            obj.eq(i).removeClass("Limit");
+            obj.eq(i).addClass("Start");
+        }
+        for (var i = arrStart[index]; i < arrLimit[index]; i++) {
+            obj.eq(i).removeClass("Start");
+            obj.eq(i).addClass("Limit");
+        }
+        for (var i = arrLimit[index]; i < 10; i++) {
+            obj.eq(i).removeClass("Start");
+            obj.eq(i).removeClass("Limit");
+        }
     }
 
     // Dominators
-    //my.DominatorTypesMax = 4;
-    //my.DominatorTypes = {
+    my.Dominator = {};
+    //my.Dominator.TypesMax = 4;
+    //my.Dominator.Types = {
     //    Type: ["smersh", "menok", "urgant", "ekventor"],
     //    MaxHP: [150, 200, 250, 300],
     //    Speed: [5, 4, 3, 2],
@@ -81,25 +118,25 @@ define(['Modules/requests'], function (REQUESTS) {
     //    Images: new Array(my.DominatorTypesMax)
     //};
 
-    //my.DominatorImagesMax = 3;
-    //for (var i = 0; i < my.DominatorTypesMax; i++) {   // ["smersh", "menok", "urgant", "ekventor"]
-    //    my.DominatorTypes.Images[i] = new Array(my.DominatorImagesMax);
-    //    for (var j = 0; j < my.DominatorImagesMax; j++) {
-    //        my.DominatorTypes.Images[i][j] = new Image();
-    //        my.DominatorTypes.Images[i][j].src = GAME.ImagePath + "Dominators/dominator-" + my.DominatorTypes.Type[i] + "0" + (j + 1) + ".png";
+    //my.Dominator.ImagesMax = 3;
+    //for (var i = 0; i < my.Dominator.TypesMax; i++) {   // ["smersh", "menok", "urgant", "ekventor"]
+    //    my.Dominator.Types.Images[i] = new Array(my.Dominator.ImagesMax);
+    //    for (var j = 0; j < my.Dominator.ImagesMax; j++) {
+    //        my.Dominator.Types.Images[i][j] = new Image();
+    //        my.Dominator.Types.Images[i][j].src = imagePath + "Dominators/dominator-" + my.Dominator.Types.Type[i] + "0" + (j + 1) + ".png";
     //    }
     //}
 
     // *** Bombs ***
     var imagePath = "http://" + location.hostname + "/Game/Content/Images/";
 
-    my.RangerBombImages = [];
-    my.RangerBombImages[0] = new Image();
-    my.RangerBombImages[0].src = imagePath + "Weapons/weapon-bomb02-green.png";
+    my.Ranger.BombImages = [];
+    my.Ranger.BombImages[0] = new Image();
+    my.Ranger.BombImages[0].src = imagePath + "Weapons/weapon-bomb02-green.png";
 
-    my.DominatorBombImages = [];
-    my.DominatorBombImages[0] = new Image();
-    my.DominatorBombImages[0].src = imagePath + "Weapons/weapon-bomb02-blue.png";
+    my.Dominator.BombImages = [];
+    my.Dominator.BombImages[0] = new Image();
+    my.Dominator.BombImages[0].src = imagePath + "Weapons/weapon-bomb02-blue.png";
 
     return my;
 });
