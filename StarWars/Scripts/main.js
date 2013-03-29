@@ -7,31 +7,33 @@
 });
 
 require(['jquery', 'Modules/game', 'Modules/requests', 'Modules/ship', 'Modules/space', 'Modules/utils', 'Prototypes/ships', 'Prototypes/bombs'], function ($, GAME, REQUESTS, SHIP, SPACE, UTILS, Ship, Bomb) {
-    // *** Main start of application ***
-    // Принудительно ожидаем, чтобы все модули успели сработать (и вернулись все Ajax-запросы, особенно в SHIP !!!)
-    // Иначе после Page Refreshing не успевают вернуться Ajax-запросы в SHIP -> карта пустая!
-    setTimeout(function () {
-        var modalWindow = $("#ModalWindow");
-        if (modalWindow.css("display") == "none") {
-            //alert(modalWindow.css("display"));
-            LoadGame(-1);
-        }
-        else {
-            //alert(modalWindow.css("display"));
-            var buttonOK = $("#ButtonOK");
-            buttonOK.on("click", function () {
-                if (buttonOK.hasClass("Active")) {
-                    $("#Sidebar").append($("#SelectShipParameters"));
-                    modalWindow.css("display", "none");
-                    var index = SHIP.MyShip.ImageIndex;
-                    LoadGame(index);
-                }
-            });
-        }
-    }, 100);
+    // *** Main start point ***
+
+    // Синхронные запросы для инициализации
+    GAME.Init();
+    SPACE.Init();
+    SHIP.Init();
+
+    var modalWindow = $("#ModalWindow");
+    if (modalWindow.css("display") == "none") {
+        $("#Sidebar").append($("#SelectShipParameters"));
+        LoadGame(-1);
+    }
+    else {
+        var buttonOK = $("#ButtonOK");
+        buttonOK.on("click", function () {
+            if (buttonOK.hasClass("Active")) {
+                $("#Sidebar").append($("#SelectShipParameters"));
+                modalWindow.css("display", "none");
+                var index = SHIP.MyShip.ImageIndex;
+                LoadGame(index);
+            }
+        });
+    }
+    // *** END of Main start point***
+
 
     function LoadGame(index) {
-        //alert("Индекс " + index);
         var request = REQUESTS.InitShips(index);
 
         request.done(function (data) {
@@ -40,13 +42,13 @@ require(['jquery', 'Modules/game', 'Modules/requests', 'Modules/ship', 'Modules/
             SPACE.Sun.GetCenter();
             //InitDominators();
 
-            // Запускаем setInterval
+            // Запросы - setInterval
             //GAME.IntervalID = setInterval(function () {
             //    Synchronize();
             //}, GAME.SyncRate);
 
-            // Запускаем синхронизацию (а в ней - зацикливаем setTimeout)
-            Synchronize();
+            // Отрисовка - setTimeout
+            RepeatReloadGame();
         });
     }
 
@@ -107,143 +109,27 @@ require(['jquery', 'Modules/game', 'Modules/requests', 'Modules/ship', 'Modules/
         // Свой корабль НЕ добавляем в общий массив SHIP.Ships
     }
 
-    function Synchronize() {
-        function SynchronizePlanets(data) {
-            SPACE.Sun.GetAngle(data.timeFromStart);
-            for (var i = 0; i < SPACE.Planets.length; i++) {
-                SPACE.Planets[i].GetOrbitAngle(data.timeFromStart);
-            }
-        }
+    function RepeatReloadGame() {
+        REQUESTS.GetShips()
+            .done(function (data) {
+                Synchronize(data);
+            })
+            .error(function () {
+                REQUESTS.GetShips()
+                    .done(function (data) {
+                        Synchronize(data);
+                    });
+            })
+            .complete(function (data) {
+                setTimeout(RepeatReloadGame, 19);
+            });
+    }
 
-        function SynchronizeShips(data) {
-            // Обновляем данные: (Очищать массив нельзя - корабль сильно мельтешит!)
-            var serverShipsCount = data.ships.length;
-            var clientShipsCount = SHIP.Ships.length;
-            var indexes = [];
-
-            // Если с сервера пришел пустой массив, очищаем клиентский массив (и таблицу статистики)
-            if (data.ships.length == 0) {
-                for (var i = 0; i < clientShipsCount; i++) {
-                    GAME.Statistics.DeleteStatRow(SHIP.Ships[i]);
-                }
-                SHIP.Ships = [];
-                SHIP.MyShip.State = "Inactive";
-            }
-            else {
-                for (var i = 0; i < serverShipsCount; i++) {
-
-                    // *** Смещение карты (если это наш корабль) ***
-                    if (data.ships[i].ID == SHIP.MyShip.ID) {
-
-                        // Старые координаты ЦЕНТРА корабля
-                        var x = SHIP.MyShip.X + SHIP.ShipSize / 2 - GAME.SpaceShiftX;
-                        var y = SHIP.MyShip.Y + SHIP.ShipSize / 2 - GAME.SpaceShiftY;
-                        // Смещение за последний шаг
-                        var dX = Math.abs(data.ships[i].X - SHIP.MyShip.X);
-                        var dY = Math.abs(data.ships[i].Y - SHIP.MyShip.Y);
-
-                        if (dX != 0 || dY != 0) {
-                            // "Зона вхождения" (аналогия с наведением мыши)
-                            var zoneX = SHIP.ShipSize * 5;  // цифра 5 - произвольная, чтобы получить "зону вхождения" побольше
-                            var zoneY = SHIP.ShipSize * 5;
-                            // Сдвигаем карту (если корабль на краю канвы, но не на краю космоса)
-                            GAME.ShiftSpace(x, y, dX, dY, zoneX, zoneY);
-                            SPACE.Sun.GetCenter();
-                        }
-
-                        // Обновляем координаты корабля
-                        SHIP.MyShip.X = data.ships[i].X; // X, Y - для центрирования карты по кораблю
-                        SHIP.MyShip.Y = data.ships[i].Y;
-
-                    }
-
-                    var isShipFound = false;
-
-                    // Цикл только по исходному списку (добавленные в ходе проверки корабли не учитываются - они добавляются в конец массива)
-                    for (var j = 0; j < clientShipsCount; j++) {
-
-                        if (SHIP.Ships[j].ID != data.ships[i].ID) {     // сравниваем массивы - локальный (Javascript) и пришедший (JSON)
-                            continue;                                   // если не одинаковые имена - берем следующий
-                        }
-
-                        indexes.push(j);    // запомнили индекс найденного элемента
-                        isShipFound = true;
-
-                        // если корабль встретился в массиве JS - обновляем данные (только те, которые изменились)
-                        if (SHIP.Ships[j].Name == "") {
-                            SHIP.Ships[j].Name = data.ships[i].Name;
-                        }
-                        SHIP.Ships[j].State = data.ships[i].State;
-                        SHIP.Ships[j].MaxHP = data.ships[i].HPCurrent * SHIP.HPMult;
-                        SHIP.Ships[j].HP = data.ships[i].HP;
-                        SHIP.Ships[j].X = data.ships[i].X;
-                        SHIP.Ships[j].Y = data.ships[i].Y;
-                        SHIP.Ships[j].Angle = data.ships[i].Angle;
-                        SHIP.Ships[j].Image = data.ships[i].Image;
-                        SHIP.Ships[j].Kill = data.ships[i].Kill;
-                        SHIP.Ships[j].Death = data.ships[i].Death;
-                        //RefreshBombs(SHIP.Ships[j], data.ships[i].Bombs);   // обнуляем и заполняем массив данными с сервера
-                        GAME.Statistics.RefreshStatRow(SHIP.Ships[j]);
-
-                        break;
-                    }
-
-                    if (!isShipFound) {                     // если корабля не было в массиве JS, то добавляем его в в массив
-                        data.ships[i].Image = parseInt(data.ships[i].Image);
-                        var otherShip = new Ship(data.ships[i]);
-
-                        //RefreshBombs(otherShip, data.ships[i].Bombs);
-                        GAME.Statistics.AddStatRow(otherShip);
-                        SHIP.Ships.push(otherShip);
-                    }
-                }
-
-                // Перебираем на клиенте корабли, и те, которые не пришли с сервера, помечаем как "Inactive"
-                for (var i = 0; i < clientShipsCount; i++) {
-                    if (indexes.indexOf(i) == -1) {
-                        SHIP.Ships[i].State = "Inactive";
-                        GAME.Statistics.DeleteStatRow(SHIP.Ships[i]);
-                    }
-                }
-                SHIP.Ships.filter(function (obj) { return obj.State != "Inactive"; });
-            }
-        }
-
-        function RefreshBombs(ship, bombs) {
-            ship.Bombs = [];    // сначала обнуляем массив бомб для каждого рейнджера
-            if (bombs != null) {
-                for (var k = 0; k < bombs.length; k++) {
-                    ship.Bombs[k] = new Bomb(
-                        bombs[k].Type,
-                        bombs[k].X,
-                        bombs[k].Y,
-                        bombs[k].Angle,
-                        bombs[k].Size,
-                        bombs[k].Image,
-                        bombs[k].Speed
-                    );
-                }
-            }
-        }
-
-        //var bombs = SHIP.MyShip.Bombs.filter(function (obj) { return obj.Sync == 0; });   // Берем из массива только бомбы, которые еще не отправлялись на сервер
-        //for (var i = 0; i < bombs.length; i++) {
-        //    bombs[i].Sync = 1;  // Помечаем бомбы как отправленные (таким образом, каждая бомба посылается на сервер только один раз, а дальше - обрабатывается на клиенте)
-        //}
-
-        var request = REQUESTS.GetShips();
-
-        request.done(function (data) {
-            SynchronizePlanets(data);
-            //SynchronizeDominatorShips();
-            SynchronizeShips(data);
-            //GenerateExplodes();
-            ReloadGame();
-
-            // Зацикливаем setTimeout с интервалом
-            //clearTimeout(GAME.TimeoutID);
-            setTimeout(Synchronize, GAME.SyncRate);
-        });
+    function Synchronize(data) {
+        SynchronizePlanets(data);
+        //SynchronizeDominatorShips();
+        SynchronizeShips(data);
+        ReloadCanvas();
 
         //request.fail(function (jqXHR, textStatus, errorThrown) {
         //    for (var i = 0; i < SHIP.Ships.length; i++) {
@@ -251,9 +137,127 @@ require(['jquery', 'Modules/game', 'Modules/requests', 'Modules/ship', 'Modules/
         //    }
         //    ReloadGame();
         //})
+
+        //function RefreshBombs(ship, bombs) {
+        //    ship.Bombs = [];    // сначала обнуляем массив бомб для каждого рейнджера
+        //    if (bombs != null) {
+        //        for (var k = 0; k < bombs.length; k++) {
+        //            ship.Bombs[k] = new Bomb(
+        //                bombs[k].Type,
+        //                bombs[k].X,
+        //                bombs[k].Y,
+        //                bombs[k].Angle,
+        //                bombs[k].Size,
+        //                bombs[k].Image,
+        //                bombs[k].Speed
+        //            );
+        //        }
+        //    }
+        //}
     }
 
-    function ReloadGame() {
+    function SynchronizePlanets(data) {
+        SPACE.Sun.GetAngle(data.timeFromStart);
+        for (var i = 0; i < SPACE.Planets.length; i++) {
+            SPACE.Planets[i].GetOrbitAngle(data.timeFromStart);
+        }
+    }
+
+    function SynchronizeShips(data) {
+        // Обновляем данные: (Очищать массив нельзя - корабль сильно мельтешит!)
+        var serverShipsCount = data.ships.length;
+        var clientShipsCount = SHIP.Ships.length;
+        var indexes = [];
+
+        // Если с сервера пришел пустой массив, очищаем клиентский массив (и таблицу статистики)
+        if (data.ships.length == 0) {
+            for (var i = 0; i < clientShipsCount; i++) {
+                GAME.Statistics.DeleteStatRow(SHIP.Ships[i]);
+            }
+            SHIP.Ships = [];
+            SHIP.MyShip.State = "Inactive";
+        }
+        else {
+            for (var i = 0; i < serverShipsCount; i++) {
+
+                // *** Смещение карты (если это наш корабль) ***
+                if (data.ships[i].ID == SHIP.MyShip.ID) {
+
+                    // Старые координаты ЦЕНТРА корабля
+                    var x = SHIP.MyShip.X + SHIP.ShipSize / 2 - GAME.SpaceShiftX;
+                    var y = SHIP.MyShip.Y + SHIP.ShipSize / 2 - GAME.SpaceShiftY;
+                    // Смещение за последний шаг
+                    var dX = Math.abs(data.ships[i].X - SHIP.MyShip.X);
+                    var dY = Math.abs(data.ships[i].Y - SHIP.MyShip.Y);
+
+                    if (dX != 0 || dY != 0) {
+                        // "Зона вхождения" (аналогия с наведением мыши)
+                        var zoneX = SHIP.ShipSize * 5;  // цифра 5 - произвольная, чтобы получить "зону вхождения" побольше
+                        var zoneY = SHIP.ShipSize * 5;
+                        // Сдвигаем карту (если корабль на краю канвы, но не на краю космоса)
+                        GAME.ShiftSpace(x, y, dX, dY, zoneX, zoneY);
+                        SPACE.Sun.GetCenter();
+                    }
+
+                    // Обновляем координаты корабля
+                    SHIP.MyShip.X = data.ships[i].X; // X, Y - для центрирования карты по кораблю
+                    SHIP.MyShip.Y = data.ships[i].Y;
+
+                }
+
+                var isShipFound = false;
+
+                // Цикл только по исходному списку (добавленные в ходе проверки корабли не учитываются - они добавляются в конец массива)
+                for (var j = 0; j < clientShipsCount; j++) {
+
+                    if (SHIP.Ships[j].ID != data.ships[i].ID) {     // сравниваем массивы - локальный (Javascript) и пришедший (JSON)
+                        continue;                                   // если не одинаковые имена - берем следующий
+                    }
+
+                    indexes.push(j);    // запомнили индекс найденного элемента
+                    isShipFound = true;
+
+                    // если корабль встретился в массиве JS - обновляем данные (только те, которые изменились)
+                    if (SHIP.Ships[j].Name == "") {
+                        SHIP.Ships[j].Name = data.ships[i].Name;
+                    }
+                    SHIP.Ships[j].State = data.ships[i].State;
+                    SHIP.Ships[j].MaxHP = data.ships[i].HPCurrent * SHIP.HPMult;
+                    SHIP.Ships[j].HP = data.ships[i].HP;
+                    SHIP.Ships[j].X = data.ships[i].X;
+                    SHIP.Ships[j].Y = data.ships[i].Y;
+                    SHIP.Ships[j].Angle = data.ships[i].Angle;
+                    SHIP.Ships[j].Image = data.ships[i].Image;
+                    SHIP.Ships[j].Kill = data.ships[i].Kill;
+                    SHIP.Ships[j].Death = data.ships[i].Death;
+                    //RefreshBombs(SHIP.Ships[j], data.ships[i].Bombs);   // обнуляем и заполняем массив данными с сервера
+                    GAME.Statistics.RefreshStatRow(SHIP.Ships[j]);
+
+                    break;
+                }
+
+                if (!isShipFound) {                     // если корабля не было в массиве JS, то добавляем его в в массив
+                    data.ships[i].Image = parseInt(data.ships[i].Image);
+                    var otherShip = new Ship(data.ships[i]);
+
+                    //RefreshBombs(otherShip, data.ships[i].Bombs);
+                    GAME.Statistics.AddStatRow(otherShip);
+                    SHIP.Ships.push(otherShip);
+                }
+            }
+
+            // Перебираем на клиенте корабли, и те, которые не пришли с сервера, помечаем как "Inactive"
+            for (var i = 0; i < clientShipsCount; i++) {
+                if (indexes.indexOf(i) == -1) {
+                    SHIP.Ships[i].State = "Inactive";
+                    GAME.Statistics.DeleteStatRow(SHIP.Ships[i]);
+                }
+            }
+            SHIP.Ships.filter(function (obj) { return obj.State != "Inactive"; });
+        }
+    }
+
+    function ReloadCanvas() {
         GAME.Context.clearRect(0, 0, GAME.Canvas.width, GAME.Canvas.height);
         SPACE.Sun.Show();
 

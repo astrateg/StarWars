@@ -15,9 +15,9 @@ namespace StarWars.Models
             public static double CenterY { get { return Game.SpaceHeight / 2; } }
         }
 
-        private static int earthOrbitRadius = 200, marsOrbitRadius = 330, jupiterOrbitRadius = 460;
+        private static int earthOrbitRadius = 200, marsOrbitRadius = 400, jupiterOrbitRadius = 600;
         private static double earthOrbitAngleStart = 0, marsOrbitAngleStart = Math.PI / 2, jupiterOrbitAngleStart = Math.PI;
-        private static double earthMoveAngle = 0.0004, marsMoveAngle = -0.0003, jupiterMoveAngle = 0.0001;
+        private static double earthMoveAngle = 0.0005, marsMoveAngle = -0.0003, jupiterMoveAngle = 0.0002;
         //private static int earthSize = 50, marsSize = 40, jupiterSize = 95;
 
         public static List<Planet> Planets = new List<Planet>

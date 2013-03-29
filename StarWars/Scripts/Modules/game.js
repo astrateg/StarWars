@@ -3,7 +3,6 @@
     my.ServerName = location.hostname;
     my.ImagePath = "http://" + my.ServerName + "/Game/Content/Images/";
     my.IntervalID = 0;      // для setInterval
-    //my.TimeoutID = 0;     // для setTimeout
 
     var totalWidth = document.documentElement.clientWidth;
     var totalHeight = document.documentElement.clientHeight;
@@ -21,28 +20,6 @@
     my.Sidebar.style.height = my.Canvas.height + "px";
     my.Sidebar.style.cssFloat = "left";
     my.Sidebar.style.backgroundColor = "grey";
-
-    var request = REQUESTS.InitGame();
-
-    request.done(function (data) {
-        my.SyncRate = data.syncRate;            // 10
-        my.SidebarWidth = data.sidebarWidth;    // 225
-        my.SpaceWidth = data.spaceWidth;        // 2560   // ширина космоса
-        my.SpaceHeight = data.spaceHeight;      // 1600  // высота космоса
-
-        // *** Константы, связанные с SidebarWidth ***
-        my.Sidebar.style.width = my.SidebarWidth + "px";
-        my.SpaceShiftX = my.SidebarWidth;   // сдвиг по X
-        my.SpaceShiftY = 0;                 // сдвиг по Y
-
-        var backPositionX = my.SidebarWidth;
-        var backPositionY = 0;
-        var backPosition = backPositionX + "px " + backPositionY + "px";
-        my.Body.css('background-position', backPosition);
-
-        my.Canvas.width = totalWidth - my.SidebarWidth;
-        // ***
-    });
 
     // *** Explosion ***
     my.Explosion = {};
@@ -202,6 +179,31 @@
         backPositionY = -my.SpaceShiftY;
         backPosition = Math.round(backPositionX) + "px " + Math.round(backPositionY) + "px";
         my.Body.css('background-position', backPosition);
+    }
+
+
+    my.Init = function () {
+        var request = REQUESTS.InitGame();
+
+        request.done(function (data) {
+            my.SyncRate = data.syncRate;            // 10
+            my.SidebarWidth = data.sidebarWidth;    // 225
+            my.SpaceWidth = data.spaceWidth;        // 2560   // ширина космоса
+            my.SpaceHeight = data.spaceHeight;      // 1600  // высота космоса
+
+            // *** Константы, связанные с SidebarWidth ***
+            my.Sidebar.style.width = my.SidebarWidth + "px";
+            my.SpaceShiftX = my.SidebarWidth;   // сдвиг по X
+            my.SpaceShiftY = 0;                 // сдвиг по Y
+
+            var backPositionX = my.SidebarWidth;
+            var backPositionY = 0;
+            var backPosition = backPositionX + "px " + backPositionY + "px";
+            my.Body.css('background-position', backPosition);
+
+            my.Canvas.width = totalWidth - my.SidebarWidth;
+            // ***
+        });
     }
 
     return my;

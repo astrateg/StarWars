@@ -12,6 +12,7 @@ body {
 }
 
 #ModalWindow {
+    display: none;
     position: fixed;
     left: 0;
     top: 0;
@@ -115,7 +116,7 @@ body {
 
 
 #SelectShipParameters {
-    width: 157px;
+    width: 162px;
     height: 410px;
     background: #c9eafe;
     display: inline-block;

@@ -13,7 +13,7 @@ namespace StarWars.Models
 		public static class Ranger {
 			public static class Mult {
 				public static int HPMult { get { return 50; } }
-				public static double SpeedMult { get { return 0.5; } }
+				public static double SpeedMult { get { return 1; } }
 				public static double AngleSpeedMult { get { return 0.01; } }
 			}
 
@@ -37,6 +37,8 @@ namespace StarWars.Models
 
 		public static int SunHP { get { return 1;} }
 		public static double RegenerateHP { get { return 0.1;} }
+
+        public static double DeltaSpeed { get { return 0.1; } }
 
 		// Properties
 		public int ID { get; set; }
@@ -103,7 +105,9 @@ namespace StarWars.Models
 			// Speed
 			this.SpeedCurrent = Ship.Ranger.Types.SpeedStart[indexRanger];
 			this.SpeedLimit = Ship.Ranger.Types.SpeedLimit[indexRanger];
-			this.Speed = this.SpeedCurrent * Ship.Ranger.Mult.SpeedMult;
+			//this.Speed = this.SpeedCurrent * Ship.Ranger.Mult.SpeedMult;
+            this.Speed = 0.0;
+
 			// AngleSpeed
 			this.AngleSpeedCurrent = Ship.Ranger.Types.AngleSpeedStart[indexRanger];
 			this.AngleSpeedLimit = Ship.Ranger.Types.AngleSpeedLimit[indexRanger];
@@ -123,24 +127,39 @@ namespace StarWars.Models
 			this.Bombs = new List<Bomb>();
 		}
 
+        // Speed: (-SpeedCurrent...+SpeedCurrent)
+        public void ChangeSpeed(int direction) {
+            if (direction > 0) {
+                if (this.Speed + Ship.DeltaSpeed <= this.SpeedCurrent) {
+                    this.Speed += Ship.DeltaSpeed;
+                }
+            }
+            else {
+                if (this.Speed - Ship.DeltaSpeed >= -this.SpeedCurrent) {
+                    this.Speed -= Ship.DeltaSpeed;
+                }
+            }
+        }
+
 		// *** Move & Rotate ***
-		public void Move(int direction) {
-			var vx = Math.Cos(this.Angle) * this.Speed;
-			var vy = Math.Sin(this.Angle) * this.Speed;
+		public void Move() {
+            var vx = Math.Cos(this.Angle) * this.Speed * Ship.Ranger.Mult.SpeedMult;
+            var vy = Math.Sin(this.Angle) * this.Speed * Ship.Ranger.Mult.SpeedMult;
 			
 			// Try moving
-			this.X += vx * direction;
-			this.Y += vy * direction;
+			this.X += vx;
+			this.Y += vy;
 			
 			// Check moving
 			bool successLeft = (this.X >= 0);
-			bool successRight = (this.X <= Game.SpaceWidth - this.Size);  // Sidebar.width = 225px
+			bool successRight = (this.X <= Game.SpaceWidth - this.Size);
 			bool successUp = (this.Y >= 0);
 			bool successDown = (this.Y <= Game.SpaceHeight - this.Size);
 
 			// Check X-moving
 			if (!successLeft) {
 				this.X = 0;
+                this.Speed = 0;
 			}
 			else if (!successRight) {
 				this.X = Game.SpaceWidth - this.Size;
@@ -152,6 +171,7 @@ namespace StarWars.Models
 			// Check Y-moving
 			if (!successUp) {
 				this.Y = 0;
+                this.Speed = 0;
 			}
 			else if (!successDown) {
 				this.Y = Game.SpaceHeight - this.Size;
@@ -272,7 +292,5 @@ namespace StarWars.Models
 				}
 			}
 		}
-
-
-	}
+    }
 }

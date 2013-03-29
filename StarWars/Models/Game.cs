@@ -9,7 +9,7 @@ namespace StarWars.Models {
     public sealed class Game {
         //Singleton Pattern
         private static readonly Game _instance = new Game();
-        public static int SyncRate      { get { return 5; } }
+        public static int SyncRate      { get { return 17; } }
         public static int SidebarWidth  { get { return 225; } }
         public static int SpaceWidth    { get { return 2560; } }
         public static int SpaceHeight   { get { return 1600; } }
@@ -71,23 +71,25 @@ namespace StarWars.Models {
 
         public void UpdateUserShip(int id, string propertyName, int propertyValue) {
             Ship ship = _ships.FirstOrDefault(s => s.ID == id);
-            ship.LastActivity = DateTime.Now;
+            if (ship != null) {
+                ship.LastActivity = DateTime.Now;
 
-            switch (propertyName) {
-                case "VectorMove":
-                    ship.VectorMove = propertyValue;
-                    break;
-                case "VectorRotate":
-                    ship.VectorRotate = propertyValue;
-                    break;
-                case "Shoot":
-                    ship.Shoot = propertyValue;
-                    break;
-                case "Image":
-                    ship.Image = propertyValue;
-                    break;
-                default:
-                    break;
+                switch (propertyName) {
+                    case "VectorMove":
+                        ship.VectorMove = propertyValue;
+                        break;
+                    case "VectorRotate":
+                        ship.VectorRotate = propertyValue;
+                        break;
+                    case "Shoot":
+                        ship.Shoot = propertyValue;
+                        break;
+                    case "Image":
+                        ship.Image = propertyValue;
+                        break;
+                    default:
+                        break;
+                }
             }
         }
 
@@ -110,7 +112,10 @@ namespace StarWars.Models {
                     ship.GenerateExplodes();
 
                     if (ship.State == "Active") {
-                        ship.Move(ship.VectorMove);
+                        if (ship.VectorMove != 0) {
+                            ship.ChangeSpeed(ship.VectorMove);
+                        }
+                        ship.Move();
                         ship.Rotate(ship.VectorRotate);
                         ship.Regenerate();
                     }
