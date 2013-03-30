@@ -133,17 +133,17 @@ namespace StarWars.Controllers {
             myShip.State = "Inactive";
         }
 
-        public JsonResult GetShips() {
-            Ship myShip = GetShipByCookie();
-            myShip.LastActivity = DateTime.Now;
+        //public JsonResult GetShips() {
+        //    Ship myShip = GetShipByCookie();
+        //    myShip.LastActivity = DateTime.Now;
 
-            var response = new {
-                timeFromStart = Game.Instance.TimeFromStart,
-                ships = Game.Instance.ShipListActive
-            };
-            //Logger.WriteToLogFile(dateBegin, DateTime.Now);
-            return Json(response, JsonRequestBehavior.AllowGet);
-        }
+        //    var response = new {
+        //        timeFromStart = Game.Instance.TimeFromStart,
+        //        ships = Game.Instance.ShipListActive
+        //    };
+        //    //Logger.WriteToLogFile(dateBegin, DateTime.Now);
+        //    return Json(response, JsonRequestBehavior.AllowGet);
+        //}
 
         [NonAction]
         public Ship CreateShip(int id, string name, int index) {

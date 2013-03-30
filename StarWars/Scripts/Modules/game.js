@@ -1,4 +1,4 @@
-﻿define(['jquery', 'Modules/requests', 'Modules/ship'], function ($, REQUESTS, SHIP) {
+﻿define(['Modules/requests', 'Modules/ship'], function (REQUESTS, SHIP) {
     var my = {};
     my.ServerName = location.hostname;
     my.ImagePath = "http://" + my.ServerName + "/Game/Content/Images/";

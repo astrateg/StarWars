@@ -9,7 +9,7 @@ namespace StarWars.Models {
     public sealed class Game {
         //Singleton Pattern
         private static readonly Game _instance = new Game();
-        public static int SyncRate      { get { return 17; } }
+        public static int SyncRate      { get { return 10; } }
         public static int SidebarWidth  { get { return 225; } }
         public static int SpaceWidth    { get { return 2560; } }
         public static int SpaceHeight   { get { return 1600; } }
@@ -121,6 +121,14 @@ namespace StarWars.Models {
                     }
                 }
             }
+
+            var response = new {
+                timeFromStart = Game.Instance.TimeFromStart,
+                ships = Game.Instance.ShipListActive
+            };
+
+
+            Notifier.Send(response);
         }
     }
 }

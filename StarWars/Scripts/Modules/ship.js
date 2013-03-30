@@ -1,5 +1,5 @@
 ﻿// *** MODULE for Ships & Bombs ***
-define(['jquery', 'Modules/requests'], function ($, REQUESTS) {
+define(['Modules/requests'], function (REQUESTS) {
     var my = {};
 
     // *** Ships ***

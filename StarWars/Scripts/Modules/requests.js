@@ -1,4 +1,4 @@
-﻿define(['jquery'], function ($) {
+﻿define([], function () {
     var my = {};
     var path = location.hostname;
     my.InitGame = function () {
@@ -52,18 +52,17 @@
     }
 
     // Последующие запросы к серверу на получение пересчитанного списка кораблей для обновления массива SHIP.Ships
-    my.GetShips = function () {
-        var request = $.ajax({
-            url: "http://" + path + "/game/Home/GetShips/",
-            type: "GET",
-            dataType: "json",
-            cache: false,
-            //async: false,       // !!! (синхронный запрос)
-            timeout: 11      // Если запрос тормозит, отменяем его
-        });
-
-        return request;
-    };
+    //my.GetShips = function () {
+    //    var request = $.ajax({
+    //        url: "http://" + path + "/game/Home/GetShips/",
+    //        type: "GET",
+    //        dataType: "json",
+    //        cache: false,
+    //        //async: false,       // !!! (синхронный запрос)
+    //        //timeout: 11      // Если запрос тормозит, отменяем его
+    //    });
+    //    return request;
+    //};
 
     // Обновление имени пользователя на сервере
     my.UpdateUserName = function (userName) {
