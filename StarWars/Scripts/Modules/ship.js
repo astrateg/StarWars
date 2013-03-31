@@ -46,8 +46,6 @@ define(['Modules/requests'], function (REQUESTS) {
             my.AngleSpeedMult = data.AngleSpeedMult,
 
             my.ShipSize = data.ShipSize;
-            my.SunHP = data.SunHP;                  // Ударная сила Солнца (1 tick = GAME.SyncRate = 20ms)
-            my.RegenerateHP = data.RegenerateHP;    // Регенерация (1 tick = GAME.SyncRate)
 
             if (my.MyShip.Exists == 0) {
                 $("#ModalWindow").css("display", "block");

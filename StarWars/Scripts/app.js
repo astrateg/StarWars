@@ -7,6 +7,7 @@
         GAME.Init();
         SPACE.Init();
         SHIP.Init();
+        SHIP.Ships = [];    // Обнуляем, т.к. иначе после F5 массив SHIP.Ships не очищается
 
         var modalWindow = $("#ModalWindow");
         if (modalWindow.css("display") == "none") {
@@ -20,7 +21,8 @@
                     $("#Sidebar").append($("#SelectShipParameters"));
                     modalWindow.css("display", "none");
                     var index = SHIP.MyShip.ImageIndex;
-                    LoadGame(index);
+                    var name = $("#UserName").val();
+                    LoadGame(index, name);
                 }
             });
         }
@@ -29,26 +31,19 @@
     // *** END of Main start point***
 
 
-    function LoadGame(index) {
-        var request = REQUESTS.InitShips(index);
+    function LoadGame(index, name) {
+        var request = REQUESTS.InitShips(index, name);
 
         request.done(function (data) {
             LoadShips(data.ships, data.id);
             GAME.CenterSpaceToShip();
             SPACE.Sun.GetCenter();
             //InitDominators();
-
-            // Запросы - setInterval
-            //GAME.IntervalID = setInterval(function () {
-            //    Synchronize();
-            //}, GAME.SyncRate);
-
-            // Отрисовка - setTimeout
-            //RepeatReloadGame();
         });
     }
 
     function LoadShips(ships, id) {
+        // Загружать все корабли не нужно, только заполнить параметры своего (SHIP.MyShip) - остальные придут через Synchronize
         if (ships[0] != null) {
             for (var i = 0; i < ships.length; i++) {
                 ships[i].Image = parseInt(ships[i].Image);
@@ -66,42 +61,23 @@
 
                     SHIP.MyShip.ID = id;
                     SHIP.MyShip.Name = userName;
-                    SHIP.MyShip.State = ships[i].State; // Active | Inactive | ExplodeXX
-                    SHIP.MyShip.X = ships[i].X; // X, Y - для центрирования карты по кораблю
+                    SHIP.MyShip.State = ships[i].State; // Active | Inactive | ExplodeXXX
+                    SHIP.MyShip.X = ships[i].X;         // X, Y - для центрирования карты по кораблю
                     SHIP.MyShip.Y = ships[i].Y;
                     SHIP.MyShip.VectorMove = 0;
                     SHIP.MyShip.VectorRotate = 0;
                     SHIP.MyShip.ImageIndex = ships[i].Image;
                     SHIP.MyShip.ImageBig.src = GAME.ImagePath + "Rangers/Original/ranger" + (ships[i].Image + 1) + ".png";   // При загрузке сразу показываем увеличенную копию
                 }
-
-                // Добавляем каждый корабль в массив SHIP.Ships (в том числе и свой!)
-                // В объекте SHIP.MyShip будет только индекс (SHIP.MyShip.Index) - для большого изображения своего корабля на левой панели
-                var otherShip = new Ship(ships[i]);
-                SHIP.Ships.push(otherShip);
-
-                if (otherShip.State != "Inactive") {
-                    GAME.Statistics.AddStatRow(otherShip);
-                }
             }
         }
     }
 
-    //function RepeatReloadGame() {
-    //    REQUESTS.GetShips()
-    //        .done(function (data) {
-    //            Synchronize(data);
-    //        })
-    //        .error(function () {
-    //            REQUESTS.GetShips()
-    //                .done(function (data) {
-    //                    Synchronize(data);
-    //                });
-    //        })
-    //        .complete(function (data) {
-    //            setTimeout(RepeatReloadGame, 19);
-    //        });
-    //}
+    my.DeleteShip = function (id) {
+        ship = UTILS.GetElement(SHIP.Ships, "ID", id);
+        ship.State = "Inactive";
+        GAME.Statistics.DeleteStatRow(ship);
+    }
 
     my.Synchronize = function(data) {
         SynchronizePlanets(data);
@@ -168,11 +144,17 @@
                         // Сдвигаем карту (если корабль на краю канвы, но не на краю космоса)
                         GAME.ShiftSpace(x, y, dX, dY, zoneX, zoneY);
                         SPACE.Sun.GetCenter();
+
+                        // Обновляем координаты корабля
+                        SHIP.MyShip.X = data.ships[i].X; // X, Y - для центрирования карты по кораблю
+                        SHIP.MyShip.Y = data.ships[i].Y;
                     }
 
-                    // Обновляем координаты корабля
-                    SHIP.MyShip.X = data.ships[i].X; // X, Y - для центрирования карты по кораблю
-                    SHIP.MyShip.Y = data.ships[i].Y;
+                    if (data.ships[i].State == "Active" && SHIP.MyShip.State.indexOf("Explode") != -1) {
+                        GAME.CenterSpaceToShip();
+                        SPACE.Sun.GetCenter();
+                    }
+                    SHIP.MyShip.State = data.ships[i].State;
 
                 }
 
@@ -192,7 +174,12 @@
                     if (SHIP.Ships[j].Name == "") {
                         SHIP.Ships[j].Name = data.ships[i].Name;
                     }
+
+                    if (SHIP.Ships[j].State == "Inactive") {
+                        GAME.Statistics.AddStatRow(SHIP.Ships[j]);
+                    }
                     SHIP.Ships[j].State = data.ships[i].State;
+
                     SHIP.Ships[j].MaxHP = data.ships[i].HPCurrent * SHIP.HPMult;
                     SHIP.Ships[j].HP = data.ships[i].HP;
                     SHIP.Ships[j].X = data.ships[i].X;
@@ -218,13 +205,13 @@
             }
 
             // Перебираем на клиенте корабли, и те, которые не пришли с сервера, помечаем как "Inactive"
-            for (var i = 0; i < clientShipsCount; i++) {
-                if (indexes.indexOf(i) == -1) {
-                    SHIP.Ships[i].State = "Inactive";
-                    GAME.Statistics.DeleteStatRow(SHIP.Ships[i]);
-                }
-            }
-            SHIP.Ships.filter(function (obj) { return obj.State != "Inactive"; });
+            //for (var i = 0; i < clientShipsCount; i++) {
+            //    if (indexes.indexOf(i) == -1) {
+            //        SHIP.Ships[i].State = "Inactive";
+            //        GAME.Statistics.DeleteStatRow(SHIP.Ships[i]);
+            //    }
+            //}
+            //SHIP.Ships.filter(function (obj) { return obj.State != "Inactive"; });
         }
     }
 
@@ -329,9 +316,9 @@
 
     window.onkeydown = function (key) {
         var vectorMove = SHIP.MyShip.VectorMove;
-        if (vectorMove == null) return false;                   // If key was up when MyShip wasn't created yet (i.e. when Ctrl+F5 was pressed in browser)
+        if (vectorMove == null) return key;                   // If key was up when MyShip wasn't created yet (i.e. when Ctrl+F5 was pressed in browser)
         var state = SHIP.MyShip.State;
-        if (state.indexOf("Explode") != -1) return false;       // If my ship is in the explosion state, it cannot move.
+        if (state.indexOf("Explode") != -1) return key;       // If my ship is in the explosion state, it cannot move.
 
         var actionName = "", actionValue = 0;
 
@@ -400,10 +387,10 @@
 
     window.onkeyup = function (key) {
         var vectorMove = SHIP.MyShip.VectorMove;
-        if (vectorMove == null) return false;                     // If key was up when MyShip wasn't created yet (i.e. when Ctrl+F5 was pressed in browser)
+        if (vectorMove == null) return key;                     // If key was up when MyShip wasn't created yet (i.e. when Ctrl+F5 was pressed in browser)
 
         var state = SHIP.MyShip.State;
-        if (state.indexOf("Explode") != -1) return false;       // If my ship is in the explosion state, it cannot move.
+        if (state.indexOf("Explode") != -1) return key;       // If my ship is in the explosion state, it cannot move.
 
         var actionName = "", actionValue = 0;
 
@@ -449,17 +436,6 @@
 
         //return false;
     };
-
-    //$(GAME.Canvas).mousemove(function (e) {
-    //    var x = e.pageX - GAME.SidebarWidth;
-    //    var y = e.pageY;
-    //    var step = 10;
-    //    var zone = 100; // зона по краю canvas, при наведении на которую карта начинает двигаться
-
-    //    GAME.ShiftSpace(x, y, step, step, zone, zone);
-    //    SPACE.Sun.GetCenter();
-
-    //});
 
     return my;
 });

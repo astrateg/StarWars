@@ -19,11 +19,26 @@ require(['jquery', 'app', 'sigr', 'signalr-hubs'], function ($, APP) {
         APP.Init();
 
         var spaceHub = $.connection.spaceHub;
+        spaceHub.client.connected = function () { };
+        spaceHub.client.disconnected = function () { };
+
 
         spaceHub.client.broadcastMessage = function (data) {
             APP.Synchronize(data);
         }
 
-        $.connection.hub.start();
+        spaceHub.client.joined = function (connId, id, time) {
+            //alert(connId + "\n" + id + " is connected at\n" + time);
+        }
+
+        spaceHub.client.leave = function (disconnected, id) {
+            if (disconnected) {
+                APP.DeleteShip(id);
+            }
+        }
+
+        $.connection.hub.start().done(function () {
+        });
+
     });
 });

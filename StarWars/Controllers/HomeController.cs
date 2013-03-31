@@ -60,7 +60,6 @@ namespace StarWars.Controllers {
                     myShip.VectorMove = 0;
                     myShip.VectorRotate = 0;
                     myShip.State = "Active";
-                    myShip.LastActivity = DateTime.Now;
                     MyShipExists = 1;
                     MyShipImageIndex = myShip.Image;
                 }
@@ -85,24 +84,18 @@ namespace StarWars.Controllers {
                 SpeedMult = Ship.Ranger.Mult.SpeedMult,
                 AngleSpeedMult = Ship.Ranger.Mult.AngleSpeedMult,
                 ShipSize = Ship.ShipSize,
-
-                //bombHP = Ship.BombHP,
                 //bombSize = Ship.BombSize,
-                //bombSpeed = Ship.BombSpeed,
-
-                SunHP = Ship.SunHP,
-                RegenerateHP = Ship.RegenerateHP,
                 SyncRate = Game.SyncRate,
             };
             return Json(response, JsonRequestBehavior.AllowGet);
         }
 
         [HttpPost]
-        public JsonResult InitShips(int index) {
+        public JsonResult InitShips(int index, string name) {
             Ship myShip;
             HttpCookie cookie = Request.Cookies["Ship"];
             if (index > -1) {
-                myShip = CreateShip(int.Parse(cookie.Value), "noname", index);
+                myShip = CreateShip(int.Parse(cookie.Value), name, index);
                 Game.Instance.AddShip(myShip);
             }
 
@@ -135,8 +128,6 @@ namespace StarWars.Controllers {
 
         //public JsonResult GetShips() {
         //    Ship myShip = GetShipByCookie();
-        //    myShip.LastActivity = DateTime.Now;
-
         //    var response = new {
         //        timeFromStart = Game.Instance.TimeFromStart,
         //        ships = Game.Instance.ShipListActive
@@ -148,8 +139,8 @@ namespace StarWars.Controllers {
         [NonAction]
         public Ship CreateShip(int id, string name, int index) {
             string type = "ranger";
-            double X = 0;
-            double Y = 0;
+            double X = Utils.RandomStartX();
+            double Y = Utils.RandomStartY();
             double angle = 0;
             int size = Ship.ShipSize;
             Ship ship = new Ship(id, name, type, index, X, Y, angle, size);

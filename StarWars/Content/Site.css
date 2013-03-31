@@ -117,12 +117,12 @@ body {
 
 #SelectShipParameters {
     width: 162px;
-    height: 410px;
     background: #c9eafe;
     display: inline-block;
 }
 
-#SelectShipParameters .Name {
+#SelectShipParameters .Name,
+#SelectUserName .Name {
     font-weight: bold;
     height: 20px;
     margin-bottom: 5px;
@@ -134,6 +134,18 @@ body {
     padding-bottom: 10px;
     border-bottom: 1px solid gray;
 }
+
+#SelectUserName {
+    width: 162px;
+    background: #c9eafe;
+    display: inline-block;
+    margin: 20px 0;
+}
+
+#Sidebar #SelectShipParameters {
+    background-color: rgba(201, 234, 254, 0.7);
+}
+
 
 #Sidebar {
 
@@ -160,6 +172,7 @@ body {
 #Statistics {
     border: 2px solid black;
     border-collapse: collapse;
+    margin: 20px 0;
 }
 
 #Statistics td {

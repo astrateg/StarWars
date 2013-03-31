@@ -38,7 +38,7 @@ namespace StarWars.Models
 		public static int SunHP { get { return 1;} }
 		public static double RegenerateHP { get { return 0.1;} }
 
-        public static double DeltaSpeed { get { return 0.1; } }
+		public static double DeltaSpeed { get { return 0.1; } }
 
 		// Properties
 		public int ID { get; set; }
@@ -73,8 +73,6 @@ namespace StarWars.Models
 		[ScriptIgnore]
 		public int VectorRotate { get; set; }    // 1 (CW) | -1 (CCW) | 0 (Stop)
 		[ScriptIgnore]
-		public DateTime LastActivity { get; set; }
-		[ScriptIgnore]
 		public int Shoot { get; set; }              // 1 (Shoot) | 0
 		
 		public int Kill { get; set; }
@@ -106,7 +104,7 @@ namespace StarWars.Models
 			this.SpeedCurrent = Ship.Ranger.Types.SpeedStart[indexRanger];
 			this.SpeedLimit = Ship.Ranger.Types.SpeedLimit[indexRanger];
 			//this.Speed = this.SpeedCurrent * Ship.Ranger.Mult.SpeedMult;
-            this.Speed = 0.0;
+			this.Speed = 0.0;
 
 			// AngleSpeed
 			this.AngleSpeedCurrent = Ship.Ranger.Types.AngleSpeedStart[indexRanger];
@@ -120,31 +118,30 @@ namespace StarWars.Models
 			this.Image = indexRanger;                     // Индекс файла-изображения
 			this.VectorMove = 0;
 			this.VectorRotate = 0;
-			this.LastActivity = DateTime.Now;
 			this.Shoot = 0;
 			this.Kill = 0;
 			this.Death = 0;
 			this.Bombs = new List<Bomb>();
 		}
 
-        // Speed: (-SpeedCurrent...+SpeedCurrent)
-        public void ChangeSpeed(int direction) {
-            if (direction > 0) {
-                if (this.Speed + Ship.DeltaSpeed <= this.SpeedCurrent) {
-                    this.Speed += Ship.DeltaSpeed;
-                }
-            }
-            else {
-                if (this.Speed - Ship.DeltaSpeed >= -this.SpeedCurrent) {
-                    this.Speed -= Ship.DeltaSpeed;
-                }
-            }
-        }
+		// Speed: (-SpeedCurrent...+SpeedCurrent)
+		public void ChangeSpeed(int direction) {
+			if (direction > 0) {
+				if (this.Speed + Ship.DeltaSpeed <= this.SpeedCurrent) {
+					this.Speed += Ship.DeltaSpeed;
+				}
+			}
+			else {
+				if (this.Speed - Ship.DeltaSpeed >= -this.SpeedCurrent) {
+					this.Speed -= Ship.DeltaSpeed;
+				}
+			}
+		}
 
 		// *** Move & Rotate ***
 		public void Move() {
-            var vx = Math.Cos(this.Angle) * this.Speed * Ship.Ranger.Mult.SpeedMult;
-            var vy = Math.Sin(this.Angle) * this.Speed * Ship.Ranger.Mult.SpeedMult;
+			var vx = Math.Cos(this.Angle) * this.Speed * Ship.Ranger.Mult.SpeedMult;
+			var vy = Math.Sin(this.Angle) * this.Speed * Ship.Ranger.Mult.SpeedMult;
 			
 			// Try moving
 			this.X += vx;
@@ -159,7 +156,7 @@ namespace StarWars.Models
 			// Check X-moving
 			if (!successLeft) {
 				this.X = 0;
-                this.Speed = 0;
+				//this.Speed = 0;
 			}
 			else if (!successRight) {
 				this.X = Game.SpaceWidth - this.Size;
@@ -171,7 +168,7 @@ namespace StarWars.Models
 			// Check Y-moving
 			if (!successUp) {
 				this.Y = 0;
-                this.Speed = 0;
+				//this.Speed = 0;
 			}
 			else if (!successDown) {
 				this.Y = Game.SpaceHeight - this.Size;
@@ -223,20 +220,7 @@ namespace StarWars.Models
 			}
 		}
 
-			// Generating my ship if it isn't found
-			//randomIndex = UTILS.GetRandomInt(0, SHIP.RangerImagesMax - 1);
-			//if (!isMyShipFound) {
-			//    var shipX1 = UTILS.RandomStartX();
-			//    var shipY1 = UTILS.RandomStartY();
-			//    var shipAngle1 = Math.random(Math.PI);
-			//    var userName = prompt("Введите свое имя (не более 8 символов)");
-			//    if (userName.length > 8) {
-			//        userName = userName.slice(0, 8);
-			//    }
-			//    userName = encodeURIComponent(userName);
-			//    this = new Ship(GAME.SessionId, userName, "ranger", SHIP.ShipMaxHP, SHIP.ShipMaxHP, shipX1, shipY1, SHIP.ShipSpeed, shipAngle1, SHIP.ShipAngleSpeed, SHIP.ShipSize, randomIndex, "Stop", "Stop", 0);
-
-			//}
+		//var shipAngle1 = Math.random(Math.PI);
 
 		public object Clone() {
 			return this.MemberwiseClone();
@@ -257,40 +241,31 @@ namespace StarWars.Models
 		// *** Explodes Animation and Changing Explosion State ***
 		public void GenerateExplodes() {
 			string state = this.State;
-			if (state.Contains("Explode")) {    // If this ship is in the explosion state, increment explosion step (00 -> 01, 01 -> 02, etc.)
+			if (state.Contains("Explode")) {        // If this ship is in the explosion state, increment explosion step (00 -> 01, 01 -> 02, etc.)
+				int DelayMax = 50 / Game.SyncRate;  // Result: int
 				int Delay = state[9] - '0';
 				int X = state[8] - '0';
-				int Y = state[7] - '0';         // Converting from Char to Int. Another way: int X = int.Parse(state[0].ToString());
+				int Y = state[7] - '0';             // Converting from Char to Int. Another way: int X = int.Parse(state[0].ToString());
 
 				Delay++;
-				int DelayMax = 10 / Game.SyncRate;  // Result: int
 				if (Delay % DelayMax == 0) {
+					Delay = 0;
 					X++;
 					if (X % 3 == 0) {
 						X = 0; Y++;
 						if (Y > 3) {
 							//this.X = UTILS.RandomStartX();
 							//this.Y = UTILS.RandomStartY();
-							this.X = 0;
-							this.Y = 0;
+							this.X = Utils.RandomStartX();
+							this.Y = Utils.RandomStartY();
 							this.HP = this.HPCurrent * Ship.Ranger.Mult.HPMult;
-							this.State = "Start0";
+							this.State = "Active";
 							return;
 						}
 					}
 				}
 				this.State = "Explode" + Y + X + Delay;    // Next step of explosion
 			}
-			else if (state.Contains("Start")) {
-				int step = int.Parse(state.Substring(5));   // (00 -> 0, 01 -> 1, etc.)
-				step++;
-				if (step < 20) {
-					this.State = "Start" + step;       // Next step of reloading
-				}
-				else {
-					this.State = "Active";               // Reloading is finished
-				}
-			}
 		}
-    }
+	}
 }

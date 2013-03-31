@@ -33,49 +33,6 @@
         return SHIP.Ranger.ImagesSmall[this.Image];
     };
 
-    // *** Отработка движения корабля в случае, если очередной запрос не вернулся с сервера ***
-    //Ship.prototype.RotateCCW = function (angle) {
-    //    this.Angle -= angle;
-    //    this.Angle = Math.round(this.Angle * 100) / 100; // Округление до 2 знаков
-    //};
-
-    //Ship.prototype.RotateCW = function (angle) {
-    //    this.Angle += angle;
-    //    this.Angle = Math.round(this.Angle * 100) / 100;
-    //};
-
-    //Ship.prototype.MoveForward = function () {
-    //    var vx = Math.cos(this.Angle) * this.Speed;
-    //    var vy = Math.sin(this.Angle) * this.Speed;
-    //    this.X += vx;
-    //    this.Y += vy;
-    //    this.X = Math.round(this.X * 100) / 100;
-    //    this.Y = Math.round(this.Y * 100) / 100;
-    //    //this.CheckReappear();   // If the ship reaches any border of the GAME, it appears on the opposite side of the GAME
-    //};
-
-    //Ship.prototype.MoveBackward = function () {
-    //    var vx = Math.cos(this.Angle) * this.Speed;
-    //    var vy = Math.sin(this.Angle) * this.Speed;
-    //    this.X -= vx;
-    //    this.Y -= vy;
-    //    this.X = Math.round(this.X * 100) / 100;
-    //    this.Y = Math.round(this.Y * 100) / 100;
-    //    //this.CheckReappear();
-    //};
-    // ***
-
-    //Ship.prototype.CheckReappear = function () {
-    //    if (this.X < - this.Size / 2)
-    //        this.X = GAME.Canvas.width - this.Size / 2;
-    //    if (this.X > GAME.Canvas.width - this.Size / 2)
-    //        this.X = -this.Size / 2;
-    //    if (this.Y < -this.Size / 2)
-    //        this.Y = GAME.Canvas.height - this.Size / 2;
-    //    if (this.Y > GAME.Canvas.height - this.Size / 2)
-    //        this.Y = -this.Size / 2;
-    //};
-
     Ship.prototype.GetCenterX = function () {
         return this.X + this.Size / 2 - GAME.SpaceShiftX;
     };
@@ -109,47 +66,51 @@
 
         var lineHP = (this.HP / this.MaxHP) * this.Size;
 
-        if (this.Type.indexOf("dominator") != -1) {
-            GAME.Context.strokeStyle = "#00BBFF";
-            GAME.Context.fillStyle = "#00BBFF";
-        }
-        else {
-            GAME.Context.strokeStyle = "#00BB00";
-            GAME.Context.fillStyle = "#00BB00";
-        }
+        //if (this.Type.indexOf("dominator") != -1) {
+        //    GAME.Context.strokeStyle = "#00BBFF";
+        //    GAME.Context.fillStyle = "#00BBFF";
+        //}
+        //else {
+        //    GAME.Context.strokeStyle = "#00BB00";
+        //    GAME.Context.fillStyle = "#00BB00";
+        //}
+
+
+        var color = {
+            myShipCircle:   "rgba(0, 200, 0, 0.3)",
+            allShipHPFull:  "#00BB00",
+            allShipHPMid:   "#FFBB00",
+            allShipHPEmpty: "#FF0000",
+        };
 
         if (this.ID == SHIP.MyShip.ID) {    // Если наш корабль - подсвечиваем его
-            if (state.indexOf("Start") != -1) { // Если reloading - то сначала концентрические круги
-                var step = parseInt(state.slice(5));
-                //GAME.Context.arc(centerShipX, centerShipY, this.Size * (20 - step) / 10, 0, 2 * Math.PI, false);
-                GAME.Context.beginPath();
-                GAME.Context.arc(centerShipX, centerShipY, this.Size * (25 - step) / 5, 0, 2 * Math.PI);      // arc(x, y, radius, startAngle, endAngle, CCW)
-                GAME.Context.closePath();
-                GAME.Context.fill();
-            }
-            else {
-                GAME.Context.beginPath();
-                GAME.Context.arc(centerShipX, centerShipY, this.Size * 0.8, -Math.PI / 4, -3 * Math.PI / 4, true);      // arc(x, y, radius, startAngle, endAngle)
-                GAME.Context.arc(centerShipX, centerShipY, this.Size * 0.75, -3 * Math.PI / 4, -Math.PI / 4);
-                GAME.Context.closePath();
-                GAME.Context.fill();
-            }
+            GAME.Context.strokeStyle = color.myShipCircle;
+            GAME.Context.fillStyle = color.myShipCircle;
+
+            GAME.Context.beginPath();
+            GAME.Context.arc(centerShipX, centerShipY, this.Size, 0, 2 * Math.PI, true);      // arc(x, y, radius, startAngle, endAngle)
+            //GAME.Context.arc(centerShipX, centerShipY, this.Size * 0.75, -3 * Math.PI / 4, -Math.PI / 4);
+            GAME.Context.closePath();
+            GAME.Context.fill();
 
             // Обновили полосу HP на панели Sidebar
             var currentShipHPValue = document.getElementById('CurrentShipHPValue');
             currentShipHPValue.style.width = (this.HP / this.MaxHP) * 124 + "px";    // 124 = 128 - 2 - 2 (размер рисунка с кораблем минус границы 2px)
 
             if (this.HP <= (this.MaxHP / 4)) {
-                GAME.Context.fillStyle = "#FF0000";
-                currentShipHPValue.style.backgroundColor = "#FF0000";
+                GAME.Context.fillStyle = color.allShipHPEmpty;
+                currentShipHPValue.style.backgroundColor = color.allShipHPEmpty;
             } else if (this.HP <= (this.MaxHP / 2)) {
-                GAME.Context.fillStyle = "#FFBB00";
-                currentShipHPValue.style.backgroundColor = "#FFBB00";
+                GAME.Context.fillStyle = color.allShipHPMid;
+                currentShipHPValue.style.backgroundColor = color.allShipHPMid;
             } else {
-                currentShipHPValue.style.backgroundColor = "#00BB00";
+                currentShipHPValue.style.backgroundColor = color.allShipHPFull;
             }
         }
 
+        // Обновили полосу HP для каждого корабля на карте
+        GAME.Context.strokeStyle = color.allShipHPFull;
+        GAME.Context.fillStyle = color.allShipHPFull;
         GAME.Context.strokeRect(centerShipX - this.Size / 2, centerShipY + this.Size / 2, this.Size, 5);    // fillRect(x, y, width, height)
         GAME.Context.fillRect(centerShipX - this.Size / 2, centerShipY + this.Size / 2, lineHP, 5);         // fillRect(x, y, width, height)
 
