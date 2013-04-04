@@ -102,5 +102,16 @@
         });
     };
 
+    my.ChangeWeapon = function (index) {
+        $.ajax({
+            url: "http://" + path + "/game/Home/ChangeWeapon/",
+            type: "POST",
+            data: { index: index },
+            //dataType: "json",
+            //contentType: "application/json; charset=utf-8", // !!! (по умолчанию - "application/x-www-form-urlencoded; charset=UTF-8")
+            cache: false
+        });
+    };
+
     return my;
 });

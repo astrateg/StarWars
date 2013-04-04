@@ -6,6 +6,8 @@
         this.State = args.State;
         this.HP = args.HP;
         this.MaxHP = args.HPCurrent * SHIP.HPMult;
+        this.MP = args.MP;
+        this.MaxMP = args.MPCurrent * SHIP.MPMult;
         this.X = args.X;
         this.Y = args.Y;
         //this.Speed = speed;
@@ -65,22 +67,14 @@
         var centerShipY = this.GetCenterY();
 
         var lineHP = (this.HP / this.MaxHP) * this.Size;
-
-        //if (this.Type.indexOf("dominator") != -1) {
-        //    GAME.Context.strokeStyle = "#00BBFF";
-        //    GAME.Context.fillStyle = "#00BBFF";
-        //}
-        //else {
-        //    GAME.Context.strokeStyle = "#00BB00";
-        //    GAME.Context.fillStyle = "#00BB00";
-        //}
-
+        var lineMP = (this.MP / this.MaxMP) * this.Size;
 
         var color = {
             myShipCircle:   "rgba(0, 200, 0, 0.3)",
             allShipHPFull:  "#00BB00",
             allShipHPMid:   "#FFBB00",
             allShipHPEmpty: "#FF0000",
+            allShipMP: "#0000BB",
         };
 
         if (this.ID == SHIP.MyShip.ID) {    // Если наш корабль - подсвечиваем его
@@ -93,27 +87,40 @@
             GAME.Context.closePath();
             GAME.Context.fill();
 
+            // (Проблема кроссбраузерности: свойство innerText отсутствует в Firefox. Поэтому используем jQuery!)
             // Обновили полосу HP на панели Sidebar
-            var currentShipHPValue = document.getElementById('CurrentShipHPValue');
-            currentShipHPValue.style.width = (this.HP / this.MaxHP) * 124 + "px";    // 124 = 128 - 2 - 2 (размер рисунка с кораблем минус границы 2px)
+            var currentShipHPValue = $('#CurrentShipHPValue');
+            currentShipHPValue.text(Math.round(this.HP));
+            currentShipHPValue.css("width", (this.HP / this.MaxHP) * 124 + "px");    // 124 = 128 - 2 - 2 (размер рисунка с кораблем минус границы 2px)
+            // Обновили полосу MP на панели Sidebar
+            var currentShipMPValue = $('#CurrentShipMPValue');
+            currentShipMPValue.text(Math.round(this.MP));
+            currentShipMPValue.css("width", (this.MP / this.MaxMP) * 124 + "px");    // 124 = 128 - 2 - 2 (размер рисунка с кораблем минус границы 2px)
+            currentShipMPValue.css("backgroundColor", color.allShipMP);
 
             if (this.HP <= (this.MaxHP / 4)) {
                 GAME.Context.fillStyle = color.allShipHPEmpty;
-                currentShipHPValue.style.backgroundColor = color.allShipHPEmpty;
+                currentShipHPValue.css("backgroundColor", color.allShipHPEmpty);
             } else if (this.HP <= (this.MaxHP / 2)) {
                 GAME.Context.fillStyle = color.allShipHPMid;
-                currentShipHPValue.style.backgroundColor = color.allShipHPMid;
+                currentShipHPValue.css("backgroundColor", color.allShipHPMid);
             } else {
-                currentShipHPValue.style.backgroundColor = color.allShipHPFull;
+                currentShipHPValue.css("backgroundColor", color.allShipHPFull);
             }
         }
 
+        var lineHeight = 5;
         // Обновили полосу HP для каждого корабля на карте
         GAME.Context.strokeStyle = color.allShipHPFull;
         GAME.Context.fillStyle = color.allShipHPFull;
-        GAME.Context.strokeRect(centerShipX - this.Size / 2, centerShipY + this.Size / 2, this.Size, 5);    // fillRect(x, y, width, height)
-        GAME.Context.fillRect(centerShipX - this.Size / 2, centerShipY + this.Size / 2, lineHP, 5);         // fillRect(x, y, width, height)
+        GAME.Context.strokeRect(centerShipX - this.Size / 2, centerShipY + this.Size / 2, this.Size, lineHeight);    // fillRect(x, y, width, height)
+        GAME.Context.fillRect(centerShipX - this.Size / 2, centerShipY + this.Size / 2, lineHP, lineHeight);         // fillRect(x, y, width, height)
 
+        // Обновили полосу MP для каждого корабля на карте
+        GAME.Context.strokeStyle = color.allShipMP;
+        GAME.Context.fillStyle = color.allShipMP;
+        GAME.Context.strokeRect(centerShipX - this.Size / 2, centerShipY + this.Size / 2 + lineHeight, this.Size, lineHeight);    // fillRect(x, y, width, height)
+        GAME.Context.fillRect(centerShipX - this.Size / 2, centerShipY + this.Size / 2 + lineHeight, lineMP, lineHeight);         // fillRect(x, y, width, height)
 
         if (this.Angle == 0) {
             GAME.Context.drawImage(this.GetImage(), this.X - GAME.SpaceShiftX, this.Y - GAME.SpaceShiftY);

@@ -68,6 +68,9 @@
                     SHIP.MyShip.VectorRotate = 0;
                     SHIP.MyShip.ImageIndex = ships[i].Image;
                     SHIP.MyShip.ImageBig.src = GAME.ImagePath + "Rangers/Original/ranger" + (ships[i].Image + 1) + ".png";   // При загрузке сразу показываем увеличенную копию
+                    SHIP.MyShip.Weapons = ships[i].Weapons;
+                    SHIP.MyShip.WeaponActive = ships[i].WeaponActive;
+                    SHIP.MyShip.ShowAllWeapons();
                 }
             }
         }
@@ -84,27 +87,10 @@
         //SynchronizeDominatorShips();
         SynchronizeShips(data);
         ReloadCanvas();
-
-        //function RefreshBombs(ship, bombs) {
-        //    ship.Bombs = [];    // сначала обнуляем массив бомб для каждого рейнджера
-        //    if (bombs != null) {
-        //        for (var k = 0; k < bombs.length; k++) {
-        //            ship.Bombs[k] = new Bomb(
-        //                bombs[k].Type,
-        //                bombs[k].X,
-        //                bombs[k].Y,
-        //                bombs[k].Angle,
-        //                bombs[k].Size,
-        //                bombs[k].Image,
-        //                bombs[k].Speed
-        //            );
-        //        }
-        //    }
-        //}
     }
 
     function SynchronizePlanets(data) {
-        SPACE.Sun.GetAngle(data.timeFromStart);
+        SPACE.Sun.Angle = data.sunAngle;
         for (var i = 0; i < SPACE.Planets.length; i++) {
             SPACE.Planets[i].GetOrbitAngle(data.timeFromStart);
         }
@@ -182,13 +168,14 @@
 
                     SHIP.Ships[j].MaxHP = data.ships[i].HPCurrent * SHIP.HPMult;
                     SHIP.Ships[j].HP = data.ships[i].HP;
+                    SHIP.Ships[j].MP = data.ships[i].MP;
                     SHIP.Ships[j].X = data.ships[i].X;
                     SHIP.Ships[j].Y = data.ships[i].Y;
                     SHIP.Ships[j].Angle = data.ships[i].Angle;
                     SHIP.Ships[j].Image = data.ships[i].Image;
                     SHIP.Ships[j].Kill = data.ships[i].Kill;
                     SHIP.Ships[j].Death = data.ships[i].Death;
-                    //RefreshBombs(SHIP.Ships[j], data.ships[i].Bombs);   // обнуляем и заполняем массив данными с сервера
+                    RefreshBombs(SHIP.Ships[j], data.ships[i].Bombs);   // обнуляем и заполняем массив данными с сервера
                     GAME.Statistics.RefreshStatRow(SHIP.Ships[j]);
 
                     break;
@@ -198,20 +185,20 @@
                     data.ships[i].Image = parseInt(data.ships[i].Image);
                     var otherShip = new Ship(data.ships[i]);
 
-                    //RefreshBombs(otherShip, data.ships[i].Bombs);
+                    RefreshBombs(otherShip, data.ships[i].Bombs);
                     GAME.Statistics.AddStatRow(otherShip);
                     SHIP.Ships.push(otherShip);
                 }
             }
+        }
+    }
 
-            // Перебираем на клиенте корабли, и те, которые не пришли с сервера, помечаем как "Inactive"
-            //for (var i = 0; i < clientShipsCount; i++) {
-            //    if (indexes.indexOf(i) == -1) {
-            //        SHIP.Ships[i].State = "Inactive";
-            //        GAME.Statistics.DeleteStatRow(SHIP.Ships[i]);
-            //    }
-            //}
-            //SHIP.Ships.filter(function (obj) { return obj.State != "Inactive"; });
+    function RefreshBombs(ship, bombs) {
+        ship.Bombs = [];    // сначала обнуляем массив бомб для каждого рейнджера
+        if (bombs != null) {
+            for (var k = 0; k < bombs.length; k++) {
+                ship.Bombs[k] = new Bomb(bombs[k]);
+            }
         }
     }
 
@@ -224,86 +211,18 @@
             SPACE.Planets[i].Show();
         }
 
+        for (i = 0; i < SHIP.Ships.length; i++) {
+            SHIP.Ships[i].Show();
+            for (var j = 0; j < SHIP.Ships[i].Bombs.length; j++) {
+                SHIP.Ships[i].Bombs[j].Show();
+            }
+        }
+
         // *** My Bombs ***
-        //for (i = 0; i < SHIP.MyShip.Bombs.length; i++) {
-        //    SHIP.MyShip.Bombs[i].Move();
-        //    CheckSunAndBomb(SHIP.MyShip.Bombs[i]);
-        //}
 
         // Функция Array.prototype.filter имеет аналог в jQuery: $.grep
         //SHIP.MyShip.Bombs = SHIP.MyShip.Bombs.filter(function (obj) { return obj.Vector !== "Inactive"; });   // Убираем из массива все неактивные бомбы (попавшие в корабль (или Солнце) / улетевшие за экран)
 
-        //for (i = 0; i < SHIP.MyShip.Bombs.length; i++) {               // Неактивных бомб в массиве нет
-        //    SHIP.MyShip.Bombs[i].Show();
-        //    for (var j = 0; j < arrDominators.length; j++) {    // А неактивные корабли - есть
-        //        CheckBombAndShip(SHIP.MyShip.Bombs[i], arrDominators[j]);       // Проверяем, не встретилась ли наша бомба с доминаторским кораблем
-        //    }
-        //    if (SHIP.MyShip.Bombs[i].Vector != "Inactive") {
-        //        for (var j = 0; j < SHIP.Ships.length; j++) {
-        //            // Проверяем, не встретилась ли наша бомба с рейнджерским кораблем (и если да, то не прибила ли его)
-        //            if ( CheckBombAndShip(SHIP.MyShip.Bombs[i], SHIP.Ships[j]) ) {
-        //                SHIP.MyShip.Kill++;
-        //            } 
-        //        }
-        //    }
-        //}
-
-        // *** Rangers bombs ***
-
-        //for (i = 0; i < SHIP.Ships.length; i++) {
-        //    if (SHIP.Ships[i].Bombs != null) {
-        //        SHIP.Ships[i].Bombs = SHIP.Ships[i].Bombs.filter(function (obj) { return obj.Vector !== "Inactive"; });   // Убираем из массива все бомбы, улетевшие за экран
-        //    }
-        //}
-
-        // Неактивные бомбы пропускаем (пусть каждый вычищает свои бомбы сам)
-        //for (i = 0; i < SHIP.Ships.length; i++) {
-        //    if (SHIP.Ships[i].Bombs != null) {
-        //        for (var j = 0; j < SHIP.Ships[i].Bombs.length; j++) {
-        //            if (SHIP.Ships[i].Bombs[j].Vector != "Inactive") {
-        //                SHIP.Ships[i].Bombs[j].Show();
-        //                // Проверяем, не встретилась ли рейнджерская бомба с нашим кораблем
-        //                if (CheckBombAndShip(SHIP.Ships[i].Bombs[j], SHIP.MyShip)) {
-        //                    SHIP.MyShip.Death++;
-        //                }
-        //            }
-        //        }
-        //    }
-        //}
-
-        for (i = 0; i < SHIP.Ships.length; i++) {
-            SHIP.Ships[i].Show();
-        }
-
-        //// Check colliding bombs with ships
-        //function CheckBombAndShip(bomb, ship) {
-        //    var state = ship.State;
-        //    if (state == "Inactive" || state.indexOf("Explode") != -1) {
-        //        return false;
-        //    }
-
-        //    var checkX = (bomb.X >= ship.X - bomb.Size / 2) && (bomb.X <= ship.X + ship.Size - bomb.Size / 2);
-        //    var checkY = (bomb.Y >= ship.Y - bomb.Size / 2) && (bomb.Y <= ship.Y + ship.Size - bomb.Size / 2);
-        //    if (checkX && checkY) {
-        //        bomb.Vector = "Inactive";
-        //        ship.HP -= SHIP.BombHP;           // Если да, уменьшаем HP корабля
-        //        if (ship.HP <= 0) {
-        //            ship.HP = 0;
-        //            ship.State = "Explode00";              // Взрыв проверяется по свойству State
-        //            ship.VectorMove = 0;
-        //            ship.VectorRotate = 0;
-        //            return true;    // Подбил
-        //        }
-        //    }
-        //    return false;
-        //}
-
-        //// Check colliding bombs with sun
-        //function CheckSunAndBomb(bomb) {
-        //    if (Math.sqrt(Math.pow(SPACE.Sun.CenterX - bomb.GetCenterX(), 2) + Math.pow(SPACE.Sun.CenterY - bomb.GetCenterY(), 2)) < SPACE.Sun.Size / 2) {
-        //        bomb.Vector = "Inactive";
-        //    }
-        //}
     }
 
     window.onresize = function () {
@@ -368,11 +287,11 @@
                 break;
 
             case 32:    // Space        (Fire)
-                if (SHIP.MyShip.Shoot == 1) {
+                if (SHIP.MyShip.VectorShoot == 1) {
                     return false;
                 }
-                SHIP.MyShip.Shoot = 1;
-                actionName = "Shoot";
+                SHIP.MyShip.VectorShoot = 1;
+                actionName = "VectorShoot";
                 actionValue = 1;
                 break;
         }
@@ -420,8 +339,8 @@
                 actionValue = 0;
                 break;
             case 32:    // Space        (Fire)
-                SHIP.MyShip.Shoot = 0;
-                actionName = "Shoot";
+                SHIP.MyShip.VectorShoot = 0;
+                actionName = "VectorShoot";
                 actionValue = 0;
                 break;
             case 67:    // C (Center map to my ship)

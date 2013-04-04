@@ -34,7 +34,7 @@ namespace StarWars.Controllers {
             var response = new {
                 Sun = new {
                     Size = Space.Sun.Size,
-                    RotationAngle = Space.Sun.RotationAngle,
+                    Angle = Space.Sun.Angle,
                 },
                 Planets = Space.Planets
             };
@@ -73,18 +73,24 @@ namespace StarWars.Controllers {
                     Type = Ship.Ranger.Types.Type,
                     HPStart = Ship.Ranger.Types.HPStart,
                     HPLimit = Ship.Ranger.Types.HPLimit,
+                    MPStart = Ship.Ranger.Types.MPStart,
+                    MPLimit = Ship.Ranger.Types.MPLimit,
+                    ArmorStart = Ship.Ranger.Types.ArmorStart,
+                    ArmorLimit = Ship.Ranger.Types.ArmorLimit,
                     SpeedStart = Ship.Ranger.Types.SpeedStart,
                     SpeedLimit = Ship.Ranger.Types.SpeedLimit,
                     AngleSpeedStart = Ship.Ranger.Types.AngleSpeedStart,
-                    AngleSpeedLimit = Ship.Ranger.Types.AngleSpeedLimit
+                    AngleSpeedLimit = Ship.Ranger.Types.AngleSpeedLimit,
+                    Weapons = Ship.Ranger.Types.Weapons
                     //Type = serializer.Serialize(Ship.Ranger.Types.Type),
                     //...
                 },
                 HPMult = Ship.Ranger.Mult.HPMult,
+                MPMult = Ship.Ranger.Mult.MPMult,
                 SpeedMult = Ship.Ranger.Mult.SpeedMult,
                 AngleSpeedMult = Ship.Ranger.Mult.AngleSpeedMult,
                 ShipSize = Ship.ShipSize,
-                //bombSize = Ship.BombSize,
+                BombSize = Bomb.Types.Size,
                 SyncRate = Game.SyncRate,
             };
             return Json(response, JsonRequestBehavior.AllowGet);
@@ -116,6 +122,12 @@ namespace StarWars.Controllers {
         public void UpdateUserShip(string name, int value) {
             int id = GetIdByCookie();
             Game.Instance.UpdateUserShip(id, name, value);
+        }
+
+        [HttpPost]
+        public void ChangeWeapon(int index) {
+            int id = GetIdByCookie();
+            Game.Instance.ChangeWeapon(id, index);
         }
 
         [HttpPost]

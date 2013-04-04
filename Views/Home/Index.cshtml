@@ -1,0 +1,134 @@
+﻿@{
+	Layout = null;
+}
+
+<!DOCTYPE html>
+
+<html>
+<head>
+	<meta name="viewport" content="width=device-width" />
+	<link rel="stylesheet" type="text/css" href="~/Content/Site.css">
+	<title>Star Wars</title>
+</head>
+<body>
+	<div id="ModalWindow">
+		<div id="SelectShipWindow" class="Panel Rounded">
+			<div id="SelectShipIcon" class="Panel Rounded"></div>
+			<div class="Wrapper">
+				<div id="SelectShipParameters" class="Panel Rounded">
+					<div class="Type">
+						<div class="Name">Type</div>
+						<div class="Value">Noname</div>
+					</div>
+					<div class="HP">
+						<div class="Name">HP</div>
+						<div class="Value">
+							<div class="Point"></div>
+							<div class="Point"></div>
+							<div class="Point"></div>
+							<div class="Point"></div>
+							<div class="Point"></div>
+							<div class="Point"></div>
+							<div class="Point"></div>
+							<div class="Point"></div>
+							<div class="Point"></div>
+							<div class="Point"></div>
+						</div>
+					</div>
+					<div class="MP">
+						<div class="Name">MP</div>
+						<div class="Value">
+							<div class="Point"></div>
+							<div class="Point"></div>
+							<div class="Point"></div>
+							<div class="Point"></div>
+							<div class="Point"></div>
+							<div class="Point"></div>
+							<div class="Point"></div>
+							<div class="Point"></div>
+							<div class="Point"></div>
+							<div class="Point"></div>
+						</div>
+					</div>
+					<div class="Armor">
+						<div class="Name">Armor</div>
+						<div class="Value">
+							<div class="Point"></div>
+							<div class="Point"></div>
+							<div class="Point"></div>
+							<div class="Point"></div>
+							<div class="Point"></div>
+							<div class="Point"></div>
+							<div class="Point"></div>
+							<div class="Point"></div>
+							<div class="Point"></div>
+							<div class="Point"></div>
+						</div>
+					</div>
+					<div class="Speed">
+						<div class="Name">Speed</div>
+						<div class="Value">
+							<div class="Point"></div>
+							<div class="Point"></div>
+							<div class="Point"></div>
+							<div class="Point"></div>
+							<div class="Point"></div>
+							<div class="Point"></div>
+							<div class="Point"></div>
+							<div class="Point"></div>
+							<div class="Point"></div>
+							<div class="Point"></div>
+						</div>
+					</div>
+					<div class="AngleSpeed">
+						<div class="Name">Angle Speed</div>
+						<div class="Value">
+							<div class="Point"></div>
+							<div class="Point"></div>
+							<div class="Point"></div>
+							<div class="Point"></div>
+							<div class="Point"></div>
+							<div class="Point"></div>
+							<div class="Point"></div>
+							<div class="Point"></div>
+							<div class="Point"></div>
+							<div class="Point"></div>
+						</div>
+					</div>
+				</div>
+				<div id="SelectUserName" class="Panel Rounded">
+						<div class="Name">Name</div>
+						<div class="Value">
+							<input id="UserName" type="text" value="" />
+						</div>
+				</div>
+				<div id="ButtonOK" class="Button Rounded">OK</div>
+			</div>
+		</div>
+	</div>
+	<div id="Sidebar">
+		<div id="CurrentShip">
+			<div id="CurrentShipHP">
+				<div id="CurrentShipHPValue"></div>
+			</div>
+			<div id="CurrentShipMP">
+				<div id="CurrentShipMPValue"></div>
+			</div>
+		</div>
+
+		<table id="Statistics">
+			<tbody>
+				<tr id="StatHeader">
+					<td class="StatShip">Ship</td>
+					<td class="StatPlayer">Player</td>
+					<td class="StatKill">+</td>
+					<td class="StatDeath">-</td>
+				</tr>
+			</tbody>
+		</table>
+	</div>
+
+	<script data-main="Game/Scripts/main" src="~/Scripts/Libraries/require.js"></script>
+</body>
+
+</html>

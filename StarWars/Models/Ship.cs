@@ -6,37 +6,56 @@ using System.Web.Script.Serialization;
 
 namespace StarWars.Models
 {
-	public class Ship : ICloneable
+	public class Ship
 	{
 		// Constants
 
 		public static class Ranger {
 			public static class Mult {
 				public static int HPMult { get { return 50; } }
+				public static int MPMult { get { return 50; } }
+				public static double HPRegenMult { get { return 0.02; } }
+				public static double MPRegenMult { get { return 0.02; } }
 				public static double SpeedMult { get { return 1; } }
-				public static double AngleSpeedMult { get { return 0.01; } }
+				public static double AngleSpeedMult { get { return 0.005; } }
 			}
 
 			public static class Types {
 				public static string[] Type = new string[] { "obiwan", "anakin", "naboo", "assault", "gunship", "jedi", "droid", "wasp", "dragon" };
 				public static int[] HPStart = new int[] { 5, 6, 3, 4, 3, 4, 6, 5, 5 };
 				public static int[] HPLimit = new int[] { 9, 10, 7, 8, 7, 8, 10, 9, 9 };
+				public static int[] MPStart = new int[] { 5, 6, 3, 4, 3, 4, 6, 5, 5 };
+				public static int[] MPLimit = new int[] { 9, 10, 7, 8, 7, 8, 10, 9, 9 };
+				public static int[] HPRegen = new int[] { 6, 5, 8, 7, 8, 7, 5, 6, 6 };
+				public static int[] MPRegen = new int[] { 6, 5, 8, 7, 8, 7, 5, 6, 6 };
+				// Armor = % (4 = 40% etc.)
+				public static int[] ArmorStart = new int[] { 4, 5, 2, 3, 2, 3, 5, 4, 4 };
+				public static int[] ArmorLimit = new int[] { 8, 9, 6, 7, 6, 7, 9, 8, 8 };
+
 				public static int[] SpeedStart = new int[] { 4, 3, 6, 5, 6, 5, 3, 4, 4 };
 				public static int[] SpeedLimit = new int[] { 8, 7, 10, 9, 10, 9, 7, 8, 8 };
 				public static int[] AngleSpeedStart = new int[] { 4, 3, 6, 5, 6, 5, 3, 4, 4 };
 				public static int[] AngleSpeedLimit = new int[] { 8, 7, 10, 9, 10, 9, 7, 8, 8 };
+
+                public static List<int>[] Weapons = new List<int>[] { 
+                    new List<int> {0, 1},
+                    new List<int> {0, 1},
+                    new List<int> {0},
+                    new List<int> {0},
+                    new List<int> {0},
+                    new List<int> {0},
+                    new List<int> {1},
+                    new List<int> {1},
+                    new List<int> {1}
+                };
 			}
 		}
 
 		public static int ShipSize { get { return 64;} }
 
-		public static int BombHP { get { return 50;} }
-		public static int BombSize { get { return 24;} }
-		public static int BombSpeed { get { return 5;} }
-		public static int BombMaxCount { get { return 5; } }
-
 		public static int SunHP { get { return 1;} }
-		public static double RegenerateHP { get { return 0.1;} }
+		//public static double HPRegenerate { get { return 0.1; } }
+		//public static double MPRegenerate { get { return 0.1; } }
 
 		public static double DeltaSpeed { get { return 0.1; } }
 
@@ -45,12 +64,23 @@ namespace StarWars.Models
 		public string Name { get; set; }
 		public string Type { get; set; }
 		public string State { get; set; }
-		public double MaxHP { get; set; }
 
 		// HP & Multiplyers
 		public double HP { get; set; }
 		public int HPCurrent { get; set; }
 		public int HPLimit { get; set; }
+		public double HPRegen { get; set; }
+
+		// MP & Multiplyers
+		public double MP { get; set; }
+		public int MPCurrent { get; set; }
+		public int MPLimit { get; set; }
+		public double MPRegen { get; set; }
+
+		// Armor & Multiplyers
+		public double Armor { get; set; }
+		public int ArmorCurrent { get; set; }
+		public int ArmorLimit { get; set; }
 
 		// Speed & Multiplyers
 		public double Speed { get; set; }
@@ -73,10 +103,14 @@ namespace StarWars.Models
 		[ScriptIgnore]
 		public int VectorRotate { get; set; }    // 1 (CW) | -1 (CCW) | 0 (Stop)
 		[ScriptIgnore]
-		public int Shoot { get; set; }              // 1 (Shoot) | 0
+		public int VectorShoot { get; set; }              // 1 (Shoot) | 0
 		
 		public int Kill { get; set; }
 		public int Death { get; set; }
+
+		public List<int> Weapons { get; set; }
+		public int WeaponActive { get; set; }
+
 		public List<Bomb> Bombs { get; set; }
 
 		// Ship Center Coordinates
@@ -99,7 +133,17 @@ namespace StarWars.Models
 			// HP
 			this.HPCurrent = Ship.Ranger.Types.HPStart[indexRanger];
 			this.HPLimit = Ship.Ranger.Types.HPLimit[indexRanger];
+			this.HPRegen = Ship.Ranger.Types.HPRegen[indexRanger] * Ship.Ranger.Mult.HPRegenMult;
 			this.HP = this.HPCurrent * Ship.Ranger.Mult.HPMult;
+			// MP
+			this.MPCurrent = Ship.Ranger.Types.MPStart[indexRanger];
+			this.MPLimit = Ship.Ranger.Types.MPLimit[indexRanger];
+			this.MPRegen = Ship.Ranger.Types.MPRegen[indexRanger] * Ship.Ranger.Mult.MPRegenMult;
+			this.MP = this.MPCurrent * Ship.Ranger.Mult.MPMult;
+			// Armor
+			this.ArmorCurrent = Ship.Ranger.Types.ArmorStart[indexRanger];
+			this.ArmorLimit = Ship.Ranger.Types.ArmorLimit[indexRanger];
+			this.Armor = this.ArmorCurrent / 10.0;  // (!!! for double type)
 			// Speed
 			this.SpeedCurrent = Ship.Ranger.Types.SpeedStart[indexRanger];
 			this.SpeedLimit = Ship.Ranger.Types.SpeedLimit[indexRanger];
@@ -118,9 +162,16 @@ namespace StarWars.Models
 			this.Image = indexRanger;                     // Индекс файла-изображения
 			this.VectorMove = 0;
 			this.VectorRotate = 0;
-			this.Shoot = 0;
+			this.VectorShoot = 0;
 			this.Kill = 0;
 			this.Death = 0;
+
+
+            this.Weapons = Ship.Ranger.Types.Weapons[indexRanger];
+            //this.Weapons = new List<int>();
+            //this.Weapons.Add(0);
+            //this.Weapons.Add(1);
+			this.WeaponActive = 0;
 			this.Bombs = new List<Bomb>();
 		}
 
@@ -162,7 +213,7 @@ namespace StarWars.Models
 				this.X = Game.SpaceWidth - this.Size;
 			}
 			else {
-				this.X = Math.Round(this.X, 2);
+				this.X = Math.Round(this.X, 3);
 			}
 
 			// Check Y-moving
@@ -174,34 +225,59 @@ namespace StarWars.Models
 				this.Y = Game.SpaceHeight - this.Size;
 			}
 			else {
-				this.Y = Math.Round(this.Y, 2);
+				this.Y = Math.Round(this.Y, 3);
 			}
 		}
 
 		public void Rotate(int direction) {
 			this.Angle += this.AngleSpeed * direction;
-			this.Angle = Math.Round(this.Angle, 2);
+			this.Angle = Math.Round(this.Angle, 3);
 		}
 
 		// *** Bombs ***
 		public double GetNewBombX() {
-			return (this.X + this.Size / 2) + (Math.Cos(this.Angle)) * (this.Size / 2) - (Ship.BombSize / 2);
+			return (this.X + this.Size / 2) + (Math.Cos(this.Angle)) * (this.Size / 2) - (Bomb.Types.Size[this.WeaponActive] / 2);
 		}
 		public double GetNewBombY() {
-			return (this.Y + this.Size / 2) + (Math.Sin(this.Angle)) * (this.Size / 2) - (Ship.BombSize / 2);
+			return (this.Y + this.Size / 2) + (Math.Sin(this.Angle)) * (this.Size / 2) - (Bomb.Types.Size[this.WeaponActive] / 2);
 		}
 
-		public void CreateBomb() {
+		public void Shoot() {
 			// Центрируем бомбу по оси наклона корабля (аналогично планетам) и затем смещаем бомбу на половину ее размера по X и Y (чтобы скомпенсировать "left top" для Image)
-			var bombX = this.GetNewBombX();
-			var bombY = this.GetNewBombY();
-			if (this.Bombs.Count < Ship.BombMaxCount) {
-				var bomb = new Bomb("ranger", bombX, bombY, this.Angle, Ship.BombSize, Ship.BombSpeed);
+			var active = this.Weapons[this.WeaponActive];
+
+			if (this.MP > Bomb.Types.MP[active]) {
+				this.MP -= Bomb.Types.MP[active];
+
+				var rotate = Bomb.Types.Rotate[active];
+				var speed = Bomb.Types.Speed[active] + this.Speed;
+				var bombX = this.GetNewBombX();
+				var bombY = this.GetNewBombY();
+
+				Bomb bomb = new Bomb("ranger", bombX, bombY, this.Angle, rotate, Bomb.Types.Size[active], speed, active);
 				this.Bombs.Add(bomb);
+
+				if (Bomb.Types.Type[active] == "shuriken") {
+					for (int i = 1; i < 3; i++) {
+                        bomb = new Bomb("ranger", bombX, bombY, this.Angle - (i * 0.1), rotate, Bomb.Types.Size[active], speed, active);
+						this.Bombs.Add(bomb);
+                        bomb = new Bomb("ranger", bombX, bombY, this.Angle + (i * 0.1), rotate, Bomb.Types.Size[active], speed, active);
+						this.Bombs.Add(bomb);
+					}
+				}
 			}
 		}
 
-		// Check colliding ships with sun
+		public void Explode() {
+			this.HP = 0;
+			this.MP = 0;
+			this.Death++;
+			this.State = "Explode000";              // Взрыв проверяется только по свойству VectorMove (для определенности)
+			this.VectorMove = 0;
+			this.VectorRotate = 0;
+		}
+
+		// Check colliding ship with sun
 		public void CheckSunAndShip() {
 			if (this.State.Contains("Explode")) {
 				return;
@@ -209,32 +285,67 @@ namespace StarWars.Models
 
 			double distance = Math.Sqrt(Math.Pow(Space.Sun.CenterX - this.GetCenterX, 2) + Math.Pow(Space.Sun.CenterY - this.GetCenterY, 2));
 			if (distance < Space.Sun.Size / 2) {
-				this.HP -= Ship.SunHP;           // Если да, уменьшаем HP корабля
+				this.HP -= Ship.SunHP * (1 - this.Armor);           // Если да, уменьшаем HP корабля
 				if (this.HP <= 0) {
-					this.HP = 0;
-					this.Death++;
-					this.State = "Explode000";              // Взрыв проверяется только по свойству VectorMove (для определенности)
-					this.VectorMove = 0;
-					this.VectorRotate = 0;
+					this.Explode();
+				}
+			}
+		}
+
+		// Check colliding ship with bomb
+		public void CheckBombAndShip() {
+			foreach (var bomb in this.Bombs) {
+				foreach (var ship in Game.Instance.ShipListActive) {
+					if (ship.ID == this.ID) {
+						continue;
+					}
+
+                    if (ship.State != "Active") {
+                        continue;
+                    }
+
+					bool checkX = (bomb.X >= ship.X - bomb.Size / 2) && (bomb.X <= ship.X + ship.Size - bomb.Size / 2);
+					bool checkY = (bomb.Y >= ship.Y - bomb.Size / 2) && (bomb.Y <= ship.Y + ship.Size - bomb.Size / 2);
+					if (checkX && checkY) {
+						bomb.State = "Inactive";
+						ship.HP -= Bomb.Types.HP[this.WeaponActive] * (1 - ship.Armor);
+						if (ship.HP <= 0) {
+							this.Kill++;
+							ship.Explode();
+						}
+					}
+
 				}
 			}
 		}
 
 		//var shipAngle1 = Math.random(Math.PI);
 
-		public object Clone() {
-			return this.MemberwiseClone();
-		}
+		//public object Clone() {
+		//    return this.MemberwiseClone();
+		//}
 
 		public void Regenerate() {
+			// HP
 			if (this.HP < this.HPCurrent * Ship.Ranger.Mult.HPMult) {
-				this.HP += Ship.RegenerateHP;    // Регенерировали
+				this.HP += this.HPRegen;    // Регенерировали
 			}
 			if (this.HP > this.HPCurrent * Ship.Ranger.Mult.HPMult) {
 				this.HP = this.HPCurrent * Ship.Ranger.Mult.HPMult;
 			}
 			else {
-				this.HP = Math.Round(this.HP, 2);
+				this.HP = Math.Round(this.HP, 3);
+			}
+
+			// MP
+			if (this.MP < this.MPCurrent * Ship.Ranger.Mult.MPMult) {
+				this.MP += this.MPRegen;    // Регенерировали
+			}
+			if (this.MP > this.MPCurrent * Ship.Ranger.Mult.MPMult) {
+				this.MP = this.MPCurrent * Ship.Ranger.Mult.MPMult;
+			}
+			else {
+				this.MP = Math.Round(this.MP, 3);
 			}
 		}
 
@@ -254,11 +365,10 @@ namespace StarWars.Models
 					if (X % 3 == 0) {
 						X = 0; Y++;
 						if (Y > 3) {
-							//this.X = UTILS.RandomStartX();
-							//this.Y = UTILS.RandomStartY();
 							this.X = Utils.RandomStartX();
 							this.Y = Utils.RandomStartY();
 							this.HP = this.HPCurrent * Ship.Ranger.Mult.HPMult;
+							this.MP = this.MPCurrent * Ship.Ranger.Mult.MPMult;
 							this.State = "Active";
 							return;
 						}
@@ -266,6 +376,29 @@ namespace StarWars.Models
 				}
 				this.State = "Explode" + Y + X + Delay;    // Next step of explosion
 			}
+		}
+
+		public void UpdateState() {
+			if (this.State == "Active") {
+				if (this.VectorMove != 0) {
+					this.ChangeSpeed(this.VectorMove);
+				}
+				if (this.VectorShoot == 1) {
+					this.Shoot();
+					this.VectorShoot = 0;
+				}
+				this.Move();
+				this.Rotate(this.VectorRotate);
+				this.Regenerate();
+				this.CheckSunAndShip();
+				this.CheckBombAndShip();
+			}
+
+			foreach (var bomb in this.Bombs) {
+				bomb.Move();
+				bomb.CheckSunAndPlanets();
+			}
+			this.Bombs.RemoveAll(b => b.State == "Inactive");
 		}
 	}
 }

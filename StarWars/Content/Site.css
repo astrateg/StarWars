@@ -1,6 +1,7 @@
 ﻿html {
     overflow: hidden;
     font-family: Arial;
+    font-size: 13px;
 }
 
 body {
@@ -35,7 +36,7 @@ body {
 
 .Point {
     width: 10px;
-    height: 20px;
+    height: 15px;
     border: 1px solid #808080;
     border-radius: 4px;
     background-color: silver;
@@ -63,7 +64,7 @@ body {
 .Button {
     background: #c9eafe;
     width: 50px;
-    line-height: 20px;
+    line-height: 14px;
     padding: 10px;
     text-align: center;
     float: right;
@@ -124,14 +125,14 @@ body {
 #SelectShipParameters .Name,
 #SelectUserName .Name {
     font-weight: bold;
-    height: 20px;
+    height: 14px;
     margin-bottom: 5px;
 }
 
 #SelectShipParameters .Value {
-    height: 20px;
-    margin-bottom: 10px;
-    padding-bottom: 10px;
+    height: 14px;
+    margin-bottom: 2px;
+    padding-bottom: 7px;
     border-bottom: 1px solid gray;
 }
 
@@ -151,24 +152,73 @@ body {
 
 }
 
+/*CurrentShip*/
 #CurrentShip {
     width: 128px;
     margin: 20px auto 10px;
 }
 
 #CurrentShipHP  {
-    height: 10px;
+    height: 12px;
     border: 2px solid #007700;
+    border-radius: 10px;
+    margin: 0;
+    margin-bottom: 3px;
+}
+
+#CurrentShipMP  {
+    height: 12px;
+    border: 2px solid #000077;
     border-radius: 10px;
     margin: 0;
 }
 
-#CurrentShipHPValue {
-    height: 10px;
+#CurrentShipHPValue,
+#CurrentShipMPValue {
+    height: 12px;
     border-radius: 5px;
+    text-align: center;
+    font-weight: bold;
+    line-height: 12px;
+    color: white;
+}
+
+#CurrentShipHPValue {
     background-color: #00BB00;
 }
 
+#CurrentShipMPValue {
+    background-color: #0000BB;
+}
+
+#CurrentShipWeapons{
+    margin: 10px;
+    padding: 4px;
+    background: #555;
+    border: 1px solid #5e8a94;
+    border-radius: 10px;
+}
+
+#CurrentShipWeapons .weapon {
+    color: white;
+    font-weight: bold;
+    display: inline-block;
+    width: 50px;
+    height: 50px;
+    padding: 5px;
+    border: 1px solid maroon;
+    border-radius: 10px;
+    background-position: center center;
+    background-repeat: no-repeat;
+}
+
+    #CurrentShipWeapons .weapon.Selected
+    {
+        padding: 3px;
+        border-width: 3px;
+    }
+
+/*Statistics*/
 #Statistics {
     border: 2px solid black;
     border-collapse: collapse;

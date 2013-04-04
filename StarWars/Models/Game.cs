@@ -19,8 +19,10 @@ namespace StarWars.Models {
 		private static List<Ship> _ships;
 		private Object thisLock = new Object();
 
-		private Game() { 
-			_startTime = DateTime.Now;
+		private Game() {
+            Space.Sun.Angle = 0;
+
+            _startTime = DateTime.Now;
 			_ships = new List<Ship>();
 			_timer = new Timer(new TimerCallback(UpdateGameState), null, 0, Game.SyncRate);     // запускаем таймер, обновляющий все объекты
 		}
@@ -45,9 +47,7 @@ namespace StarWars.Models {
 
 		public IEnumerable<Ship> ShipListActive {
 			get {
-				var ships = _ships
-					.Where(s => s.State != "Inactive")
-					.Select(s => { s.Clone(); return s; });
+				var ships = _ships.Where(s => s.State != "Inactive");
 				return ships;
 			}
 		}
@@ -89,8 +89,8 @@ namespace StarWars.Models {
 					case "VectorRotate":
 						ship.VectorRotate = propertyValue;
 						break;
-					case "Shoot":
-						ship.Shoot = propertyValue;
+                    case "VectorShoot":
+						ship.VectorShoot = propertyValue;
 						break;
 					case "Image":
 						ship.Image = propertyValue;
@@ -101,34 +101,32 @@ namespace StarWars.Models {
 			}
 		}
 
+        public void ChangeWeapon(int id, int index) {
+            Ship ship = _ships.FirstOrDefault(s => s.ID == id);
+            if (ship != null) {
+                ship.WeaponActive = index;
+            }
+        }
+
 		// Timer
 		public void UpdateGameState(object state) {
-			lock (thisLock) {
-				foreach (Ship ship in _ships) {
-					if (ship.State == "Active") {
-						ship.CheckSunAndShip();
-					}
-
-					ship.GenerateExplodes();
-
-					if (ship.State == "Active") {
-						if (ship.VectorMove != 0) {
-							ship.ChangeSpeed(ship.VectorMove);
-						}
-						ship.Move();
-						ship.Rotate(ship.VectorRotate);
-						ship.Regenerate();
-					}
-				}
+            // Sun and planets
+            Space.Sun.Rotate();
+            
+            // Ships
+			foreach (Ship ship in _ships) {
+				ship.GenerateExplodes();
+                ship.UpdateState();
 			}
 
 			var response = new {
 				timeFromStart = Game.Instance.TimeFromStart,
-				ships = Game.Instance.ShipListActive
+				ships = Game.Instance.ShipListActive,
+                sunAngle = Math.Round(Space.Sun.Angle, 3),
 			};
 
 
 			Notifier.Send(response);
 		}
-	}
+    }
 }
