@@ -188,7 +188,9 @@
     <Content Include="Content\Images\Space02.jpg" />
     <Content Include="Content\Images\Space03.jpg" />
     <Content Include="Content\Images\sun.png" />
+    <Content Include="Content\Images\Weapons\orb1.png" />
     <Content Include="Content\Images\Weapons\shuriken1.png" />
+    <Content Include="Content\Images\Weapons\sphere1.png" />
     <Content Include="Content\Images\Weapons\weapon-atomic-bomb.png" />
     <Content Include="Content\Images\Weapons\weapon-bomb01-blue.png" />
     <Content Include="Content\Images\Weapons\weapon-bomb01-green.png" />

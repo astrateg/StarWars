@@ -38,15 +38,15 @@ namespace StarWars.Models
 				public static int[] AngleSpeedLimit = new int[] { 8, 7, 10, 9, 10, 9, 7, 8, 8 };
 
                 public static List<int>[] Weapons = new List<int>[] { 
-                    new List<int> {0, 1},
-                    new List<int> {0, 1},
-                    new List<int> {0},
-                    new List<int> {0},
-                    new List<int> {0},
-                    new List<int> {0},
-                    new List<int> {1},
-                    new List<int> {1},
-                    new List<int> {1}
+                    new List<int> {0, 1, 2},
+                    new List<int> {0, 1, 2},
+                    new List<int> {0, 2, 3},
+                    new List<int> {0, 2, 3},
+                    new List<int> {0, 1, 2},
+                    new List<int> {0, 1, 2},
+                    new List<int> {1, 2, 3},
+                    new List<int> {1, 2, 3},
+                    new List<int> {1, 2, 3}
                 };
 			}
 		}
@@ -249,22 +249,26 @@ namespace StarWars.Models
 			if (this.MP > Bomb.Types.MP[active]) {
 				this.MP -= Bomb.Types.MP[active];
 
-				var rotate = Bomb.Types.Rotate[active];
-				var speed = Bomb.Types.Speed[active] + this.Speed;
-				var bombX = this.GetNewBombX();
+                var type = Bomb.Types.Type[active];
+                var bombX = this.GetNewBombX();
 				var bombY = this.GetNewBombY();
+                var rotate = Bomb.Types.Rotate[active];
+                var size = Bomb.Types.Size[active];
+                var speed = Bomb.Types.Speed[active] + this.Speed;
 
-				Bomb bomb = new Bomb("ranger", bombX, bombY, this.Angle, rotate, Bomb.Types.Size[active], speed, active);
+                Bomb bomb = new Bomb(type, bombX, bombY, this.Angle, rotate, size, speed, active);
 				this.Bombs.Add(bomb);
 
-				if (Bomb.Types.Type[active] == "shuriken") {
+                if (type == "shuriken") {
 					for (int i = 1; i < 3; i++) {
-                        bomb = new Bomb("ranger", bombX, bombY, this.Angle - (i * 0.1), rotate, Bomb.Types.Size[active], speed, active);
+                        bomb = new Bomb(type, bombX, bombY, this.Angle - (i * 0.05), rotate * 0.1, Bomb.Types.Size[active], speed, active);
 						this.Bombs.Add(bomb);
-                        bomb = new Bomb("ranger", bombX, bombY, this.Angle + (i * 0.1), rotate, Bomb.Types.Size[active], speed, active);
+                        bomb = new Bomb(type, bombX, bombY, this.Angle + (i * 0.05), rotate * 0.1, Bomb.Types.Size[active], speed, active);
 						this.Bombs.Add(bomb);
 					}
+                    return;
 				}
+
 			}
 		}
 
@@ -304,8 +308,9 @@ namespace StarWars.Models
                         continue;
                     }
 
-					bool checkX = (bomb.X >= ship.X - bomb.Size / 2) && (bomb.X <= ship.X + ship.Size - bomb.Size / 2);
-					bool checkY = (bomb.Y >= ship.Y - bomb.Size / 2) && (bomb.Y <= ship.Y + ship.Size - bomb.Size / 2);
+                    var k = 0.8;
+                    bool checkX = (bomb.X >= ship.X - bomb.Size * k) && (bomb.X <= ship.X + ship.Size * k - bomb.Size * (1 - k));
+					bool checkY = (bomb.Y >= ship.Y - bomb.Size * k) && (bomb.Y <= ship.Y + ship.Size * k - bomb.Size * (1 - k));
 					if (checkX && checkY) {
 						bomb.State = "Inactive";
 						ship.HP -= Bomb.Types.HP[this.WeaponActive] * (1 - ship.Armor);

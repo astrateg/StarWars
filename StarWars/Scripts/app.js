@@ -244,7 +244,6 @@
         switch (key.keyCode) {
             case 37:    // Left Arrow   (Rotate CCW)
             case 65:    // A
-            case 97:    // a
                 if (SHIP.MyShip.VectorRotate == -1) {
                     return false;
                 }
@@ -255,7 +254,6 @@
 
             case 38:    // Up Arrow     (Move Forward)
             case 87:    // W
-            case 119:   // w
                 if (SHIP.MyShip.VectorMove == 1) {
                     return false;
                 }
@@ -266,7 +264,6 @@
 
             case 39:    // Right Arrow  (Rotate CW)
             case 68:    // D
-            case 100:   // d
                 if (SHIP.MyShip.VectorRotate == 1) {
                     return false;
                 }
@@ -277,13 +274,22 @@
 
             case 40:    // Down Arrow   (Move Backward)
             case 83:    // S
-            case 115:   // s
                 if (SHIP.MyShip.VectorMove == -1) {
                     return false;
                 }
                 SHIP.MyShip.VectorMove = -1;
                 actionName = "VectorMove";
                 actionValue = -1;
+                break;
+
+            case 49:    // 1
+            case 50:    // 2
+            case 51:    // 3
+                if (SHIP.MyShip.WeaponActive == key.keyCode - 49) {
+                    return false;
+                }
+                var weaponDiv = $("#CurrentShipWeapons .weapon").eq(key.keyCode - 49);
+                weaponDiv.trigger("click");
                 break;
 
             case 32:    // Space        (Fire)

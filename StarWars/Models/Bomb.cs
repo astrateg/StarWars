@@ -8,18 +8,13 @@ namespace StarWars.Models
 {
     public class Bomb
     {
-        //public static int BombHP { get { return 50; } }
-        //public static int BombMP { get { return 10; } }
-        //public static int BombSize { get { return 24; } }
-        //public static int BombSpeed { get { return 10; } }
-
         public static class Types {
-            public static string[] Type = new string[] { "bomb", "shuriken" };
-            public static int[] HP = new int[] { 50, 20 };
-            public static int[] MP = new int[] { 20, 30 };
-            public static int[] Rotate = new int[] { 0, 1 };
-            public static int[] Size = new int[] { 24, 35 };
-            public static int[] Speed = new int[] { 10, 12 };
+            public static string[] Type = new string[] { "bomb", "shuriken", "orb", "sphere" };
+            public static int[] HP = new int[] { 50, 20, 80, 70 };
+            public static int[] MP = new int[] { 20, 30, 30, 30 };
+            public static int[] Rotate = new int[] { 0, 10, 5, 0 };
+            public static int[] Size = new int[] { 24, 35, 50, 30 };
+            public static int[] Speed = new int[] { 10, 12, 9, 11 };
         }
 
         public string Type { get; set; }
@@ -57,6 +52,10 @@ namespace StarWars.Models
             this.Y += vy;
             this.X = Math.Round(this.X, 3);
             this.Y = Math.Round(this.Y, 3);
+
+            if (this.Type == "sphere" && this.Size < 100) {
+                this.Size++;
+            }
 
             // If the bomb reaches any border of the GAME, it disappears
             if ((this.X < -this.Size) || (this.X > Game.SpaceWidth) || (this.Y < -this.Size) || (this.Y > Game.SpaceHeight + this.Size)) {
