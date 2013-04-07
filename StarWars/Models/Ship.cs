@@ -1,6 +1,8 @@
 ﻿using System;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading.Tasks;
 using System.Web;
 using System.Web.Script.Serialization;
 
@@ -9,7 +11,7 @@ namespace StarWars.Models
 	public class Ship
 	{
 		// Constants
-
+		private object syncLock = new object();
 		public static class Ranger {
 			public static class Mult {
 				public static int HPMult { get { return 50; } }
@@ -37,17 +39,17 @@ namespace StarWars.Models
 				public static int[] AngleSpeedStart = new int[] { 4, 3, 6, 5, 6, 5, 3, 4, 4 };
 				public static int[] AngleSpeedLimit = new int[] { 8, 7, 10, 9, 10, 9, 7, 8, 8 };
 
-                public static List<int>[] Weapons = new List<int>[] { 
-                    new List<int> {0, 1, 2},
-                    new List<int> {0, 1, 2},
-                    new List<int> {0, 2, 3},
-                    new List<int> {0, 2, 3},
-                    new List<int> {0, 1, 2},
-                    new List<int> {0, 1, 2},
-                    new List<int> {1, 2, 3},
-                    new List<int> {1, 2, 3},
-                    new List<int> {1, 2, 3}
-                };
+				public static List<int>[] Weapons = new List<int>[] { 
+					new List<int> {0, 1, 2},
+					new List<int> {0, 1, 2},
+					new List<int> {0, 2, 3},
+					new List<int> {0, 2, 3},
+					new List<int> {0, 1, 2},
+					new List<int> {0, 1, 2},
+					new List<int> {1, 2, 3},
+					new List<int> {1, 2, 3},
+					new List<int> {1, 2, 3}
+				};
 			}
 		}
 
@@ -112,6 +114,8 @@ namespace StarWars.Models
 		public int WeaponActive { get; set; }
 
 		public List<Bomb> Bombs { get; set; }
+		//[ScriptIgnore]
+		//public ConcurrentBag<Bomb> BombsBuffer { get; set; }
 
 		// Ship Center Coordinates
 		[ScriptIgnore]
@@ -167,10 +171,7 @@ namespace StarWars.Models
 			this.Death = 0;
 
 
-            this.Weapons = Ship.Ranger.Types.Weapons[indexRanger];
-            //this.Weapons = new List<int>();
-            //this.Weapons.Add(0);
-            //this.Weapons.Add(1);
+			this.Weapons = Ship.Ranger.Types.Weapons[indexRanger];
 			this.WeaponActive = 0;
 			this.Bombs = new List<Bomb>();
 		}
@@ -249,24 +250,39 @@ namespace StarWars.Models
 			if (this.MP > Bomb.Types.MP[active]) {
 				this.MP -= Bomb.Types.MP[active];
 
-                var type = Bomb.Types.Type[active];
-                var bombX = this.GetNewBombX();
+				var type = Bomb.Types.Type[active];
+				var bombX = this.GetNewBombX();
 				var bombY = this.GetNewBombY();
-                var rotate = Bomb.Types.Rotate[active];
-                var size = Bomb.Types.Size[active];
-                var speed = Bomb.Types.Speed[active] + this.Speed;
+				var rotate = Bomb.Types.Rotate[active];
+				var size = Bomb.Types.Size[active];
+				var speed = Bomb.Types.Speed[active] + this.Speed;
 
-                Bomb bomb = new Bomb(type, bombX, bombY, this.Angle, rotate, size, speed, active);
+				Bomb bomb = new Bomb(type, bombX, bombY, this.Angle, rotate, size, speed, active);
 				this.Bombs.Add(bomb);
 
-                if (type == "shuriken") {
+				if (type == "bomb") {
+					var t = Task.Run(async () => {
+						for (int i = 0; i < 4; i++) { 
+							await Task.Delay(20 * (i + 1));
+							// Recount parameters (ship has been definitely moved at the moment)
+							bombX = this.GetNewBombX();
+							bombY = this.GetNewBombY();
+							speed = Bomb.Types.Speed[active] + this.Speed;
+							bomb = new Bomb(type, bombX, bombY, this.Angle, rotate, size, speed, active);
+							// Add bomb to the concurrent collection (because Task runs asynchronously)
+							Game.Instance.BombsBuffer[this.ID].Add(bomb);
+						}
+					});
+				}
+
+				if (type == "shuriken") {
 					for (int i = 1; i < 3; i++) {
-                        bomb = new Bomb(type, bombX, bombY, this.Angle - (i * 0.05), rotate * 0.1, Bomb.Types.Size[active], speed, active);
+						bomb = new Bomb(type, bombX, bombY, this.Angle - (i * 0.05), rotate * 0.1, Bomb.Types.Size[active], speed, active);
 						this.Bombs.Add(bomb);
-                        bomb = new Bomb(type, bombX, bombY, this.Angle + (i * 0.05), rotate * 0.1, Bomb.Types.Size[active], speed, active);
+						bomb = new Bomb(type, bombX, bombY, this.Angle + (i * 0.05), rotate * 0.1, Bomb.Types.Size[active], speed, active);
 						this.Bombs.Add(bomb);
 					}
-                    return;
+					return;
 				}
 
 			}
@@ -304,12 +320,12 @@ namespace StarWars.Models
 						continue;
 					}
 
-                    if (ship.State != "Active") {
-                        continue;
-                    }
+					if (ship.State != "Active") {
+						continue;
+					}
 
-                    var k = 0.8;
-                    bool checkX = (bomb.X >= ship.X - bomb.Size * k) && (bomb.X <= ship.X + ship.Size * k - bomb.Size * (1 - k));
+					var k = 0.8;
+					bool checkX = (bomb.X >= ship.X - bomb.Size * k) && (bomb.X <= ship.X + ship.Size * k - bomb.Size * (1 - k));
 					bool checkY = (bomb.Y >= ship.Y - bomb.Size * k) && (bomb.Y <= ship.Y + ship.Size * k - bomb.Size * (1 - k));
 					if (checkX && checkY) {
 						bomb.State = "Inactive";
@@ -323,12 +339,6 @@ namespace StarWars.Models
 				}
 			}
 		}
-
-		//var shipAngle1 = Math.random(Math.PI);
-
-		//public object Clone() {
-		//    return this.MemberwiseClone();
-		//}
 
 		public void Regenerate() {
 			// HP
@@ -399,6 +409,17 @@ namespace StarWars.Models
 				this.CheckBombAndShip();
 			}
 
+			// If bombs buffer isn't empty for this ship, move bombs from buffer to collection "Bombs"
+			// Буфер вынесен за пределы объекта Ship, т.к. иначе не работает Hub - ругается метод Notifier.Send(response);
+			// Видимо, SignalR не понимает конкурентную коллекцию... даже если она исключена из списка сериализации - [ScriptIgnore]
+			Bomb bombFromBuffer;
+			ConcurrentBag<Bomb> bombBuffer = Game.Instance.BombsBuffer[this.ID];
+			while (!bombBuffer.IsEmpty) {
+				if (bombBuffer.TryTake(out bombFromBuffer)) {
+					this.Bombs.Add(bombFromBuffer);
+				}
+			}
+			
 			foreach (var bomb in this.Bombs) {
 				bomb.Move();
 				bomb.CheckSunAndPlanets();

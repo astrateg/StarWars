@@ -125,8 +125,8 @@
 
                     if (dX != 0 || dY != 0) {
                         // "Зона вхождения" (аналогия с наведением мыши)
-                        var zoneX = SHIP.ShipSize * 5;  // цифра 5 - произвольная, чтобы получить "зону вхождения" побольше
-                        var zoneY = SHIP.ShipSize * 5;
+                        var zoneX = SHIP.ShipSize * 10;  // цифра 10 - произвольная, чтобы получить "зону вхождения" побольше
+                        var zoneY = SHIP.ShipSize * 10;
                         // Сдвигаем карту (если корабль на краю канвы, но не на краю космоса)
                         GAME.ShiftSpace(x, y, dX, dY, zoneX, zoneY);
                         SPACE.Sun.GetCenter();
@@ -171,6 +171,8 @@
                     SHIP.Ships[j].MP = data.ships[i].MP;
                     SHIP.Ships[j].X = data.ships[i].X;
                     SHIP.Ships[j].Y = data.ships[i].Y;
+                    SHIP.Ships[j].Speed = data.ships[i].Speed;
+                    SHIP.Ships[j].SpeedCurrent = data.ships[i].SpeedCurrent;
                     SHIP.Ships[j].Angle = data.ships[i].Angle;
                     SHIP.Ships[j].Image = data.ships[i].Image;
                     SHIP.Ships[j].Kill = data.ships[i].Kill;
@@ -225,7 +227,7 @@
 
     }
 
-    window.onresize = function () {
+    my.OnResize = function () {
         var heightTotal = document.documentElement.clientHeight;
         GAME.Sidebar.style.height = heightTotal + "px";
 
@@ -233,7 +235,7 @@
         GAME.Canvas.height = heightTotal;
     };
 
-    window.onkeydown = function (key) {
+    my.OnKeyDown = function (key, spaceHub) {
         var vectorMove = SHIP.MyShip.VectorMove;
         if (vectorMove == null) return key;                   // If key was up when MyShip wasn't created yet (i.e. when Ctrl+F5 was pressed in browser)
         var state = SHIP.MyShip.State;
@@ -304,13 +306,14 @@
 
         // Если сработало какое-то действие, а не просто нажата любая клавиша
         if (actionName.length > 0) {
-            REQUESTS.UpdateUserShip(actionName, actionValue);
+        	//REQUESTS.UpdateUserShip(actionName, actionValue);
+        	spaceHub.server.updateUserShip(actionName, actionValue);
         }
 
         //return false;
     };
 
-    window.onkeyup = function (key) {
+    my.OnKeyUp = function (key, spaceHub) {
         var vectorMove = SHIP.MyShip.VectorMove;
         if (vectorMove == null) return key;                     // If key was up when MyShip wasn't created yet (i.e. when Ctrl+F5 was pressed in browser)
 
@@ -356,7 +359,8 @@
         }
 
         if (actionName.length > 0) {
-            REQUESTS.UpdateUserShip(actionName, actionValue);
+        	//REQUESTS.UpdateUserShip(actionName, actionValue);
+        	spaceHub.server.updateUserShip(actionName, actionValue);
         }
 
         //return false;

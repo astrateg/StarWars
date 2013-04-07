@@ -38,7 +38,17 @@ require(['jquery', 'app', 'sigr', 'signalr-hubs'], function ($, APP) {
         }
 
         $.connection.hub.start().done(function () {
-        });
+        	window.onresize = function () {
+        		APP.OnResize();
+        	};
 
+        	window.onkeydown = function (key) {
+        		APP.OnKeyDown(key, spaceHub);
+        	};
+
+        	window.onkeyup = function (key) {
+        		APP.OnKeyUp(key, spaceHub);
+        	};
+        });
     });
 });

@@ -4,6 +4,7 @@ using System.Linq;
 using System.Web;
 using System.Reflection;
 using System.Threading;
+using System.Collections.Concurrent;
 
 namespace StarWars.Models {
 	public sealed class Game {
@@ -13,16 +14,17 @@ namespace StarWars.Models {
 		public static int SidebarWidth  { get { return 225; } }
 		public static int SpaceWidth    { get { return 2560; } }
 		public static int SpaceHeight   { get { return 1600; } }
+		public Dictionary<int, ConcurrentBag<Bomb>> BombsBuffer { get; set; }	// буфер для бомб (тип "bomb"), из которого бомбы перемещаются в коллекцию Bombs
 
 		private static Timer _timer;
 		private static DateTime _startTime;
 		private static List<Ship> _ships;
-		private Object thisLock = new Object();
 
 		private Game() {
-            Space.Sun.Angle = 0;
+			Space.Sun.Angle = 0;
+			BombsBuffer = new Dictionary<int, ConcurrentBag<Bomb>>();
 
-            _startTime = DateTime.Now;
+			_startTime = DateTime.Now;
 			_ships = new List<Ship>();
 			_timer = new Timer(new TimerCallback(UpdateGameState), null, 0, Game.SyncRate);     // запускаем таймер, обновляющий все объекты
 		}
@@ -59,9 +61,8 @@ namespace StarWars.Models {
 		}
 
 		public void AddShip(Ship ship) {
-			lock (thisLock) {
-				_ships.Add(ship);
-			}
+			_ships.Add(ship);
+			BombsBuffer.Add(ship.ID, new ConcurrentBag<Bomb>());	// Key: ship.id;	Value: bombs concurrent collection
 		}
 
 		public bool DisconnectShip(int id) {
@@ -89,7 +90,7 @@ namespace StarWars.Models {
 					case "VectorRotate":
 						ship.VectorRotate = propertyValue;
 						break;
-                    case "VectorShoot":
+					case "VectorShoot":
 						ship.VectorShoot = propertyValue;
 						break;
 					case "Image":
@@ -101,32 +102,32 @@ namespace StarWars.Models {
 			}
 		}
 
-        public void ChangeWeapon(int id, int index) {
-            Ship ship = _ships.FirstOrDefault(s => s.ID == id);
-            if (ship != null) {
-                ship.WeaponActive = index;
-            }
-        }
+		public void ChangeWeapon(int id, int index) {
+			Ship ship = _ships.FirstOrDefault(s => s.ID == id);
+			if (ship != null) {
+				ship.WeaponActive = index;
+			}
+		}
 
 		// Timer
 		public void UpdateGameState(object state) {
-            // Sun and planets
-            Space.Sun.Rotate();
-            
-            // Ships
+			// Sun and planets
+			Space.Sun.Rotate();
+			
+			// Ships
 			foreach (Ship ship in _ships) {
 				ship.GenerateExplodes();
-                ship.UpdateState();
+				ship.UpdateState();
 			}
 
 			var response = new {
 				timeFromStart = Game.Instance.TimeFromStart,
 				ships = Game.Instance.ShipListActive,
-                sunAngle = Math.Round(Space.Sun.Angle, 3),
+				sunAngle = Math.Round(Space.Sun.Angle, 3),
 			};
 
 
 			Notifier.Send(response);
 		}
-    }
+	}
 }

@@ -10,8 +10,8 @@ namespace StarWars.Models
     {
         public static class Types {
             public static string[] Type = new string[] { "bomb", "shuriken", "orb", "sphere" };
-            public static int[] HP = new int[] { 50, 20, 80, 70 };
-            public static int[] MP = new int[] { 20, 30, 30, 30 };
+            public static int[] HP = new int[] { 20, 20, 80, 70 };
+            public static int[] MP = new int[] { 30, 20, 30, 30 };
             public static int[] Rotate = new int[] { 0, 10, 5, 0 };
             public static int[] Size = new int[] { 24, 35, 50, 30 };
             public static int[] Speed = new int[] { 10, 12, 9, 11 };
