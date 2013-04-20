@@ -43,12 +43,12 @@ body {
 	display: inline-block;
 }
 
-.Point.Start {
-	background-color: green;
-}
-
 .Point.Limit {
 	background-color: lightgreen;
+}
+
+.Point.Start {
+	background-color: green;
 }
 
 .Rounded {
@@ -110,17 +110,45 @@ body {
 	background-color: #bbb;
 }
 
-.Button.Active:active {
-	line-height: 22px;
-	padding-bottom: 8px;
-}
-
-
 #SelectShipParameters {
 	width: 162px;
 	background: #c9eafe;
 	display: inline-block;
 }
+
+#Sidebar #SelectShipParameters {
+    padding: 10px;
+    margin-left: 20px;
+}
+
+#SelectShipParameters > div {
+    position: relative;
+}
+
+#SelectShipParameters #SkillPoints {
+    display: none;
+    position: absolute;
+    top: 2px;
+    right: 5px;
+	font-weight: bold;
+    color: navy;
+	font-size: 20px;
+}
+
+#SelectShipParameters .Plus {
+    display: none;
+    position: absolute;
+    top: 2px;
+    right: 5px;
+    height: 15px;
+    width: 15px;
+    background-image: url(Images/plus2.png);
+}
+
+    #SelectShipParameters .Plus:active {
+        background-image: url(Images/plus1.png);
+    }
+
 
 #SelectShipParameters .Name,
 #SelectUserName .Name {

@@ -138,6 +138,7 @@
     <Compile Include="Models\Ship.cs" />
     <Compile Include="Models\Space.cs" />
     <Compile Include="Models\SpaceHub.cs" />
+    <Compile Include="Models\Stuff.cs" />
     <Compile Include="Models\Utils.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
@@ -160,6 +161,8 @@
     <Content Include="Content\Images\explosion.png" />
     <Content Include="Content\Images\jupiter.png" />
     <Content Include="Content\Images\mars.png" />
+    <Content Include="Content\Images\minus1.png" />
+    <Content Include="Content\Images\minus2.png" />
     <Content Include="Content\Images\OriginalSize\Explosions\explosion.png" />
     <Content Include="Content\Images\OriginalSize\Explosions\explosion_2.jpg" />
     <Content Include="Content\Images\OriginalSize\Explosions\explosion_3.jpg" />
@@ -172,6 +175,8 @@
     <Content Include="Content\Images\OriginalSize\Weapons\weapon-all-50scale.png" />
     <Content Include="Content\Images\OriginalSize\Weapons\weapon-all.png" />
     <Content Include="Content\Images\OriginalSize\Weapons\shuriken1.png" />
+    <Content Include="Content\Images\plus1.png" />
+    <Content Include="Content\Images\plus2.png" />
     <Content Include="Content\Images\Rangers\Original\ranger1.png" />
     <Content Include="Content\Images\Rangers\Original\ranger2.png" />
     <Content Include="Content\Images\Rangers\Original\ranger3.png" />
@@ -193,6 +198,8 @@
     <Content Include="Content\Images\Space01.jpg" />
     <Content Include="Content\Images\Space02.jpg" />
     <Content Include="Content\Images\Space03.jpg" />
+    <Content Include="Content\Images\Stuff\bonusHP.png" />
+    <Content Include="Content\Images\Stuff\bonusMP.png" />
     <Content Include="Content\Images\sun.png" />
     <Content Include="Content\Images\Weapons\orb1.png" />
     <Content Include="Content\Images\Weapons\shuriken1.png" />
@@ -205,14 +212,11 @@
     <Content Include="Content\Images\Weapons\weapon-missile01-blue.png" />
     <Content Include="Content\Images\Weapons\weapon-missile01-green.png" />
     <Content Include="Scripts\app.js" />
-    <None Include="Scripts\jquery-1.6.4-vsdoc.js" />
-    <Content Include="Scripts\jquery-1.6.4.js" />
-    <Content Include="Scripts\jquery-1.6.4.min.js" />
-    <Content Include="Scripts\jquery.signalR-1.0.1.js" />
-    <Content Include="Scripts\jquery.signalR-1.0.1.min.js" />
     <Content Include="Scripts\Libraries\jquery-1.9.1.min.js" />
     <Content Include="Scripts\Libraries\jquery.signalR-1.0.1.js" />
     <Content Include="Scripts\Libraries\jquery.signalR-1.0.1.min.js" />
+    <Content Include="Scripts\Libraries\knockout-2.2.1.debug.js" />
+    <Content Include="Scripts\Libraries\knockout-2.2.1.min.js" />
     <Content Include="Scripts\Libraries\noext.js" />
     <Content Include="Scripts\main.js" />
     <Content Include="Scripts\Modules\dominators.js" />
@@ -228,6 +232,7 @@
     <Content Include="Global.asax" />
     <Content Include="Scripts\Libraries\r.js" />
     <Content Include="Scripts\Libraries\require.js" />
+    <Content Include="Scripts\Prototypes\stuffs.js" />
     <Content Include="Web.config">
       <SubType>Designer</SubType>
     </Content>

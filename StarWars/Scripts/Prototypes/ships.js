@@ -13,7 +13,7 @@
 		this.Speed = args.Speed;
 		this.SpeedCurrent = args.SpeedCurrent;
 		this.Angle = args.Angle;
-		//this.AngleSpeed = angleSpeed;
+		this.AngleSpeed = args.AngleSpeed;
 		this.Size = args.Size;
 		this.Image = args.Image;                     // Индекс имени файла-изображения (для массива imgShipShortName)
 		//this.VectorMove = vectorMove;
@@ -22,6 +22,7 @@
 		//this.Shoot = shoot || 0;
 		this.Kill = args.Kill || 0;
 		this.Death = args.Death || 0;
+		this.SkillPoints = args.SkillPoints || 0;
 		this.Bombs = [];
 	}
 
@@ -147,6 +148,13 @@
 					}
 				});
 			}
+		}
+		// Показываем имена остальных игроков
+		else {
+			GAME.Context.fillStyle = "#FFF";
+			GAME.Context.font = "12pt Arial";
+			GAME.Context.textAlign = "center";
+			GAME.Context.fillText(this.Name, this.GetCenterX(), this.GetCenterY() - this.Size / 2);
 		}
 
 		var lineHeight = 5;

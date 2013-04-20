@@ -2,7 +2,9 @@
     baseUrl: 'Game/Scripts',
     paths: {
         //"jquery": "http://code.jquery.com/jquery-latest",
-        "jquery":   "Libraries/jquery-1.9.1.min",
+        "jquery": "Libraries/jquery-1.9.1.min",
+        "knockout": 'Libraries/knockout-2.2.1.debug',
+        //"knockout": 'Libraries/knockout-2.2.1.min',
         //"noext":    "Libraries/noext",
         "sigr":  "Libraries/jquery.signalR-1.0.1",
         "signalr-hubs": "../signalr/hubs?noext",

@@ -16,6 +16,15 @@
     imgPlanets["mars"].src = imagePath + "mars.png";
     imgPlanets["jupiter"].src = imagePath + "jupiter.png";
 
+    my.Stuff = {};
+    my.Stuff.Stuffs = [];
+    my.Stuff.Images = [];
+    my.Stuff.Images[0] = new Image();
+    my.Stuff.Images[0].src = imagePath + "Stuff/bonusHP.png";
+    my.Stuff.Images[1] = new Image();
+    my.Stuff.Images[1].src = imagePath + "Stuff/bonusMP.png";
+
+
     my.Init = function () {
         var request = REQUESTS.InitSpace();
 

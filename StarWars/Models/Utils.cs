@@ -19,5 +19,20 @@ namespace StarWars.Models {
             double randomTop = rnd.NextDouble();
             return (randomTop < 0.5) ? randomY : (Game.SpaceHeight - randomY);
         }
+
+        public static int RandomSpaceX() {
+            double randomX = rnd.NextDouble();
+            return (int)(Game.SpaceWidth * randomX);
+        }
+
+        public static int RandomSpaceY() {
+            double randomY = rnd.NextDouble();
+            return (int)(Game.SpaceHeight * randomY);
+        }
+
+        public static double RandomSpaceAngle() {
+            double randomAngle = rnd.NextDouble();
+            return randomAngle * 2 * Math.PI;
+        }
     }
 }
