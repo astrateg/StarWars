@@ -1,4 +1,17 @@
 ﻿define(['knockout', 'Modules/game', 'Modules/requests', 'Modules/ship', 'Modules/space', 'Modules/utils', 'Prototypes/ships', 'Prototypes/stuffs', 'Prototypes/bombs'], function (ko, GAME, REQUESTS, SHIP, SPACE, UTILS, Ship, Stuff, Bomb) {
+	// Функция для сравнения старого и нового значений observable.
+	// Для скиллов не подходит, т.к. перехватывает binding у функций во View, типа *** data-bind="css: HPSkill(@i)" ***
+	// Оранжевый div остается оранжевым даже после возврата скилла [+] - этот шаг по j автоматом пропускается в функции *** SHIP.MyShip[skill + "Skill"] = ... ***
+
+	//ko.observable.fn.subscribeChanged = function (callback) {
+	//	var oldValue;
+	//	this.subscribe(function (_oldValue) {
+	//		oldValue = _oldValue;
+	//	}, undefined, 'beforeChange');
+	//	this.subscribe(function (newValue) {
+	//		callback(oldValue, newValue);
+	//	});
+	//};
 
 	my = {};
 	// *** Main start point ***
@@ -81,14 +94,24 @@
 					function observeSkill(skill) {
 						var current = skill + "Current";
 						var limit = skill + "Limit";
+						var oldValue = 0;
 						SHIP.MyShip[current] = ko.observable(ships[i][current]);
+						// А вот так - работает (оранжевые снова можно сделать зелеными)!
+						SHIP.MyShip[current].subscribe(function (_oldValue) {
+							oldValue = _oldValue;
+						}, this, "beforeChange");
 						SHIP.MyShip[limit] = ko.observable(ships[i][limit]);
-						SHIP.MyShip[skill + "Skill"] = function (i) {
-							if (SHIP.MyShip[current]() > i) {
-								return "Point " + "Start";
+
+						SHIP.MyShip[skill + "Skill"] = function (j) {
+							if ((oldValue == j + 1) && (oldValue > SHIP.MyShip[current]())) {
+								oldValue = 0;
+								return "Point Removed";
 							}
-							else if (SHIP.MyShip[limit]() > i) {
-								return "Point " + "Limit";
+							if (SHIP.MyShip[current]() > j) {
+								return "Point Start";
+							}
+							else if (SHIP.MyShip[limit]() > j) {
+								return "Point Limit";
 							}
 							else {
 								return "Point";
@@ -200,11 +223,15 @@
 						}
 					}
 
-					tryChangeSkill("HP");
-					tryChangeSkill("MP");
-					tryChangeSkill("Armor");
-					tryChangeSkill("Speed");
-					tryChangeSkill("AngleSpeed");
+					function tryChangeSkills() {
+						tryChangeSkill("HP");
+						tryChangeSkill("MP");
+						tryChangeSkill("Armor");
+						tryChangeSkill("Speed");
+						tryChangeSkill("AngleSpeed");
+					}
+
+					tryChangeSkills();
 
 				}
 

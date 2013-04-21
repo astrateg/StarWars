@@ -51,6 +51,10 @@ body {
 	background-color: green;
 }
 
+.Point.Removed {
+	background-color: orange;
+}
+
 .Rounded {
 	border: 2px solid #808080;
 	border-radius: 10px;
@@ -117,37 +121,37 @@ body {
 }
 
 #Sidebar #SelectShipParameters {
-    padding: 10px;
-    margin-left: 20px;
+	padding: 10px;
+	margin-left: 20px;
 }
 
 #SelectShipParameters > div {
-    position: relative;
+	position: relative;
 }
 
 #SelectShipParameters #SkillPoints {
-    display: none;
-    position: absolute;
-    top: 2px;
-    right: 5px;
+	display: none;
+	position: absolute;
+	top: 2px;
+	right: 5px;
 	font-weight: bold;
-    color: navy;
+	color: navy;
 	font-size: 20px;
 }
 
 #SelectShipParameters .Plus {
-    display: none;
-    position: absolute;
-    top: 2px;
-    right: 5px;
-    height: 15px;
-    width: 15px;
-    background-image: url(Images/plus2.png);
+	display: none;
+	position: absolute;
+	top: 2px;
+	right: 5px;
+	height: 15px;
+	width: 15px;
+	background-image: url(Images/plus2.png);
 }
 
-    #SelectShipParameters .Plus:active {
-        background-image: url(Images/plus1.png);
-    }
+	#SelectShipParameters .Plus:active {
+		background-image: url(Images/plus1.png);
+	}
 
 
 #SelectShipParameters .Name,

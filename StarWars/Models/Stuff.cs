@@ -12,7 +12,7 @@ namespace StarWars.Models {
             public static int[] MP = new int[] { 0, 100 };
             public static double[] Rotate = new double[] { 0.01, 0.01 };
             public static int[] Size = new int[] { 50, 50 };
-            public static int[] Speed = new int[] { 1, 1 };
+            public static int[] Speed = new int[] { 3, 3 };
         }
 
         public Stuff(string type, double x, double y, double angle, double rotate, int size, double speed, int index) 

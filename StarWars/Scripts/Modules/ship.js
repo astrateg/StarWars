@@ -86,10 +86,11 @@ define(['Modules/requests'], function (REQUESTS) {
 
 					selectShip.appendChild(my.Ranger.ImagesBig[i]);
 				}
-			}
-			else {
 				ShowAllParameters(my.MyShip.ImageIndex);
 			}
+			//else {
+			//	ShowAllParameters(my.MyShip.ImageIndex);
+			//}
 
 			// *** Skills ***
 			$("#SelectShipParameters .Plus").on("click", function () {

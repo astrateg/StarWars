@@ -2,13 +2,14 @@
 using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Linq;
+using System.Reflection;
 using System.Threading.Tasks;
 using System.Web;
 using System.Web.Script.Serialization;
 
 namespace StarWars.Models
 {
-	public class Ship
+	public class Ship : Body
 	{
 		// Constants
 		private object syncLock = new object();
@@ -90,11 +91,16 @@ namespace StarWars.Models
 		public int AngleSpeedLimit { get; set; }
 		public double AngleSpeed { get { return AngleSpeedCurrent * AngleSpeedCurrent * Ship.Ranger.Mult.AngleSpeedMult; } }
 
-		public double X { get; set; }
-		public double Y { get; set; }
-		public double Angle { get; set; }
-		public int Size { get; set; }
-		public int Image { get; set; }
+		// *** Inherit from class Body ***
+		//public double X { get; set; }
+		//public double Y { get; set; }
+		//public double Angle { get; set; }
+		//public int Size { get; set; }
+		//public int Image { get; set; }
+		//[ScriptIgnore]
+		//public double GetCenterX { get { return this.X + this.Size / 2; } }
+		//[ScriptIgnore]
+		//public double GetCenterY { get { return this.Y + this.Size / 2; } }
 
 		[ScriptIgnore]
 		public int VectorMove { get; set; }      // 1 (Forward) | -1 (Backward) | 0 (Stop)
@@ -114,14 +120,10 @@ namespace StarWars.Models
 		//[ScriptIgnore]
 		//public ConcurrentBag<Bomb> BombsBuffer { get; set; }
 
-		// Ship Center Coordinates
-		[ScriptIgnore]
-		public double GetCenterX { get { return this.X + this.Size / 2; } }
-		[ScriptIgnore]
-		public double GetCenterY { get { return this.Y + this.Size / 2; } }
-
 		// *** Ship Constructor ***
-		public Ship(int id, string name, string type, int indexRanger, double X, double Y, double angle, int size) {
+		public Ship(int id, string name, string type, int indexRanger, double X, double Y, double angle, int size)
+			: base(X, Y, angle, size, indexRanger) 
+		{
 			this.ID = id;
 			this.Name = name;
 			this.Type = type;
@@ -147,18 +149,17 @@ namespace StarWars.Models
 			// Speed
 			this.SpeedCurrent = Ship.Ranger.Types.SpeedStart[indexRanger];
 			this.SpeedLimit = Ship.Ranger.Types.SpeedLimit[indexRanger];
-			//this.Speed = this.SpeedCurrent * Ship.Ranger.Mult.SpeedMult;
 			this.Speed = 0.0;
 
 			// AngleSpeed
 			this.AngleSpeedCurrent = Ship.Ranger.Types.AngleSpeedStart[indexRanger];
 			this.AngleSpeedLimit = Ship.Ranger.Types.AngleSpeedLimit[indexRanger];
 
-			this.X = X;
-			this.Y = Y;
-			this.Angle = angle;
-			this.Size = size;
-			this.Image = indexRanger;                     // Индекс файла-изображения
+			//this.X = X;
+			//this.Y = Y;
+			//this.Angle = angle;
+			//this.Size = size;
+			//this.Image = indexRanger;                     // Индекс файла-изображения
 			this.VectorMove = 0;
 			this.VectorRotate = 0;
 			this.VectorShoot = 0;
@@ -194,13 +195,11 @@ namespace StarWars.Models
 
 		// *** Move & Rotate ***
 		public void Move() {
+			// Ship momentum
 			var vx = Math.Cos(this.Angle) * this.Speed * Ship.Ranger.Mult.SpeedMult;
 			var vy = Math.Sin(this.Angle) * this.Speed * Ship.Ranger.Mult.SpeedMult;
-			
-			// Try moving
-			this.X += vx;
-			this.Y += vy;
-			
+			this.GravityCorrection(vx, vy, this.HPCurrent);
+
 			// Check moving
 			bool successLeft = (this.X >= 0);
 			bool successRight = (this.X <= Game.SpaceWidth - this.Size);
@@ -210,7 +209,6 @@ namespace StarWars.Models
 			// Check X-moving
 			if (!successLeft) {
 				this.X = 0;
-				//this.Speed = 0;
 			}
 			else if (!successRight) {
 				this.X = Game.SpaceWidth - this.Size;
@@ -222,7 +220,6 @@ namespace StarWars.Models
 			// Check Y-moving
 			if (!successUp) {
 				this.Y = 0;
-				//this.Speed = 0;
 			}
 			else if (!successDown) {
 				this.Y = Game.SpaceHeight - this.Size;
@@ -309,9 +306,36 @@ namespace StarWars.Models
 			this.HP = 0;
 			this.MP = 0;
 			this.Death++;
-			this.State = "Explode000";              // Взрыв проверяется только по свойству VectorMove (для определенности)
+			this.SubtractSkill();		// Отнимается 1 пункт у случайного скилла
+
+			this.State = "Explode000";  // Взрыв проверяется только по свойству VectorMove (для определенности)
 			Game.Instance.CreateStuff(0, this.GetCenterX, this.GetCenterY);
 			Game.Instance.CreateStuff(1, this.GetCenterX, this.GetCenterY);
+		}
+
+		public void SubtractSkill() {
+			List<string> skills = new List<string>();
+			if (this.HPCurrent > 1) {
+				skills.Add("HPCurrent");
+			}
+			if (this.MPCurrent > 1) {
+				skills.Add("MPCurrent");
+			}
+			if (this.ArmorCurrent > 1) {
+				skills.Add("ArmorCurrent");
+			}
+			if (this.SpeedCurrent > 1) {
+				skills.Add("SpeedCurrent");
+			}
+			if (this.AngleSpeedCurrent > 1) {
+				skills.Add("AngleSpeedCurrent");
+			}
+
+			int rnd = Utils.RandomInt(0, skills.Count);
+			PropertyInfo propertyInfo = this.GetType().GetProperty(skills[rnd]);
+			int propertyValue = (int)propertyInfo.GetValue(this);
+			propertyInfo.SetValue(this, Convert.ChangeType(propertyValue - 1, propertyInfo.PropertyType));
+
 		}
 
 		// Check colliding ship with sun
