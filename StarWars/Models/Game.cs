@@ -43,11 +43,6 @@ namespace StarWars.Models
       get { return (int)((DateTime.Now - _startTime).TotalMilliseconds); }
     }
 
-    public string ServerName
-    {
-      get { return Environment.MachineName; }
-    }
-
     public IEnumerable<Ship> ShipListActive
     {
       get

@@ -12,7 +12,6 @@ namespace StarWars.Controllers
   {
     public ActionResult Index()
     {
-      //ViewBag.ServerName = Game.Instance.ServerName;
       return View();
     }
 

@@ -1,7 +1,6 @@
 ﻿define(['Modules/requests', 'Modules/ship'], function (REQUESTS, SHIP) {
     var my = {};
-    my.ServerName = location.hostname;
-    my.ImagePath = "http://" + my.ServerName + "/Content/Images/";
+    my.ImagePath = "http://" + location.hostname + "/Content/Images/";
     my.IntervalID = 0;      // для setInterval
 
     var totalWidth = document.documentElement.clientWidth;

@@ -213,6 +213,7 @@
     <Content Include="Content\Images\Weapons\weapon-bomb02-green.png" />
     <Content Include="Content\Images\Weapons\weapon-missile01-blue.png" />
     <Content Include="Content\Images\Weapons\weapon-missile01-green.png" />
+    <Content Include="Content\ToDoList-2017-04.txt" />
     <Content Include="Scripts\app.js" />
     <Content Include="Scripts\Libraries\jquery-1.9.1.min.js" />
     <Content Include="Scripts\Libraries\jquery.signalR-1.0.1.js" />
@@ -230,7 +231,7 @@
     <Content Include="Scripts\Modules\requests.js" />
     <Content Include="Scripts\Prototypes\ships.js" />
     <Content Include="Content\Site.css" />
-    <Content Include="Content\ToDoList.txt" />
+    <Content Include="Content\ToDoList-2013.txt" />
     <Content Include="Global.asax" />
     <Content Include="Scripts\Libraries\r.js" />
     <Content Include="Scripts\Libraries\require.js" />

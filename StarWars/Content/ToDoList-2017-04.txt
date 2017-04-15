@@ -1,0 +1,7 @@
+﻿***** JS *****
+Fixes
+- Fix autocheck errors in JS files
+- Add constants into Window object in View-file (and refactor ImagePath usage in game.js, ship.js, space.js)
+
+Features
+- Add auto-moving into the mouse-click-point (auto-rotate + auto-accelerate) !?
