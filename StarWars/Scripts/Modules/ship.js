@@ -48,7 +48,7 @@ define(['Modules/requests'], function (REQUESTS) {
 
       my.ShipSize = data.ShipSize;
 
-      if (my.MyShip.Exists == 0) {
+      if (my.MyShip.Exists === 0) {
         $("#ModalWindow").css("display", "block");
 
         // Загружаем большие иконки кораблей - они нужны только если корабль еще не создан
@@ -81,7 +81,7 @@ define(['Modules/requests'], function (REQUESTS) {
               ShowAllParameters(index);
               my.MyShip.ShowAllWeapons();
 
-            }
+            };
           }(i));
 
           selectShip.appendChild(my.Ranger.ImagesBig[i]);
@@ -121,8 +121,8 @@ define(['Modules/requests'], function (REQUESTS) {
         for (i = 0; i < 4; i++) {
           weaponDiv = $("#CurrentShipWeapons .weapon").eq(i);
           weaponIndex = my.MyShip.Weapons[i];
-          if (weaponIndex != null) {
-            if (weaponIndex == my.MyShip.WeaponActive) {
+          if (weaponIndex !== null) {
+            if (weaponIndex === my.MyShip.WeaponActive) {
               weaponDiv.addClass("Selected");
             }
             weaponDiv.css("backgroundImage", "url(" + my.Bomb.Images[weaponIndex].src + ")");
@@ -140,9 +140,9 @@ define(['Modules/requests'], function (REQUESTS) {
             weaponDiv.css("backgroundImage", "none");
           }
         }
-      }
+      };
     });
-  }
+  };
 
   function ShowAllParameters(index) {
     var type = $("#SelectShipParameters .Type .Value").eq(0);
@@ -169,11 +169,11 @@ define(['Modules/requests'], function (REQUESTS) {
       obj.eq(i).removeClass("Limit");
       obj.eq(i).addClass("Start");
     }
-    for (var i = arrStart[index]; i < arrLimit[index]; i++) {
+    for (i = arrStart[index]; i < arrLimit[index]; i++) {
       obj.eq(i).removeClass("Start");
       obj.eq(i).addClass("Limit");
     }
-    for (var i = arrLimit[index]; i < 10; i++) {
+    for (i = arrLimit[index]; i < 10; i++) {
       obj.eq(i).removeClass("Start");
       obj.eq(i).removeClass("Limit");
     }

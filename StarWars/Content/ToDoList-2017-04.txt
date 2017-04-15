@@ -1,4 +1,13 @@
-﻿***** JS *****
+﻿***** Git *****
++ Add .gitignore file
+
+***** C# *****
+- Add unit tests
+- Add logging (login, logout, kill, death) - structured log
+- Move constant settings to web.config
+- Add in-game chat
+
+***** JS *****
 Fixes
 - Fix autocheck errors in JS files
 - Add constants into Window object in View-file (and refactor ImagePath usage in game.js, ship.js, space.js)

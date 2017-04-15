@@ -45,7 +45,7 @@
         my.Planets.push(planet);
       }
     });
-  }
+  };
 
   // *** Sun prototype ***
   function Sun(name, size, image, angle) {
