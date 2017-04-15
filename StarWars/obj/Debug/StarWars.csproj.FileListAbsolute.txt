@@ -62,3 +62,4 @@ C:\Users\alexeys\Documents\Visual Studio 2012\Projects\StarWars\StarWars\bin\Mic
 C:\Users\alexeys\Documents\Visual Studio 2012\Projects\StarWars\StarWars\bin\Microsoft.AspNet.SignalR.SystemWeb.xml
 C:\Users\alexeys\Documents\Visual Studio 2012\Projects\StarWars\StarWars\bin\Microsoft.Owin.Host.SystemWeb.xml
 C:\Users\alexeys\Documents\Visual Studio 2012\Projects\StarWars\StarWars\bin\Newtonsoft.Json.xml
+C:\Users\Alex\Documents\Visual Studio 2012\Projects\StarWars\StarWars\bin\StarWars.dll.config

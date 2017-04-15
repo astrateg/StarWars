@@ -1,5 +1,5 @@
 ﻿require.config({
-    baseUrl: 'Game/Scripts',
+    baseUrl: 'Scripts',
     paths: {
         //"jquery": "http://code.jquery.com/jquery-latest",
         "jquery": "Libraries/jquery-1.9.1.min",
