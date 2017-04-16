@@ -79,7 +79,7 @@
     var shipStatRow = document.getElementById(ship.ID);
 
     // Если корабль активен, и его строка есть в таблице на левой панели - обновляем данные
-    if (ship.State !== "Inactive" && shipStatRow !== null) {
+    if (ship.State !== "Inactive" && shipStatRow != null) {
       var cell = shipStatRow.getElementsByClassName("StatShip")[0].firstChild;    // Ship Image
       cell.src = ship.GetImage().src;
 
@@ -94,7 +94,7 @@
     }
 
       // Если корабль неактивен, НО его строка ЕЩЕ есть в таблице на левой панели - удаляем строку
-    else if (shipStatRow !== null) {
+    else if (shipStatRow != null) {
       $(shipStatRow).remove();
     }
   };
