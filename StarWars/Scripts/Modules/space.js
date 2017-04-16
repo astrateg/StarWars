@@ -9,7 +9,7 @@
   imgPlanets["jupiter"] = new Image();
 
   // Objects "Image" are used as properties of the appropriate "Planet" objects (planets.js).
-  var imagePath = "http://" + location.hostname + "/Content/Images/";
+  var imagePath = location.href + "/Content/Images/";
 
   imgPlanets["sun"].src = imagePath + "sun.png";
   imgPlanets["earth"].src = imagePath + "earth.png";
