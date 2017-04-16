@@ -28,68 +28,68 @@ var arrDominators = [];         // Array of Dominators
 var dominatorTimer;
 
 function InitDominators() {
-    var dominatorsMax = 5;
-    var XStart = 1200, YStart = 100;
-    var randomIndexType, randomIndexImage;
-    var dominator, type, maxHP, speed, size, randomAngle;
-    for (var i = 0; i < dominatorsMax; i++) {
-        randomIndexType = UTILS.GetRandomInt(0, SHIP.DominatorTypesMax - 1);
-        randomIndexImage = UTILS.GetRandomInt(0, SHIP.DominatorImagesMax - 1);
+  var dominatorsMax = 5;
+  var XStart = 1200, YStart = 100;
+  var randomIndexType, randomIndexImage;
+  var dominator, type, maxHP, speed, size, randomAngle;
+  for (var i = 0; i < dominatorsMax; i++) {
+    randomIndexType = UTILS.GetRandomInt(0, SHIP.DominatorTypesMax - 1);
+    randomIndexImage = UTILS.GetRandomInt(0, SHIP.DominatorImagesMax - 1);
 
-        type = SHIP.Dominator.Types.Type[randomIndexType];
-        maxHP = SHIP.Dominator.Types.MaxHP[randomIndexType];
-        size = SHIP.Dominator.Types.Size[randomIndexType];
-        randomAngle = Math.random() * (2 * Math.PI);
-        speed = SHIP.Dominator.Types.Speed[randomIndexType];
+    type = SHIP.Dominator.Types.Type[randomIndexType];
+    maxHP = SHIP.Dominator.Types.MaxHP[randomIndexType];
+    size = SHIP.Dominator.Types.Size[randomIndexType];
+    randomAngle = Math.random() * (2 * Math.PI);
+    speed = SHIP.Dominator.Types.Speed[randomIndexType];
 
-        // Исправить под новый конструктор Ship
-        //dominator = new Ship(
-        //    type,
-        //    type,
-        //    "dominator-" + type,
-        //    maxHP,
-        //    maxHP,
-        //    XStart + randomIndexType * randomIndexImage * 10,
-        //    YStart + i * 100,
-        //    speed,
-        //    randomAngle,
-        //    0,      // скорость вращения (пока 0)
-        //    size,
-        //    randomIndexImage,
-        //    "MoveForward",
-        //    "Stop",
-        //    0
-        //);
-        //arrDominators.push(dominator);
-    }
+    // Исправить под новый конструктор Ship
+    //dominator = new Ship(
+    //    type,
+    //    type,
+    //    "dominator-" + type,
+    //    maxHP,
+    //    maxHP,
+    //    XStart + randomIndexType * randomIndexImage * 10,
+    //    YStart + i * 100,
+    //    speed,
+    //    randomAngle,
+    //    0,      // скорость вращения (пока 0)
+    //    size,
+    //    randomIndexImage,
+    //    "MoveForward",
+    //    "Stop",
+    //    0
+    //);
+    //arrDominators.push(dominator);
+  }
 }
 
 function SynchronizeDominatorShips() {
-    var type, indexTyp;
-    for (var i = 0; i < arrDominators.length; i++) {
-        // Checking state
-        var state = arrDominators[i].State;
-        if (state == "Inactive" || state.indexOf("Explode") != -1) {
-            continue;
-        }
-
-        arrDominators[i].MoveForward();
+  var type, indexTyp;
+  for (var i = 0; i < arrDominators.length; i++) {
+    // Checking state
+    var state = arrDominators[i].State;
+    if (state === "Inactive" || state.indexOf("Explode") !== -1) {
+      continue;
     }
+
+    arrDominators[i].MoveForward();
+  }
 }
 
 function GenerateDominatorBombs() {
-    for (var i = 0; i < arrDominators.length; i++) {
-        // Cheching state
-        var state = arrDominators[i].State;
-        if (state == "Inactive" || state.indexOf("Explode") != -1) {
-            continue;
-        }
-
-        var bombX = GetNewBombX(arrDominators[i]);
-        var bombY = GetNewBombY(arrDominators[i]);
-        var bomb = new Bomb("dominator", bombX, bombY, arrDominators[i].Angle, SHIP.BombSize, 0, SHIP.BombSpeed);
-        arrDominators[i].Bombs.push(bomb);
+  for (var i = 0; i < arrDominators.length; i++) {
+    // Cheching state
+    var state = arrDominators[i].State;
+    if (state === "Inactive" || state.indexOf("Explode") !== -1) {
+      continue;
     }
+
+    var bombX = GetNewBombX(arrDominators[i]);
+    var bombY = GetNewBombY(arrDominators[i]);
+    var bomb = new Bomb("dominator", bombX, bombY, arrDominators[i].Angle, SHIP.BombSize, 0, SHIP.BombSpeed);
+    arrDominators[i].Bombs.push(bomb);
+  }
 }
 
 //for (i = 0; i < arrDominators.length; i++) {
