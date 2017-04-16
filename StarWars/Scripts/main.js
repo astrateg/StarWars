@@ -7,12 +7,12 @@
         //"knockout": 'Libraries/knockout-2.2.1.min',
         //"noext":    "Libraries/noext",
         "sigr":  "Libraries/jquery.signalR-1.0.1",
-        "signalr-hubs": "../signalr/hubs?noext",
+        "signalr-hubs": "../signalr/hubs?noext"
     },
     shim: {
         "sigr": { deps: ['jquery'] },
         "signalr-hubs": { deps: ['jquery', 'sigr'] },
-        "app": { deps: ['jquery'] },
+        "app": { deps: ['jquery'] }
     }
 });
 
@@ -27,17 +27,17 @@ require(['jquery', 'app', 'sigr', 'signalr-hubs'], function ($, APP) {
 
         spaceHub.client.broadcastMessage = function (data) {
             APP.Synchronize(data);
-        }
+        };
 
         spaceHub.client.joined = function (connId, id, time) {
             //alert(connId + "\n" + id + " is connected at\n" + time);
-        }
+        };
 
         spaceHub.client.leave = function (disconnected, id) {
             if (disconnected) {
                 APP.DeleteShip(id);
             }
-        }
+        };
 
         $.connection.hub.start().done(function () {
         	window.onresize = function () {

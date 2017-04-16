@@ -23,7 +23,7 @@
 		SHIP.Ships = [];    // Обнуляем, т.к. иначе после F5 массив SHIP.Ships не очищается
 
 		var modalWindow = $("#ModalWindow");
-		if (modalWindow.css("display") == "none") {
+		if (modalWindow.css("display") === "none") {
 			$("#SelectShipParameters").insertAfter("#CurrentShipWeapons");
 			LoadGame(-1);
 		}
@@ -39,7 +39,7 @@
 				}
 			});
 		}
-	}
+	};
 
 	// *** END of Main start point***
 
@@ -61,8 +61,8 @@
 			for (var i = 0; i < ships.length; i++) {
 				ships[i].Image = parseInt(ships[i].Image);
 				var userName = ships[i].Name;
-				if (ships[i].ID == id) {
-					if (userName.length == 0) {
+				if (ships[i].ID === +id) {
+					if (userName.length === 0) {
 						userName = prompt("Введите свое имя (не более 8 символов)");
 						if (userName.length > 8) {
 							userName = userName.slice(0, 8);
@@ -103,7 +103,7 @@
 						SHIP.MyShip[limit] = ko.observable(ships[i][limit]);
 
 						SHIP.MyShip[skill + "Skill"] = function (j) {
-							if ((oldValue == j + 1) && (oldValue > SHIP.MyShip[current]())) {
+							if ((oldValue === j + 1) && (oldValue > SHIP.MyShip[current]())) {
 								oldValue = 0;
 								return "Point Removed";
 							}
@@ -116,7 +116,7 @@
 							else {
 								return "Point";
 							}
-						}
+						};
 					}
 
 					observeSkill("HP");
@@ -136,7 +136,7 @@
 		ship = UTILS.GetElement(SHIP.Ships, "ID", id);
 		ship.State = "Inactive";
 		GAME.Statistics.DeleteStatRow(ship);
-	}
+	};
 
 	my.Synchronize = function(data) {
 		SynchronizePlanets(data);
@@ -144,7 +144,7 @@
 		//SynchronizeDominatorShips();
 		SynchronizeShips(data);
 		ReloadCanvas();
-	}
+	};
 
 	function SynchronizeStuffs(data) {
 		SPACE.Stuff.Stuffs = [];
@@ -167,7 +167,7 @@
 		var indexes = [];
 
 		// Если с сервера пришел пустой массив, очищаем клиентский массив (и таблицу статистики)
-		if (data.ships.length == 0) {
+		if (data.ships.length === 0) {
 			for (var i = 0; i < clientShipsCount; i++) {
 				GAME.Statistics.DeleteStatRow(SHIP.Ships[i]);
 			}
@@ -175,10 +175,10 @@
 			SHIP.MyShip.State = "Inactive";
 		}
 		else {
-			for (var i = 0; i < serverShipsCount; i++) {
+			for (i = 0; i < serverShipsCount; i++) {
 
 				// *** Смещение карты (если это наш корабль) ***
-				if (data.ships[i].ID == SHIP.MyShip.ID) {
+				if (data.ships[i].ID === +SHIP.MyShip.ID) {
 
 					// Старые координаты ЦЕНТРА корабля
 					var x = SHIP.MyShip.X + SHIP.ShipSize / 2 - GAME.SpaceShiftX;
@@ -187,7 +187,7 @@
 					var dX = Math.abs(data.ships[i].X - SHIP.MyShip.X);
 					var dY = Math.abs(data.ships[i].Y - SHIP.MyShip.Y);
 
-					if (dX != 0 || dY != 0) {
+					if (dX !== 0 || dY !== 0) {
 						// "Зона вхождения" (аналогия с наведением мыши)
 						var zoneX = SHIP.ShipSize * 10;  // цифра 10 - произвольная, чтобы получить "зону вхождения" побольше
 						var zoneY = SHIP.ShipSize * 10;
@@ -200,7 +200,7 @@
 						SHIP.MyShip.Y = data.ships[i].Y;
 					}
 
-					if (data.ships[i].State == "Active" && SHIP.MyShip.State.indexOf("Explode") != -1) {
+					if (data.ships[i].State === "Active" && SHIP.MyShip.State.indexOf("Explode") !== -1) {
 						GAME.CenterSpaceToShip();
 						SPACE.Sun.GetCenter();
 					}
@@ -240,7 +240,7 @@
 				// Цикл только по исходному списку (добавленные в ходе проверки корабли не учитываются - они добавляются в конец массива)
 				for (var j = 0; j < clientShipsCount; j++) {
 
-					if (SHIP.Ships[j].ID != data.ships[i].ID) {     // сравниваем массивы - локальный (Javascript) и пришедший (JSON)
+					if (SHIP.Ships[j].ID !== data.ships[i].ID) {     // сравниваем массивы - локальный (Javascript) и пришедший (JSON)
 						continue;                                   // если не одинаковые имена - берем следующий
 					}
 
@@ -248,11 +248,11 @@
 					isShipFound = true;
 
 					// если корабль встретился в массиве JS - обновляем данные (только те, которые изменились)
-					if (SHIP.Ships[j].Name == "") {
+					if (SHIP.Ships[j].Name === "") {
 						SHIP.Ships[j].Name = data.ships[i].Name;
 					}
 
-					if (SHIP.Ships[j].State == "Inactive") {
+					if (SHIP.Ships[j].State === "Inactive") {
 						GAME.Statistics.AddStatRow(SHIP.Ships[j]);
 					}
 					SHIP.Ships[j].State = data.ships[i].State;
@@ -334,14 +334,14 @@
 		var vectorMove = SHIP.MyShip.VectorMove;
 		if (vectorMove == null) return key;                   // If key was up when MyShip wasn't created yet (i.e. when Ctrl+F5 was pressed in browser)
 		var state = SHIP.MyShip.State;
-		if (state.indexOf("Explode") != -1) return key;       // If my ship is in the explosion state, it cannot move.
+		if (state.indexOf("Explode") !== -1) return key;       // If my ship is in the explosion state, it cannot move.
 
 		var actionName = "", actionValue = 0;
 
 		switch (key.keyCode) {
 			case 37:    // Left Arrow   (Rotate CCW)
 			case 65:    // A
-				if (SHIP.MyShip.VectorRotate == -1) {
+				if (SHIP.MyShip.VectorRotate === -1) {
 					return false;
 				}
 				SHIP.MyShip.VectorRotate = -1;
@@ -351,7 +351,7 @@
 
 			case 38:    // Up Arrow     (Move Forward)
 			case 87:    // W
-				if (SHIP.MyShip.VectorMove == 1) {
+				if (SHIP.MyShip.VectorMove === 1) {
 					return false;
 				}
 				SHIP.MyShip.VectorMove = 1;
@@ -361,7 +361,7 @@
 
 			case 39:    // Right Arrow  (Rotate CW)
 			case 68:    // D
-				if (SHIP.MyShip.VectorRotate == 1) {
+				if (SHIP.MyShip.VectorRotate === 1) {
 					return false;
 				}
 				SHIP.MyShip.VectorRotate = 1;
@@ -371,7 +371,7 @@
 
 			case 40:    // Down Arrow   (Move Backward)
 			case 83:    // S
-				if (SHIP.MyShip.VectorMove == -1) {
+				if (SHIP.MyShip.VectorMove === -1) {
 					return false;
 				}
 				SHIP.MyShip.VectorMove = -1;
@@ -382,7 +382,7 @@
 			case 49:    // 1
 			case 50:    // 2
 			case 51:    // 3
-				if (SHIP.MyShip.WeaponActive == key.keyCode - 49) {
+				if (SHIP.MyShip.WeaponActive === key.keyCode - 49) {
 					return false;
 				}
 				var weaponDiv = $("#CurrentShipWeapons .weapon").eq(key.keyCode - 49);
@@ -390,7 +390,7 @@
 				break;
 
 			case 32:    // Space        (Fire)
-				if (SHIP.MyShip.VectorShoot == 1) {
+				if (SHIP.MyShip.VectorShoot === 1) {
 					return false;
 				}
 				SHIP.MyShip.VectorShoot = 1;
@@ -413,7 +413,7 @@
 		if (vectorMove == null) return key;                     // If key was up when MyShip wasn't created yet (i.e. when Ctrl+F5 was pressed in browser)
 
 		var state = SHIP.MyShip.State;
-		if (state.indexOf("Explode") != -1) return key;       // If my ship is in the explosion state, it cannot move.
+		if (state.indexOf("Explode") !== -1) return key;       // If my ship is in the explosion state, it cannot move.
 
 		var actionName = "", actionValue = 0;
 
