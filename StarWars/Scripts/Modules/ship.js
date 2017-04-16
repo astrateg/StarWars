@@ -22,7 +22,7 @@ define(['Modules/requests'], function (REQUESTS) {
   my.Ranger.ImagesSmall = [];
   my.Ranger.ImagesMax = 9;
 
-  var imagePath = "http://" + location.hostname + "/Content/Images/";    // Чтобы не ссылаться на GAME (иначе будет циклическая ссылка)
+  var imagePath = location.href + "/Content/Images/";    // Чтобы не ссылаться на GAME (иначе будет циклическая ссылка)
 
   // Загружаем маленькие иконки кораблей - они нужны в любом случае (весь набор)
   for (var i = 0; i < my.Ranger.ImagesMax; i++) {

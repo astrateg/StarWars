@@ -1,6 +1,6 @@
 ﻿define(['Modules/requests', 'Modules/ship'], function (REQUESTS, SHIP) {
   var my = {};
-  my.ImagePath = "http://" + location.hostname + "/Content/Images/";
+  my.ImagePath = location.href + "/Content/Images/";
   my.IntervalID = 0;      // для setInterval
 
   var totalWidth = document.documentElement.clientWidth;
@@ -39,7 +39,7 @@
 
     row = document.createElement('tr');
     row.id = ship.ID;
-    if (ship.ID === SHIP.MyShip.ID) {
+    if (ship.ID === +SHIP.MyShip.ID) {
       $(row).addClass("MyShip");
     }
 

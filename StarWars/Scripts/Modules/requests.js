@@ -1,9 +1,10 @@
 ﻿define([], function () {
   var my = {};
-  var path = location.hostname;
+  var homePath = location.href + "Home/";
+
   my.InitGame = function () {
     var request = $.ajax({
-      url: "http://" + path + "/Home/InitGame/",
+      url: homePath + "InitGame/",
       type: "GET",
       dataType: "json",
       async: false,       // !!! (синхронный запрос)
@@ -15,7 +16,7 @@
 
   my.InitSpace = function () {
     var request = $.ajax({
-      url: "http://" + path + "/Home/InitSpace/",
+      url: homePath + "InitSpace/",
       type: "GET",
       dataType: "json",
       async: false,       // !!! (синхронный запрос)
@@ -27,7 +28,7 @@
 
   my.InitShipConstants = function () {
     var request = $.ajax({
-      url: "http://" + path + "/Home/InitShipConstants/",
+      url: homePath + "InitShipConstants/",
       type: "GET",
       dataType: "json",
       async: false,       // !!! (синхронный запрос, чтобы выяснить, есть у меня корабль или нет)
@@ -41,7 +42,7 @@
   // (если нашего корабля еще нет, то он будет создан)
   my.InitShips = function (index, name) {
     var request = $.ajax({
-      url: "http://" + path + "/Home/InitShips/",
+      url: homePath + "InitShips/",
       type: "POST",
       data: { index: index, name: name },
       dataType: "json",
@@ -54,7 +55,7 @@
   // Последующие запросы к серверу на получение пересчитанного списка кораблей для обновления массива SHIP.Ships
   //my.GetShips = function () {
   //    var request = $.ajax({
-  //        url: "http://" + path + "/Home/GetShips/",
+  //        url: homePath + "GetShips/",
   //        type: "GET",
   //        dataType: "json",
   //        cache: false,
@@ -67,7 +68,7 @@
   // Обновление имени пользователя на сервере
   my.UpdateUserName = function (userName) {
     var request = $.ajax({
-      url: "http://" + path + "/Home/UpdateUserName/",
+      url: homePath + "UpdateUserName/",
       type: "POST",
       data: { userName: userName },
       cache: false
@@ -79,7 +80,7 @@
   // Отключение корабля на сервере
   my.DeactivateUserShip = function () {
     var request = $.ajax({
-      url: "http://" + path + "/Home/DeactivateUserShip/",
+      url: homePath + "DeactivateUserShip/",
       type: "POST",
       data: {},
       cache: false
@@ -93,7 +94,7 @@
   my.UpdateUserShip = function (name, value) {
     // Отправляем только совершенное действие
     $.ajax({
-      url: "http://" + path + "/Home/UpdateUserShip/",
+      url: homePath + "UpdateUserShip/",
       type: "POST",
       data: { name: name, value: value },
       //dataType: "json",
@@ -104,7 +105,7 @@
 
   my.ChangeWeapon = function (index) {
     $.ajax({
-      url: "http://" + path + "/Home/ChangeWeapon/",
+      url: homePath + "ChangeWeapon/",
       type: "POST",
       data: { index: index },
       cache: false
@@ -113,7 +114,7 @@
 
   my.ChangeSkill = function (skill) {
     $.ajax({
-      url: "http://" + path + "/Home/ChangeSkill/",
+      url: homePath + "ChangeSkill/",
       type: "POST",
       data: { skill: skill },
       cache: false
