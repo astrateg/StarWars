@@ -121,7 +121,7 @@ define(['Modules/requests'], function (REQUESTS) {
         for (i = 0; i < 4; i++) {
           weaponDiv = $("#CurrentShipWeapons .weapon").eq(i);
           weaponIndex = my.MyShip.Weapons[i];
-          if (weaponIndex !== null) {
+          if (weaponIndex != null) {
             if (weaponIndex === my.MyShip.WeaponActive) {
               weaponDiv.addClass("Selected");
             }
