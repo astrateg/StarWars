@@ -47,11 +47,11 @@
 
 	Ship.prototype.Show = function () {
 		var state = this.State;
-		if (state == "Inactive") {
+		if (state === "Inactive") {
 			return;
 		}
 
-		if (state.indexOf("Explode") != -1) {   // Например, Explode01 (X = 1, Y = 0)
+		if (state.indexOf("Explode") !== -1) {   // Например, Explode01 (X = 1, Y = 0)
 			var explodeX = state[8];
 			var explodeY = state[7];
 			var explodeStepX = GAME.Explosion.imgExplosionStepX;
@@ -76,10 +76,10 @@
 			allShipHPFull:  "#00BB00",
 			allShipHPMid:   "#FFBB00",
 			allShipHPEmpty: "#FF0000",
-			allShipMP: "#0000BB",
+			allShipMP: "#0000BB"
 		};
 
-		if (this.ID == SHIP.MyShip.ID) {    // Если наш корабль - подсвечиваем его
+		if (this.ID === +SHIP.MyShip.ID) {    // Если наш корабль - подсвечиваем его
 			GAME.Context.strokeStyle = color.myShipCircle;
 			GAME.Context.fillStyle = color.myShipCircle;
 
@@ -120,7 +120,7 @@
 			var currentShipSpeedPositive = $("#CurrentShipSpeedPositiveValue .Square");						// порядок перебора: 0..4 (прямой)
 			var currentShipSpeedNegative = $($("#CurrentShipSpeedNegativeValue .Square").get().reverse());	// порядок перебора: 4..0 (обратный)
 			// Если скорость около 0
-			if (Math.round(this.Speed * 1000) == 0) {
+			if (Math.round(this.Speed * 1000) === 0) {
 				currentShipSpeedPositive.eq(0).css("backgroundColor", "transparent");
 				currentShipSpeedNegative.eq(0).css("backgroundColor", "transparent");
 			}
@@ -170,7 +170,7 @@
 		GAME.Context.strokeRect(centerShipX - this.Size / 2, centerShipY + this.Size / 2 + lineHeight, this.Size, lineHeight);    // fillRect(x, y, width, height)
 		GAME.Context.fillRect(centerShipX - this.Size / 2, centerShipY + this.Size / 2 + lineHeight, lineMP, lineHeight);         // fillRect(x, y, width, height)
 
-		if (this.Angle == 0) {
+		if (this.Angle === 0) {
 			GAME.Context.drawImage(this.GetImage(), this.X - GAME.SpaceShiftX, this.Y - GAME.SpaceShiftY);
 		} else {
 			// If Angle <> 0, have to rotate the ship ("Angle" - direction for moving & shooting)

@@ -39,7 +39,7 @@
 
     row = document.createElement('tr');
     row.id = ship.ID;
-    if (ship.ID === SHIP.MyShip.ID) {
+    if (ship.ID === +SHIP.MyShip.ID) {
       $(row).addClass("MyShip");
     }
 

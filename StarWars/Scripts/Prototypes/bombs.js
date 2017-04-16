@@ -24,7 +24,7 @@
     };
 
     Bomb.prototype.Show = function () {
-        if (this.RotateAngle == 0) {
+        if (this.RotateAngle === 0) {
             GAME.Context.drawImage(this.GetImage(), this.X - GAME.SpaceShiftX, this.Y - GAME.SpaceShiftY, this.Size, this.Size);
         } else {
             GAME.Context.save();
