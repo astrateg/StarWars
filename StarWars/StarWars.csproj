@@ -135,8 +135,10 @@
     </Compile>
     <Compile Include="Models\Body.cs" />
     <Compile Include="Models\Bomb.cs" />
+    <Compile Include="Models\DominatorShip.cs" />
     <Compile Include="Models\Game.cs" />
     <Compile Include="Models\Logger.cs" />
+    <Compile Include="Models\RangerShip.cs" />
     <Compile Include="Models\Ship.cs" />
     <Compile Include="Models\Space.cs" />
     <Compile Include="Models\SpaceHub.cs" />
@@ -147,18 +149,18 @@
   <ItemGroup>
     <Compile Include="App_Start\FilterConfig.cs" />
     <Compile Include="App_Start\RouteConfig.cs" />
-    <Content Include="Content\Images\Dominators\dominator-ekventor01.png" />
-    <Content Include="Content\Images\Dominators\dominator-ekventor02.png" />
-    <Content Include="Content\Images\Dominators\dominator-ekventor03.png" />
-    <Content Include="Content\Images\Dominators\dominator-menok01.png" />
-    <Content Include="Content\Images\Dominators\dominator-menok02.png" />
-    <Content Include="Content\Images\Dominators\dominator-menok03.png" />
-    <Content Include="Content\Images\Dominators\dominator-smersh01.png" />
-    <Content Include="Content\Images\Dominators\dominator-smersh02.png" />
-    <Content Include="Content\Images\Dominators\dominator-smersh03.png" />
-    <Content Include="Content\Images\Dominators\dominator-urgant01.png" />
-    <Content Include="Content\Images\Dominators\dominator-urgant02.png" />
-    <Content Include="Content\Images\Dominators\dominator-urgant03.png" />
+    <Content Include="Content\Images\Dominators\dominator-ekventor1.png" />
+    <Content Include="Content\Images\Dominators\dominator-ekventor2.png" />
+    <Content Include="Content\Images\Dominators\dominator-ekventor3.png" />
+    <Content Include="Content\Images\Dominators\dominator-menok1.png" />
+    <Content Include="Content\Images\Dominators\dominator-menok2.png" />
+    <Content Include="Content\Images\Dominators\dominator-menok3.png" />
+    <Content Include="Content\Images\Dominators\dominator-smersh1.png" />
+    <Content Include="Content\Images\Dominators\dominator-smersh2.png" />
+    <Content Include="Content\Images\Dominators\dominator-smersh3.png" />
+    <Content Include="Content\Images\Dominators\dominator-urgant1.png" />
+    <Content Include="Content\Images\Dominators\dominator-urgant2.png" />
+    <Content Include="Content\Images\Dominators\dominator-urgant3.png" />
     <Content Include="Content\Images\earth.png" />
     <Content Include="Content\Images\explosion.png" />
     <Content Include="Content\Images\jupiter.png" />

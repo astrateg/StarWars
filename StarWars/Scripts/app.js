@@ -51,7 +51,6 @@
       LoadShips(data.ships, data.id);
       GAME.CenterSpaceToShip();
       SPACE.Sun.GetCenter();
-      //InitDominators();
     });
   }
 
@@ -141,7 +140,7 @@
   my.Synchronize = function (data) {
     SynchronizePlanets(data);
     SynchronizeStuffs(data);
-    //SynchronizeDominatorShips();
+    SynchronizeDominatorShips(data);
     SynchronizeShips(data);
     ReloadCanvas();
   };
@@ -157,6 +156,75 @@
     SPACE.Sun.Angle = data.sunAngle;
     for (var i = 0; i < SPACE.Planets.length; i++) {
       SPACE.Planets[i].GetOrbitAngle(data.timeFromStart);
+    }
+  }
+
+  function SynchronizeDominatorShips(data) {
+    // Обновляем данные: (Очищать массив нельзя - корабль сильно мельтешит!)
+    var serverDominatorsCount = data.dominators.length;
+    var clientDominatorsCount = SHIP.Dominators.length;
+    var indexes = [];
+
+    // Если с сервера пришел пустой массив, очищаем клиентский массив
+    if (data.dominators.length === 0) {
+      SHIP.Dominators = [];
+      return;
+    }
+
+    for (i = 0; i < serverDominatorsCount; i++) {
+
+      var isDominatorFound = false;
+
+      // Цикл только по исходному списку (добавленные в ходе проверки корабли не учитываются - они добавляются в конец массива)
+      for (var j = 0; j < clientDominatorsCount; j++) {
+
+        if (SHIP.Dominators[j].ID !== data.dominators[i].ID) {     // сравниваем массивы - локальный (Javascript) и пришедший (JSON)
+          continue;                                   // если не одинаковые имена - берем следующий
+        }
+
+        indexes.push(j);    // запомнили индекс найденного элемента
+        isDominatorFound = true;
+
+        // если корабль встретился в массиве JS - обновляем данные (только те, которые изменились)
+        if (SHIP.Dominators[j].Name === "") {
+          SHIP.Dominators[j].Name = data.dominators[i].Name;
+        }
+
+        SHIP.Dominators[j].State = data.dominators[i].State;
+        SHIP.Dominators[j].MaxHP = data.dominators[i].HPCurrent * SHIP.HPMult;
+        SHIP.Dominators[j].HP = data.dominators[i].HP;
+        SHIP.Dominators[j].MaxMP = data.dominators[i].MPCurrent * SHIP.MPMult;
+        SHIP.Dominators[j].MP = data.dominators[i].MP;
+        SHIP.Dominators[j].X = data.dominators[i].X;
+        SHIP.Dominators[j].Y = data.dominators[i].Y;
+        SHIP.Dominators[j].Speed = data.dominators[i].Speed;
+        SHIP.Dominators[j].SpeedCurrent = data.dominators[i].SpeedCurrent;
+        SHIP.Dominators[j].Angle = data.dominators[i].Angle;
+        SHIP.Dominators[j].Image = data.dominators[i].Image;
+        SHIP.Dominators[j].Kill = data.dominators[i].Kill;
+        SHIP.Dominators[j].Death = data.dominators[i].Death;
+        //RefreshBombs(SHIP.Dominators[j], data.dominators[i].Bombs);   // обнуляем и заполняем массив данными с сервера
+
+        break;
+      }
+      
+      // если корабля не было в массиве JS, то добавляем его в в массив
+      if (!isDominatorFound) {
+        data.dominators[i].Image = parseInt(data.dominators[i].Image);
+        var otherDominator = new Ship(data.dominators[i]);
+
+        //RefreshBombs(otherDominator, data.dominators[i].Bombs);
+        SHIP.Dominators.push(otherDominator);
+      }
+    }
+
+    // очищаем JS массив от неактивных кораблей доминаторов (с конца, чтобы не нарушить порядок)
+    for (i = clientDominatorsCount - 1; i >= 0; i--) {
+      if (indexes.indexOf(i) !== -1) {
+        continue;
+      }
+
+      SHIP.Dominators[i].State = "Inactive";
     }
   }
 
@@ -313,6 +381,13 @@
       for (var j = 0; j < SHIP.Ships[i].Bombs.length; j++) {
         SHIP.Ships[i].Bombs[j].Show();
       }
+    }
+
+    for (i = 0; i < SHIP.Dominators.length; i++) {
+      SHIP.Dominators[i].Show();
+      //for (var j = 0; j < SHIP.Ships[i].Bombs.length; j++) {
+      //  SHIP.Ships[i].Bombs[j].Show();
+      //}
     }
 
     // *** My Bombs ***

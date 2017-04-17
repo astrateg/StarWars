@@ -5,10 +5,16 @@ define(['Modules/requests'], function (REQUESTS) {
   // *** Ships ***
   my.MyShip = {};   // Ship's speed & rotating angle
   my.Ships = [];    // Array of Ships
+  my.Dominators = []; // Array of Dominators
 
   // Rangers
   my.Ranger = {};
   my.Ranger.TypesMax = 9;
+
+  // Dominators
+  my.Dominator = {};
+  my.Dominator.TypesMax = 4;
+  my.Dominator.Types = ["smersh", "menok", "urgant", "ekventor"];
 
   // *** My ship (add image) ***
   var currentShip = document.getElementById("CurrentShip");
@@ -22,12 +28,26 @@ define(['Modules/requests'], function (REQUESTS) {
   my.Ranger.ImagesSmall = [];
   my.Ranger.ImagesMax = 9;
 
+  // *** Dominator ship types ***
+  //my.Dominator.ImagesBig = [];
+  my.Dominator.ImagesSmall = new Array(my.Dominator.Types.length);
+  my.Dominator.ImagesMax = 3;
+
   var imagePath = location.href + "/Content/Images/";    // Чтобы не ссылаться на GAME (иначе будет циклическая ссылка)
 
   // Загружаем маленькие иконки кораблей - они нужны в любом случае (весь набор)
   for (var i = 0; i < my.Ranger.ImagesMax; i++) {
     my.Ranger.ImagesSmall[i] = new Image();
     my.Ranger.ImagesSmall[i].src = imagePath + "Rangers/ranger" + (i + 1) + ".png";
+  }
+
+  // Загружаем маленькие иконки кораблей доминаторов (весь набор)
+  for (i = 0; i < my.Dominator.Types.length; i++) {
+    my.Dominator.ImagesSmall[i] = new Array(my.Dominator.ImagesMax);
+    for (var j = 0; j < my.Dominator.ImagesMax; j++) {
+      my.Dominator.ImagesSmall[i][j] = new Image();
+      my.Dominator.ImagesSmall[i][j].src = imagePath + "Dominators/dominator-" + my.Dominator.Types[i] + (j + 1) + ".png";
+    }
   }
 
   my.Init = function () {
@@ -41,6 +61,7 @@ define(['Modules/requests'], function (REQUESTS) {
       }
 
       my.Types = data.Types;
+      my.DominatorTypes = data.DominatorTypes;
       my.HPMult = data.HPMult,
       my.MPMult = data.MPMult,
       my.SpeedMult = data.SpeedMult,

@@ -14,11 +14,13 @@ namespace StarWars.Models
     public static int SidebarWidth { get { return 225; } }
     public static int SpaceWidth { get { return 2560; } }
     public static int SpaceHeight { get { return 1600; } }
+
     public Dictionary<int, ConcurrentBag<Bomb>> BombsBuffer { get; set; } // буфер для бомб (тип "bomb"), из которого бомбы перемещаются в коллекцию Bombs
 
     private static Timer _timer;
     private static DateTime _startTime;
-    private static List<Ship> _ships;
+    private static List<RangerShip> _rangers;
+    private static List<DominatorShip> _dominators;
     private static List<Stuff> _stuffs;
 
     private Game()
@@ -27,7 +29,8 @@ namespace StarWars.Models
       BombsBuffer = new Dictionary<int, ConcurrentBag<Bomb>>();
 
       _startTime = DateTime.Now;
-      _ships = new List<Ship>();
+      _rangers = new List<RangerShip>();
+      _dominators = new List<DominatorShip>();
       _stuffs = new List<Stuff>();
 
       _timer = new Timer(new TimerCallback(UpdateGameState), null, 0, Game.SyncRate);     // запускаем таймер, обновляющий все объекты
@@ -43,37 +46,59 @@ namespace StarWars.Models
       get { return (int)((DateTime.Now - _startTime).TotalMilliseconds); }
     }
 
-    public IEnumerable<Ship> ShipListActive
+    public IEnumerable<RangerShip> RangerShipListActive
     {
       get
       {
-        var ships = _ships.Where(s => s.State != "Inactive");
-        return ships;
+        var rangers = _rangers.Where(s => s.State != "Inactive");
+        return rangers;
       }
     }
+
+    public IEnumerable<DominatorShip> DominatorShipListActive
+    {
+      get
+      {
+        var dominators = _dominators.Where(s => s.State != "Inactive");
+        return dominators;
+      }
+    }
+
+    //public bool IsDominatorGenerated = false;
 
     public List<Stuff> StuffList
     {
       get { return _stuffs; }
     }
 
-    public List<Ship> ShipList
+    public List<RangerShip> RangerShipList
     {
-      get { return _ships; }
+      get { return _rangers; }
     }
 
-    public void AddShip(Ship ship)
+    public List<DominatorShip> DominatorShipList
     {
-      _ships.Add(ship);
-      BombsBuffer.Add(ship.ID, new ConcurrentBag<Bomb>());  // Key: ship.id;	Value: bombs concurrent collection
+      get { return _dominators; }
+    }
+
+    public void AddRangerShip(RangerShip ranger)
+    {
+      _rangers.Add(ranger);
+      BombsBuffer.Add(ranger.ID, new ConcurrentBag<Bomb>());  // Key: ship.id;	Value: bombs concurrent collection
+    }
+
+    public void AddDominatorShip(DominatorShip dominator)
+    {
+      _dominators.Add(dominator);
+      //BombsBuffer.Add(dominator.ID, new ConcurrentBag<Bomb>());  // Key: ship.id;	Value: bombs concurrent collection
     }
 
     public bool DisconnectShip(int id)
     {
-      Ship ship = _ships.FirstOrDefault(s => s.ID == id);
-      if (ship != null)
+      RangerShip ranger = _rangers.FirstOrDefault(s => s.ID == id);
+      if (ranger != null)
       {
-        ship.State = "Inactive";
+        ranger.State = "Inactive";
         return true;
       }
       return false;
@@ -81,68 +106,66 @@ namespace StarWars.Models
 
     public void UpdateUserName(int id, string name)
     {
-      Ship oldShip = _ships.FirstOrDefault(s => s.ID == id);
-      oldShip.Name = name;
+      RangerShip oldRanger = _rangers.FirstOrDefault(s => s.ID == id);
+      oldRanger.Name = name;
     }
 
     public void UpdateUserShip(int id, string propertyName, int propertyValue)
     {
-      Ship ship = _ships.FirstOrDefault(s => s.ID == id);
-      if (ship != null && ship.State == "Active")
+      RangerShip ranger = _rangers.FirstOrDefault(s => s.ID == id);
+      if (ranger != null && ranger.State == "Active")
       {
         switch (propertyName)
         {
-          case "VectorMove": ship.VectorMove = propertyValue; break;
-          case "VectorRotate": ship.VectorRotate = propertyValue; break;
-          case "VectorShoot": ship.VectorShoot = propertyValue; break;
-          case "Image": ship.Image = propertyValue; break;
+          case "VectorMove": ranger.VectorMove = propertyValue; break;
+          case "VectorRotate": ranger.VectorRotate = propertyValue; break;
+          case "VectorShoot": ranger.VectorShoot = propertyValue; break;
+          case "Image": ranger.Image = propertyValue; break;
         }
       }
     }
 
     public void ChangeWeapon(int id, int index)
     {
-      Ship ship = _ships.FirstOrDefault(s => s.ID == id);
-      if (ship != null && ship.State == "Active")
+      RangerShip ranger = _rangers.FirstOrDefault(s => s.ID == id);
+      if (ranger != null && ranger.State == "Active")
       {
-        ship.WeaponActive = index;
+        ranger.WeaponActive = index;
       }
     }
 
     public void ChangeSkill(int id, string skill)
     {
-      Ship ship = _ships.FirstOrDefault(s => s.ID == id);
-      if (ship != null && ship.State == "Active")
+      RangerShip ranger = _rangers.FirstOrDefault(s => s.ID == id);
+      if (ranger != null && ranger.State == "Active")
       {
         switch (skill)
         {
           case "HP":
-            ship.HPCurrent++;
-            ship.HPRegen += Ship.Ranger.Mult.HPRegenMult;
+            ranger.HPCurrent++;
+            ranger.HPRegen += Ship.Mult.HPRegenMult;
             break;
           case "MP":
-            ship.MPCurrent++;
-            ship.MPRegen += Ship.Ranger.Mult.MPRegenMult;
+            ranger.MPCurrent++;
+            ranger.MPRegen += Ship.Mult.MPRegenMult;
             break;
           case "Armor":
-            ship.ArmorCurrent++;
+            ranger.ArmorCurrent++;
             break;
           case "Speed":
-            ship.SpeedCurrent++;
+            ranger.SpeedCurrent++;
             break;
           case "AngleSpeed":
-            ship.AngleSpeedCurrent++;
+            ranger.AngleSpeedCurrent++;
             break;
         }
-        ship.SkillPoints--;
+        ranger.SkillPoints--;
       }
     }
 
     public void CreateStuff(int index, double X, double Y)
     {
       var type = Stuff.Types.Type[index];
-      //var stuffX = Utils.RandomSpaceX();
-      //var stuffY = Utils.RandomSpaceY();
       var angle = Utils.RandomSpaceAngle();
       var rotate = Stuff.Types.Rotate[index];
       var size = Stuff.Types.Size[index];
@@ -164,26 +187,30 @@ namespace StarWars.Models
       }
       _stuffs.RemoveAll(s => s.State == "Inactive");
 
-      //var checkTimerHP = TimeFromStart % 6000 < Game.SyncRate;
-      //var checkTimerMP = TimeFromStart % 7000 < Game.SyncRate;
-      //if (checkTimerHP) { CreateStuff(0); }
-      //if (checkTimerMP) { CreateStuff(1); }
+      // Ships
+      foreach (RangerShip ranger in _rangers)
+      {
+        ranger.GenerateExplodes();
+        ranger.UpdateState();
+      }
 
       // Ships
-      foreach (Ship ship in _ships)
+      foreach (DominatorShip dominator in _dominators)
       {
-        ship.GenerateExplodes();
-        ship.UpdateState();
+        dominator.GenerateExplodes();
+        dominator.CalculateNextAction();
+        dominator.UpdateState();
       }
+      _dominators.RemoveAll(s => s.State == "Inactive");
 
       var response = new
       {
         timeFromStart = Game.Instance.TimeFromStart,
-        ships = Game.Instance.ShipListActive,
+        ships = Game.Instance.RangerShipListActive,
+        dominators = Game.Instance.DominatorShipListActive,
         stuffs = Game.Instance.StuffList,
         sunAngle = Math.Round(Space.Sun.Angle, 3),
       };
-
 
       Notifier.Send(response);
     }

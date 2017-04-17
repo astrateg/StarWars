@@ -11,48 +11,15 @@ namespace StarWars.Models
   {
     // Constants
     private object syncLock = new object();
-    public static class Ranger
+
+    public static class Mult
     {
-      public static class Mult
-      {
-        public static int HPMult { get { return 50; } }
-        public static int MPMult { get { return 50; } }
-        public static double HPRegenMult { get { return 0.02; } }
-        public static double MPRegenMult { get { return 0.02; } }
-        public static double SpeedMult { get { return 1; } }
-        public static double AngleSpeedMult { get { return 0.001; } }
-      }
-
-      public static class Types
-      {
-        public static string[] Type = new string[] { "obiwan", "anakin", "naboo", "assault", "gunship", "jedi", "droid", "wasp", "dragon" };
-        public static int[] HPStart = new int[] { 5, 6, 3, 4, 4, 3, 6, 5, 5 };
-        public static int[] HPLimit = new int[] { 9, 10, 6, 7, 7, 6, 10, 9, 9 };
-        public static int[] MPStart = new int[] { 5, 6, 4, 4, 4, 4, 6, 5, 5 };
-        public static int[] MPLimit = new int[] { 9, 10, 7, 7, 7, 7, 10, 9, 9 };
-        public static int[] HPRegen = new int[] { 6, 5, 8, 7, 7, 8, 5, 6, 6 };
-        public static int[] MPRegen = new int[] { 6, 5, 8, 7, 7, 8, 5, 6, 6 };
-        // Armor = % (4 = 40% etc.)
-        public static int[] ArmorStart = new int[] { 3, 4, 2, 3, 3, 2, 4, 3, 3 };
-        public static int[] ArmorLimit = new int[] { 6, 8, 5, 6, 6, 5, 8, 6, 6 };
-
-        public static int[] SpeedStart = new int[] { 4, 3, 6, 5, 5, 6, 3, 4, 4 };
-        public static int[] SpeedLimit = new int[] { 6, 5, 10, 9, 9, 10, 5, 6, 6 };
-        public static int[] AngleSpeedStart = new int[] { 3, 3, 6, 5, 6, 5, 3, 4, 4 };
-        public static int[] AngleSpeedLimit = new int[] { 5, 5, 10, 9, 10, 9, 5, 6, 6 };
-
-        public static List<int>[] Weapons = new List<int>[] {
-          new List<int> {0, 1, 2},
-          new List<int> {0, 1, 2},
-          new List<int> {2, 3, 4},
-          new List<int> {0, 2, 3},
-          new List<int> {0, 1, 2},
-          new List<int> {2, 3, 5},
-          new List<int> {1, 2, 3},
-          new List<int> {1, 2, 3},
-          new List<int> {1, 2, 3}
-        };
-      }
+      public static int HPMult { get { return 50; } }
+      public static int MPMult { get { return 50; } }
+      public static double HPRegenMult { get { return 0.02; } }
+      public static double MPRegenMult { get { return 0.02; } }
+      public static double SpeedMult { get { return 1; } }
+      public static double AngleSpeedMult { get { return 0.001; } }
     }
 
     public static int ShipSize { get { return 64; } }
@@ -90,18 +57,7 @@ namespace StarWars.Models
     // AngleSpeed & Multiplyers
     public int AngleSpeedCurrent { get; set; }
     public int AngleSpeedLimit { get; set; }
-    public double AngleSpeed { get { return AngleSpeedCurrent * AngleSpeedCurrent * Ship.Ranger.Mult.AngleSpeedMult; } }
-
-    // *** Inherit from class Body ***
-    //public double X { get; set; }
-    //public double Y { get; set; }
-    //public double Angle { get; set; }
-    //public int Size { get; set; }
-    //public int Image { get; set; }
-    //[ScriptIgnore]
-    //public double GetCenterX { get { return this.X + this.Size / 2; } }
-    //[ScriptIgnore]
-    //public double GetCenterY { get { return this.Y + this.Size / 2; } }
+    public double AngleSpeed { get { return AngleSpeedCurrent * AngleSpeedCurrent * Ship.Mult.AngleSpeedMult; } }
 
     [ScriptIgnore]
     public int VectorMove { get; set; }      // 1 (Forward) | -1 (Backward) | 0 (Stop)
@@ -118,60 +74,15 @@ namespace StarWars.Models
     public int WeaponActive { get; set; }
 
     public List<Bomb> Bombs { get; set; }
-    //[ScriptIgnore]
-    //public ConcurrentBag<Bomb> BombsBuffer { get; set; }
 
     // *** Ship Constructor ***
-    public Ship(int id, string name, string type, int indexRanger, double X, double Y, double angle, int size)
-      : base(X, Y, angle, size, indexRanger)
+    public Ship(int id, string name, string type, int indexShip, double X, double Y, double angle, int size)
+      : base(X, Y, angle, size, indexShip)
     {
       this.ID = id;
       this.Name = name;
       this.Type = type;
       this.State = "Active";
-
-      if (indexRanger < 0 || 9 < indexRanger)
-      {
-        indexRanger = 0;
-      }
-
-      // HP
-      this.HPCurrent = Ship.Ranger.Types.HPStart[indexRanger];
-      this.HPLimit = Ship.Ranger.Types.HPLimit[indexRanger];
-      this.HPRegen = Ship.Ranger.Types.HPRegen[indexRanger] * Ship.Ranger.Mult.HPRegenMult;
-      this.HP = this.HPCurrent * Ship.Ranger.Mult.HPMult;
-      // MP
-      this.MPCurrent = Ship.Ranger.Types.MPStart[indexRanger];
-      this.MPLimit = Ship.Ranger.Types.MPLimit[indexRanger];
-      this.MPRegen = Ship.Ranger.Types.MPRegen[indexRanger] * Ship.Ranger.Mult.MPRegenMult;
-      this.MP = this.MPCurrent * Ship.Ranger.Mult.MPMult;
-      // Armor
-      this.ArmorCurrent = Ship.Ranger.Types.ArmorStart[indexRanger];
-      this.ArmorLimit = Ship.Ranger.Types.ArmorLimit[indexRanger];
-      // Speed
-      this.SpeedCurrent = Ship.Ranger.Types.SpeedStart[indexRanger];
-      this.SpeedLimit = Ship.Ranger.Types.SpeedLimit[indexRanger];
-      this.Speed = 0.0;
-
-      // AngleSpeed
-      this.AngleSpeedCurrent = Ship.Ranger.Types.AngleSpeedStart[indexRanger];
-      this.AngleSpeedLimit = Ship.Ranger.Types.AngleSpeedLimit[indexRanger];
-
-      //this.X = X;
-      //this.Y = Y;
-      //this.Angle = angle;
-      //this.Size = size;
-      //this.Image = indexRanger;                     // Индекс файла-изображения
-      this.VectorMove = 0;
-      this.VectorRotate = 0;
-      this.VectorShoot = 0;
-      this.Kill = 0;
-      this.Death = 0;
-      this.SkillPoints = 5;
-
-      this.Weapons = Ship.Ranger.Types.Weapons[indexRanger];
-      this.WeaponActive = 0;
-      this.Bombs = new List<Bomb>();
     }
 
     // Speed: (-SpeedCurrent...+SpeedCurrent)
@@ -206,8 +117,8 @@ namespace StarWars.Models
     public void Move()
     {
       // Ship momentum
-      var vx = Math.Cos(this.Angle) * this.Speed * Ship.Ranger.Mult.SpeedMult;
-      var vy = Math.Sin(this.Angle) * this.Speed * Ship.Ranger.Mult.SpeedMult;
+      var vx = Math.Cos(this.Angle) * this.Speed * Ship.Mult.SpeedMult;
+      var vy = Math.Sin(this.Angle) * this.Speed * Ship.Mult.SpeedMult;
       this.GravityCorrection(vx, vy, this.HPCurrent);
 
       // Check moving
@@ -403,10 +314,13 @@ namespace StarWars.Models
     public void CheckBombAndShip()
     {
       var active = this.Weapons[this.WeaponActive];
+      var activeShips = new List<Ship>();
+      activeShips.AddRange(Game.Instance.RangerShipListActive);
+      activeShips.AddRange(Game.Instance.DominatorShipListActive);
 
       foreach (var bomb in this.Bombs)
       {
-        foreach (var ship in Game.Instance.ShipListActive)
+        foreach (var ship in activeShips)
         {
           if (ship.ID == this.ID)
           {
@@ -449,18 +363,18 @@ namespace StarWars.Models
           if (stuff.Type == "bonusHP")
           {
             this.HP += Stuff.Types.HP[stuff.Image];
-            if (this.HP > this.HPCurrent * Ship.Ranger.Mult.HPMult)
+            if (this.HP > this.HPCurrent * Ship.Mult.HPMult)
             {
-              this.HP = this.HPCurrent * Ship.Ranger.Mult.HPMult;
+              this.HP = this.HPCurrent * Ship.Mult.HPMult;
             }
             continue;
           }
           if (stuff.Type == "bonusMP")
           {
             this.MP += Stuff.Types.MP[stuff.Image];
-            if (this.MP > this.MPCurrent * Ship.Ranger.Mult.MPMult)
+            if (this.MP > this.MPCurrent * Ship.Mult.MPMult)
             {
-              this.MP = this.MPCurrent * Ship.Ranger.Mult.MPMult;
+              this.MP = this.MPCurrent * Ship.Mult.MPMult;
             }
             continue;
           }
@@ -476,7 +390,7 @@ namespace StarWars.Models
 
     public void RegenerateHP(double regen)
     {
-      var HPMax = this.HPCurrent * Ship.Ranger.Mult.HPMult;
+      var HPMax = this.HPCurrent * Ship.Mult.HPMult;
       if (this.HP < HPMax)
       {
         this.HP += regen;    // Регенерировали
@@ -493,7 +407,7 @@ namespace StarWars.Models
 
     public void RegenerateMP(double regen)
     {
-      var MPMax = this.MPCurrent * Ship.Ranger.Mult.MPMult;
+      var MPMax = this.MPCurrent * Ship.Mult.MPMult;
       if (this.MP < MPMax)
       {
         this.MP += regen;    // Регенерировали
@@ -529,10 +443,16 @@ namespace StarWars.Models
             X = 0; Y++;
             if (Y > 3)
             {
+              if (this.Type == "dominator")
+              {
+                this.State = "Inactive";
+                return;
+              }
+
               this.X = Utils.RandomStartX();
               this.Y = Utils.RandomStartY();
-              this.HP = this.HPCurrent * Ship.Ranger.Mult.HPMult;
-              this.MP = this.MPCurrent * Ship.Ranger.Mult.MPMult;
+              this.HP = this.HPCurrent * Ship.Mult.HPMult;
+              this.MP = this.MPCurrent * Ship.Mult.MPMult;
               this.State = "Active";
               this.Speed = 0;
               this.VectorMove = 0;
@@ -566,6 +486,12 @@ namespace StarWars.Models
       }
 
       this.CheckBombAndShip();
+
+      // Don't work with dominator's bombs yet...
+      if (this.Type == "dominator")
+      {
+        return;
+      }
 
       // If bombs buffer isn't empty for this ship, move bombs from buffer to collection "Bombs"
       // Буфер вынесен за пределы объекта Ship, т.к. иначе не работает Hub - ругается метод Notifier.Send(response);

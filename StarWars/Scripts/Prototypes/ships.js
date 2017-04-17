@@ -27,12 +27,17 @@
   }
 
   Ship.prototype.GetImage = function () {
-    //var type = this.Type;
-    //if (type.indexOf("dominator") != -1) {  // "dominator-smersh", "dominator-menok", "dominator-urgant", "dominator-ekventor"
-    //    type = type.slice(10);               // "smersh", "menok", "urgant", "ekventor"
-    //    var indexType = SHIP.DominatorTypes.Type.indexOf(type);
-    //    return SHIP.DominatorTypes.Images[indexType][this.Image];
-    //}
+    var type = this.Type;
+    if (type === "dominator") {
+      // Name example: "dominator-smersh123"
+      var dominatorType = this.Name.slice(10, -3);
+      var indexType = SHIP.Dominator.Types.indexOf(dominatorType);
+      var image = SHIP.Dominator.ImagesSmall[indexType][this.Image];
+      if (!image) {
+        debugger;
+      }
+      return image;
+    }
 
     return SHIP.Ranger.ImagesSmall[this.Image];
   };
@@ -171,7 +176,11 @@
     GAME.Context.fillRect(centerShipX - this.Size / 2, centerShipY + this.Size / 2 + lineHeight, lineMP, lineHeight);         // fillRect(x, y, width, height)
 
     if (this.Angle === 0) {
-      GAME.Context.drawImage(this.GetImage(), this.X - GAME.SpaceShiftX, this.Y - GAME.SpaceShiftY);
+      try {
+        GAME.Context.drawImage(this.GetImage(), this.X - GAME.SpaceShiftX, this.Y - GAME.SpaceShiftY);
+      } catch (e) {
+        debugger;
+      }
     } else {
       // If Angle <> 0, have to rotate the ship ("Angle" - direction for moving & shooting)
       GAME.Context.save();

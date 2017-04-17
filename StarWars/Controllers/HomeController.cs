@@ -48,7 +48,7 @@ namespace StarWars.Controllers
 
     public JsonResult InitShipConstants()
     {
-      Ship myShip;
+      RangerShip myShip;
       HttpCookie cookie = Request.Cookies["Ship"];
       int MyShipExists = 0;
       int MyShipImageIndex = -1;
@@ -62,7 +62,7 @@ namespace StarWars.Controllers
       }
       else
       {
-        myShip = Game.Instance.ShipList.FirstOrDefault(s => s.ID == int.Parse(cookie.Value));
+        myShip = Game.Instance.RangerShipList.FirstOrDefault(s => s.ID == int.Parse(cookie.Value));
         if (myShip != null)
         {
           myShip.VectorMove = 0;
@@ -73,32 +73,44 @@ namespace StarWars.Controllers
         }
       }
 
-      //var serializer = new JavaScriptSerializer();
       var response = new
       {
         MyShipExists = MyShipExists,
         MyShipImageIndex = MyShipImageIndex,
         Types = new
         {
-          Type = Ship.Ranger.Types.Type,
-          HPStart = Ship.Ranger.Types.HPStart,
-          HPLimit = Ship.Ranger.Types.HPLimit,
-          MPStart = Ship.Ranger.Types.MPStart,
-          MPLimit = Ship.Ranger.Types.MPLimit,
-          ArmorStart = Ship.Ranger.Types.ArmorStart,
-          ArmorLimit = Ship.Ranger.Types.ArmorLimit,
-          SpeedStart = Ship.Ranger.Types.SpeedStart,
-          SpeedLimit = Ship.Ranger.Types.SpeedLimit,
-          AngleSpeedStart = Ship.Ranger.Types.AngleSpeedStart,
-          AngleSpeedLimit = Ship.Ranger.Types.AngleSpeedLimit,
-          Weapons = Ship.Ranger.Types.Weapons
-          //Type = serializer.Serialize(Ship.Ranger.Types.Type),
-          //...
+          Type = RangerShip.RangerTypes.Type,
+          HPStart = RangerShip.RangerTypes.HPStart,
+          HPLimit = RangerShip.RangerTypes.HPLimit,
+          MPStart = RangerShip.RangerTypes.MPStart,
+          MPLimit = RangerShip.RangerTypes.MPLimit,
+          ArmorStart = RangerShip.RangerTypes.ArmorStart,
+          ArmorLimit = RangerShip.RangerTypes.ArmorLimit,
+          SpeedStart = RangerShip.RangerTypes.SpeedStart,
+          SpeedLimit = RangerShip.RangerTypes.SpeedLimit,
+          AngleSpeedStart = RangerShip.RangerTypes.AngleSpeedStart,
+          AngleSpeedLimit = RangerShip.RangerTypes.AngleSpeedLimit,
+          Weapons = RangerShip.RangerTypes.Weapons
         },
-        HPMult = Ship.Ranger.Mult.HPMult,
-        MPMult = Ship.Ranger.Mult.MPMult,
-        SpeedMult = Ship.Ranger.Mult.SpeedMult,
-        AngleSpeedMult = Ship.Ranger.Mult.AngleSpeedMult,
+        DominatorTypes = new
+        {
+          Type = DominatorShip.DominatorTypes.Type,
+          HPStart = DominatorShip.DominatorTypes.HPStart,
+          HPLimit = DominatorShip.DominatorTypes.HPLimit,
+          MPStart = DominatorShip.DominatorTypes.MPStart,
+          MPLimit = DominatorShip.DominatorTypes.MPLimit,
+          ArmorStart = DominatorShip.DominatorTypes.ArmorStart,
+          ArmorLimit = DominatorShip.DominatorTypes.ArmorLimit,
+          SpeedStart = DominatorShip.DominatorTypes.SpeedStart,
+          SpeedLimit = DominatorShip.DominatorTypes.SpeedLimit,
+          AngleSpeedStart = DominatorShip.DominatorTypes.AngleSpeedStart,
+          AngleSpeedLimit = DominatorShip.DominatorTypes.AngleSpeedLimit,
+          Weapons = DominatorShip.DominatorTypes.Weapons
+        },
+        HPMult = Ship.Mult.HPMult,
+        MPMult = Ship.Mult.MPMult,
+        SpeedMult = Ship.Mult.SpeedMult,
+        AngleSpeedMult = Ship.Mult.AngleSpeedMult,
         ShipSize = Ship.ShipSize,
         BombSize = Bomb.Types.Size,
         SyncRate = Game.SyncRate,
@@ -109,18 +121,21 @@ namespace StarWars.Controllers
     [HttpPost]
     public JsonResult InitShips(int index, string name)
     {
-      Ship myShip;
+      RangerShip myShip;
       HttpCookie cookie = Request.Cookies["Ship"];
       if (index > -1)
       {
-        myShip = CreateShip(int.Parse(cookie.Value), name, index);
-        Game.Instance.AddShip(myShip);
+        myShip = CreateRangerShip(int.Parse(cookie.Value), name, index);
+        Game.Instance.AddRangerShip(myShip);
       }
+
+      GenerateRandomDominatorShips(3);
 
       var response = new
       {
         id = cookie.Value,
-        ships = Game.Instance.ShipListActive,
+        ships = Game.Instance.RangerShipListActive,
+        dominators = Game.Instance.DominatorShipListActive
       };
       return Json(response);
     }
@@ -173,23 +188,51 @@ namespace StarWars.Controllers
     //}
 
     [NonAction]
-    public Ship CreateShip(int id, string name, int index)
+    public RangerShip CreateRangerShip(int id, string name, int index)
     {
       string type = "ranger";
       double X = Utils.RandomStartX();
       double Y = Utils.RandomStartY();
       double angle = 0;
       int size = Ship.ShipSize;
-      Ship ship = new Ship(id, name, type, index, X, Y, angle, size);
+      RangerShip ship = new RangerShip(id, name, type, index, X, Y, angle, size);
 
       return ship;
+    }
+
+    [NonAction]
+    public DominatorShip CreateDominatorShip(int id, string name, int typeIndex, int imageIndex, int size)
+    {
+      string type = "dominator";
+      double X = Utils.RandomStartX();
+      double Y = Utils.RandomStartY();
+      double angle = 0;
+      DominatorShip ship = new DominatorShip(id, name + id.ToString(), type, typeIndex, imageIndex, X, Y, angle, size);
+
+      return ship;
+    }
+
+    [NonAction]
+    public void GenerateRandomDominatorShips(int count)
+    {
+      for (int i = 0; i < count; i++)
+      {
+        var id = Utils.RandomInt(100, 1000);
+        var dominatorTypeIndex = Utils.RandomInt(0, 4);
+        var dominatorType = DominatorShip.DominatorTypes.Type[dominatorTypeIndex];
+        var dominatorImageIndex = Utils.RandomInt(0, 3);
+        var dominatorSize = DominatorShip.DominatorTypes.Size[dominatorTypeIndex];
+
+        var dominator = CreateDominatorShip(id, "dominator-" + dominatorType, dominatorTypeIndex, dominatorImageIndex, dominatorSize);
+        Game.Instance.AddDominatorShip(dominator);
+      }
     }
 
     [NonAction]
     public Ship GetShipByCookie()
     {
       HttpCookie cookie = Request.Cookies["Ship"];
-      return Game.Instance.ShipList.FirstOrDefault(s => s.ID == int.Parse(cookie.Value));
+      return Game.Instance.RangerShipList.FirstOrDefault(s => s.ID == int.Parse(cookie.Value));
     }
 
     [NonAction]

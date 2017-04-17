@@ -2,6 +2,11 @@
 + Add .gitignore file
 
 ***** C# *****
+* Dominators *
++ Add dominators (moving, not shooting, can be killed)
+- Make dominators to follow the nearest ranges
+- Make dominators to shoot
+
 - Add unit tests
 - Add logging (login, logout, kill, death) - structured log
 - Move constant settings to web.config
