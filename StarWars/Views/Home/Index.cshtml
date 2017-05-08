@@ -95,11 +95,10 @@
         <div id="CurrentShipSpeedNegative">
           <div class="Name">-</div>
           <div id="CurrentShipSpeedNegativeValue">
-            <div class="Square"></div>
-            <div class="Square"></div>
-            <div class="Square"></div>
-            <div class="Square"></div>
-            <div class="Square"></div>
+            @for (int i = 0; i < 5; i++)
+            {
+              <div class="Square"></div>
+            }
           </div>
           <div style="clear: left;"></div>
         </div>
@@ -107,11 +106,10 @@
         <div id="CurrentShipSpeedPositive">
           <div class="Name">+</div>
           <div id="CurrentShipSpeedPositiveValue">
-            <div class="Square"></div>
-            <div class="Square"></div>
-            <div class="Square"></div>
-            <div class="Square"></div>
-            <div class="Square"></div>
+            @for (int i = 0; i < 5; i++)
+            {
+              <div class="Square"></div>
+            }
           </div>
           <div style="clear: left;"></div>
         </div>

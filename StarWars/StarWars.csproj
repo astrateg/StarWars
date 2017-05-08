@@ -142,7 +142,11 @@
     <Compile Include="Models\Ship.cs" />
     <Compile Include="Models\Space.cs" />
     <Compile Include="Models\SpaceHub.cs" />
+    <Compile Include="Models\Strategies\DominatorDefenceStrategy.cs" />
+    <Compile Include="Models\Strategies\DominatorAttackStrategy.cs" />
+    <Compile Include="Models\Strategies\BaseDominatorStrategy.cs" />
     <Compile Include="Models\Stuff.cs" />
+    <Compile Include="Models\DominatorTarget.cs" />
     <Compile Include="Models\Utils.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>

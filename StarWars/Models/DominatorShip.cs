@@ -1,4 +1,7 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using StarWars.Models.Strategies;
 
 namespace StarWars.Models
 {
@@ -8,20 +11,20 @@ namespace StarWars.Models
     {
       public static string[] Type = new string[] { "smersh", "menok", "urgant", "ekventor" };
       public static int[] Size = new int[] { 70, 75, 80, 85 };
-      public static int[] HPStart = new int[] { 1, 2, 3, 4 };
-      public static int[] HPLimit = new int[] { 1, 2, 3, 4 };
-      public static int[] MPStart = new int[] { 1, 2, 3, 4 };
-      public static int[] MPLimit = new int[] { 1, 2, 3, 4 };
-      public static int[] HPRegen = new int[] { 2, 2, 2, 2 };
-      public static int[] MPRegen = new int[] { 2, 2, 2, 2 };
+      public static int[] HPStart = new int[] { 3, 4, 5, 6 };
+      public static int[] HPLimit = new int[] { 3, 4, 5, 6 };
+      public static int[] MPStart = new int[] { 3, 4, 5, 6 };
+      public static int[] MPLimit = new int[] { 3, 4, 5, 6 };
+      public static int[] HPRegen = new int[] { 5, 6, 7, 8 };
+      public static int[] MPRegen = new int[] { 5, 6, 7, 8 };
       // Armor = % (4 = 40% etc.)
-      public static int[] ArmorStart = new int[] { 1, 2, 3, 4 };
-      public static int[] ArmorLimit = new int[] { 1, 2, 3, 4 };
+      public static int[] ArmorStart = new int[] { 2, 3, 4, 5 };
+      public static int[] ArmorLimit = new int[] { 2, 3, 4, 5 };
 
-      public static int[] SpeedStart = new int[] { 4, 3, 2, 1 };
-      public static int[] SpeedLimit = new int[] { 4, 3, 2, 1 };
-      public static int[] AngleSpeedStart = new int[] { 4, 3, 2, 1 };
-      public static int[] AngleSpeedLimit = new int[] { 4, 3, 2, 1 };
+      public static int[] SpeedStart = new int[] { 5, 4, 3, 2 };
+      public static int[] SpeedLimit = new int[] { 5, 4, 3, 2 };
+      public static int[] AngleSpeedStart = new int[] { 5, 4, 3, 2 };
+      public static int[] AngleSpeedLimit = new int[] { 5, 4, 3, 2 };
 
       public static List<int>[] Weapons = new List<int>[] {
           new List<int> {1, 2, 3},
@@ -70,8 +73,18 @@ namespace StarWars.Models
 
     public void CalculateNextAction()
     {
-      this.VectorMove = 1;
-      this.VectorRotate = 1;
+      BaseDominatorStrategy strategy;
+      if (this.HP < this.HPCurrent * Ship.Mult.HPMult / 2)
+      {
+        strategy = new DominatorDefenceStrategy(this);
+      }
+      else
+      {
+        strategy = new DominatorAttackStrategy(this);
+      }
+
+      strategy.GetInitialState();
+      strategy.CalculateNextAction();
     }
   }
 }

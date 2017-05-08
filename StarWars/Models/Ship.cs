@@ -159,6 +159,19 @@ namespace StarWars.Models
     public void Rotate(int direction)
     {
       this.Angle += this.AngleSpeed * direction;
+
+      // Normalizing Angle to the interval [-2*PI, 2*PI]
+      // Needs for dominators to calculate target angle
+      if (this.Angle > 2 * Math.PI)
+      {
+        this.Angle -= 2 * Math.PI;
+      }
+
+      if (this.Angle < 2 * Math.PI)
+      {
+        this.Angle += 2 * Math.PI;
+      }
+
       this.Angle = Math.Round(this.Angle, 3);
     }
 
