@@ -203,7 +203,7 @@
         SHIP.Dominators[j].Image = data.dominators[i].Image;
         SHIP.Dominators[j].Kill = data.dominators[i].Kill;
         SHIP.Dominators[j].Death = data.dominators[i].Death;
-        //RefreshBombs(SHIP.Dominators[j], data.dominators[i].Bombs);   // обнуляем и заполняем массив данными с сервера
+        RefreshBombs(SHIP.Dominators[j], data.dominators[i].Bombs);   // обнуляем и заполняем массив данными с сервера
 
         break;
       }
@@ -213,7 +213,7 @@
         data.dominators[i].Image = parseInt(data.dominators[i].Image);
         var otherDominator = new Ship(data.dominators[i]);
 
-        //RefreshBombs(otherDominator, data.dominators[i].Bombs);
+        RefreshBombs(otherDominator, data.dominators[i].Bombs);
         SHIP.Dominators.push(otherDominator);
       }
     }
@@ -385,9 +385,9 @@
 
     for (i = 0; i < SHIP.Dominators.length; i++) {
       SHIP.Dominators[i].Show();
-      //for (var j = 0; j < SHIP.Ships[i].Bombs.length; j++) {
-      //  SHIP.Ships[i].Bombs[j].Show();
-      //}
+      for (var j = 0; j < SHIP.Dominators[i].Bombs.length; j++) {
+        SHIP.Dominators[i].Bombs[j].Show();
+      }
     }
 
     // *** My Bombs ***

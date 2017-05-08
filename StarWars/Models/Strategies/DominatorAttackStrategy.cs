@@ -14,6 +14,11 @@ namespace StarWars.Models.Strategies
 
     public override void CalculateNextAction()
     {
+      if (this.ReadyToShoot)
+      {
+        this.Dominator.VectorShoot = 1;
+      }
+
       this.CalculateSun();
       if (this.OnTheSun)
       {

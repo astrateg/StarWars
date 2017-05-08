@@ -12,9 +12,21 @@ namespace StarWars.Models.Strategies
     protected bool InTheRight { get; set; }
     protected bool InTheTop { get; set; }
     protected bool InTheBottom { get; set; }
+
     protected bool AtTheEdge
     {
       get { return this.InTheLeft || this.InTheRight || this.InTheTop || this.InTheBottom; }
+    }
+
+    protected bool ReadyToShoot
+    {
+      // TODO: Add checking the Sun on the trajectory
+      get
+      { return 
+          this.Target != null 
+          && this.Target.Distance < 500 
+          && Math.Abs(Math.PI - this.Target.DiffAngle) < Ship.Mult.AngleSpeedMult * 2;
+      }
     }
 
     public BaseDominatorStrategy(DominatorShip dominator)

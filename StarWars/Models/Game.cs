@@ -10,7 +10,7 @@ namespace StarWars.Models
   {
     //Singleton Pattern
     private static readonly Game _instance = new Game();
-    public static int SyncRate { get { return 10; } }
+    public static int SyncRate { get { return 16; } }
     public static int SidebarWidth { get { return 225; } }
     public static int SpaceWidth { get { return 2560; } }
     public static int SpaceHeight { get { return 1600; } }
@@ -64,8 +64,6 @@ namespace StarWars.Models
       }
     }
 
-    //public bool IsDominatorGenerated = false;
-
     public List<Stuff> StuffList
     {
       get { return _stuffs; }
@@ -90,7 +88,7 @@ namespace StarWars.Models
     public void AddDominatorShip(DominatorShip dominator)
     {
       _dominators.Add(dominator);
-      //BombsBuffer.Add(dominator.ID, new ConcurrentBag<Bomb>());  // Key: ship.id;	Value: bombs concurrent collection
+      BombsBuffer.Add(dominator.ID, new ConcurrentBag<Bomb>());  // Key: ship.id;	Value: bombs concurrent collection
     }
 
     public bool DisconnectShip(int id)

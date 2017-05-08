@@ -500,12 +500,6 @@ namespace StarWars.Models
 
       this.CheckBombAndShip();
 
-      // Don't work with dominator's bombs yet...
-      if (this.Type == "dominator")
-      {
-        return;
-      }
-
       // If bombs buffer isn't empty for this ship, move bombs from buffer to collection "Bombs"
       // Буфер вынесен за пределы объекта Ship, т.к. иначе не работает Hub - ругается метод Notifier.Send(response);
       // Видимо, SignalR не понимает конкурентную коллекцию... даже если она исключена из списка сериализации - [ScriptIgnore]

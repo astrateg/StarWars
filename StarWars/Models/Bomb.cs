@@ -92,8 +92,8 @@ namespace StarWars.Models
         this.State = "Inactive";
         return;
       }
-
-      // Add checking collisions for the bomb and planets
+      
+      // TODO: Add checking collisions for the bomb and planets
       // ...
     }
 

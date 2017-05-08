@@ -228,7 +228,6 @@
     <Content Include="Scripts\Libraries\knockout-2.2.1.min.js" />
     <Content Include="Scripts\Libraries\noext.js" />
     <Content Include="Scripts\main.js" />
-    <Content Include="Scripts\Modules\dominators.js" />
     <Content Include="Scripts\Prototypes\bombs.js" />
     <Content Include="Scripts\Modules\game.js" />
     <Content Include="Scripts\Modules\ship.js" />
