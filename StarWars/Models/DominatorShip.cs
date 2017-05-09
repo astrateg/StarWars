@@ -27,10 +27,10 @@ namespace StarWars.Models
       public static int[] AngleSpeedLimit = new int[] { 5, 4, 3, 2 };
 
       public static List<int>[] Weapons = new List<int>[] {
-          new List<int> {1, 2, 3},
-          new List<int> {1, 2, 3},
-          new List<int> {1, 2, 3},
-          new List<int> {1, 2, 3}
+          new List<int> { 6 },
+          new List<int> { 6 },
+          new List<int> { 6 },
+          new List<int> { 6 }
         };
     }
 

@@ -135,6 +135,8 @@ define(['Modules/requests'], function (REQUESTS) {
       my.Bomb.Images[4].src = imagePath + "Weapons/mine1.png";
       my.Bomb.Images[5] = new Image();
       my.Bomb.Images[5].src = imagePath + "Weapons/mine2.png";
+      my.Bomb.Images[6] = new Image();
+      my.Bomb.Images[6].src = imagePath + "Weapons/weapon-bomb02-blue.png";
 
       // Show icons for my weapons
       my.MyShip.ShowAllWeapons = function () {

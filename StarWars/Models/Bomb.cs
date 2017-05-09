@@ -10,12 +10,12 @@ namespace StarWars.Models
   {
     public static class Types
     {
-      public static string[] Type = new string[] { "bomb", "shuriken", "orb", "sphere", "mine", "mine" };
-      public static int[] HP = new int[] { 20, 10, 100, 80, 200, 150 };
-      public static int[] MP = new int[] { 30, 20, 40, 35, 50, 35 };
-      public static int[] Rotate = new int[] { 0, 10, 5, 0, 0, 0 };
-      public static int[] Size = new int[] { 24, 35, 50, 30, 32, 24 };
-      public static int[] Speed = new int[] { 10, 12, 9, 11, 2, 3 };
+      public static string[] Type = new string[] { "bomb", "shuriken", "orb", "sphere", "mine", "mine", "dominator-bomb" };
+      public static int[] HP = new int[] { 20, 10, 100, 80, 200, 150, 20 };
+      public static int[] MP = new int[] { 30, 20, 40, 35, 50, 35, 30 };
+      public static int[] Rotate = new int[] { 0, 10, 5, 0, 0, 0, 0 };
+      public static int[] Size = new int[] { 24, 35, 50, 30, 32, 24, 24 };
+      public static int[] Speed = new int[] { 10, 12, 9, 11, 2, 3, 10 };
     }
 
     public string Type { get; set; }
