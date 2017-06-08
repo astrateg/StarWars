@@ -78,7 +78,8 @@ namespace StarWars.Models.Strategies
 
     private void GetTargetCoordinates()
     {
-      var ranger = Game.Instance.RangerShipListActive.FirstOrDefault();
+      double distance = 0.0;
+      var ranger = GetNearestRanger(out distance);
       if (ranger == null)
       {
         return;
@@ -88,8 +89,33 @@ namespace StarWars.Models.Strategies
       this.Target.X = ranger.GetCenterX;
       this.Target.Y = ranger.GetCenterY;
       this.Target.Angle = Math.Atan2(this.Dominator.GetCenterY - this.Target.Y, this.Dominator.GetCenterX - this.Target.X);
-      this.Target.Distance = Math.Sqrt(Math.Pow(this.Dominator.GetCenterY - this.Target.Y, 2) + Math.Pow(this.Dominator.GetCenterX - this.Target.X, 2));
+      this.Target.Distance = distance;
       this.Target.DiffAngle = (this.Dominator.Angle - this.Target.Angle) % (2 * Math.PI);
+    }
+
+    private RangerShip GetNearestRanger(out double nearestDistance)
+    {
+      var rangers = Game.Instance.RangerShipListActive;
+      RangerShip nearestRanger = null;
+      nearestDistance = double.MaxValue;
+
+      foreach (var ranger in rangers)
+      {
+        var currentDistance = CalculateDistanceToRanger(ranger);
+        if (currentDistance < nearestDistance)
+        {
+          nearestDistance = currentDistance;
+          nearestRanger = ranger;
+        }
+      }
+
+      return nearestRanger;
+    }
+
+    private double CalculateDistanceToRanger(RangerShip ranger)
+    {
+      var distance = Math.Sqrt(Math.Pow(this.Dominator.GetCenterY - ranger.Y, 2) + Math.Pow(this.Dominator.GetCenterX - ranger.X, 2));
+      return distance;
     }
   }
 }
