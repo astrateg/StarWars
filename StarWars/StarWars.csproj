@@ -137,7 +137,9 @@
     <Compile Include="Models\Bomb.cs" />
     <Compile Include="Models\DominatorShip.cs" />
     <Compile Include="Models\Game.cs" />
+    <Compile Include="Models\GameConfiguration.cs" />
     <Compile Include="Models\Logger.cs" />
+    <Compile Include="Models\Notifier.cs" />
     <Compile Include="Models\RangerShip.cs" />
     <Compile Include="Models\Ship.cs" />
     <Compile Include="Models\Space.cs" />

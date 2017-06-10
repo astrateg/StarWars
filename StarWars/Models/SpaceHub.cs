@@ -26,15 +26,12 @@ namespace StarWars.Models
       Game.Instance.UpdateUserShip(id, name, value);
     }
 
-  }
-
-  // To call from server
-  public static class Notifier
-  {
-    public static void Send(object response)
+    public void UpdateGameState()
     {
-      var context = GlobalHost.ConnectionManager.GetHubContext<SpaceHub>();
-      context.Clients.All.broadcastMessage(response);
+      if (GameConfiguration.IsTestingMode)
+      {
+        Game.Instance.UpdateGameState(null);
+      }
     }
   }
 }

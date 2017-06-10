@@ -472,12 +472,23 @@
         actionName = "VectorShoot";
         actionValue = 1;
         break;
+
+      case 13:    // Enter (Manually update game state in Testing mode)
+        if (window.GameConfiguration.IsTestingMode) {
+          spaceHub.server.updateGameState();
+          return;
+        }
+        break;
     }
 
     // Если сработало какое-то действие, а не просто нажата любая клавиша
     if (actionName.length > 0) {
       //REQUESTS.UpdateUserShip(actionName, actionValue);
       spaceHub.server.updateUserShip(actionName, actionValue);
+
+      if (window.GameConfiguration.IsTestingMode) {
+        spaceHub.server.updateGameState();
+      }
     }
 
     //return false;

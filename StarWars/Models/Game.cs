@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 using System.Collections.Concurrent;
+using System.Configuration;
 
 namespace StarWars.Models
 {
@@ -32,6 +33,11 @@ namespace StarWars.Models
       _rangers = new List<RangerShip>();
       _dominators = new List<DominatorShip>();
       _stuffs = new List<Stuff>();
+
+      if (GameConfiguration.IsTestingMode)
+      {
+        return;
+      }
 
       _timer = new Timer(new TimerCallback(UpdateGameState), null, 0, Game.SyncRate);     // запускаем таймер, обновляющий все объекты
     }

@@ -14,10 +14,10 @@
 
 * Refactoring *
 + Move start point to Global.asax (now Game.Instance starts by SpaceHub.OnDisconnected)
-- Make Timer-based workflow as a feature, configured in Web.config
-- Add new config for testing mode - IsTestingMode
-- Create the endpoint UpdateGameState(int steps), use only when IsTestingMode = true
-- Separate UpdateGameState and Notifier.Send, call Notifier.Send only when IsTestingMode = true
++ Add new config for testing mode - IsTestingMode
++ Call Timer-based workflow only when IsTestingMode == false
++ Call Notifier.Send only when IsTestingMode == false
+- Create the endpoint UpdateGameState(int steps = 1), use only when IsTestingMode == true
 - Make Dominators as a feature
 - Update SignalR to the last stable version (1.0.1. -> 2.2.2)
 
@@ -27,4 +27,7 @@ Fixes
 + Add constants into Window object in View-file (and refactor ImagePath usage in game.js, ship.js, space.js)
 
 Features
++ app.js: If IsTestingMode == true, press Enter (or make any action) to call new Hub's endpoint: UpdateGameState
+
+- Add FPS (measure interval between current and previous frames, show/hide it in the top right corner by pressing F12)
 - Add auto-moving into the mouse-click-point (auto-rotate + auto-accelerate) !?
