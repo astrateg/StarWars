@@ -129,7 +129,10 @@ namespace StarWars.Controllers
         Game.Instance.AddRangerShip(myShip);
       }
 
-      GenerateRandomDominatorShips(3);
+      if (GameConfiguration.IsDominator)
+      {
+        GenerateRandomDominatorShips(GameConfiguration.DominatorCount);
+      }
 
       var response = new
       {

@@ -18,7 +18,9 @@
 + Call Timer-based workflow only when IsTestingMode == false
 + Call Notifier.Send only when IsTestingMode == false
 - Create the endpoint UpdateGameState(int steps = 1), use only when IsTestingMode == true
-- Make Dominators as a feature
++ Make Dominators as a feature
++ Move DominatorsCount to web.config
+
 - Update SignalR to the last stable version (1.0.1. -> 2.2.2)
 
 ***** JS *****
