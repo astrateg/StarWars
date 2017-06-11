@@ -10,20 +10,36 @@ namespace StarWars.Models
   {
     public override Task OnConnected()
     {
-      Guid id = Guid.Parse(Context.Request.Cookies["Ship"].Value);
+      Guid id;
+      if (!Guid.TryParse(Context.Request.Cookies["Ship"]?.Value, out id))
+      {
+        throw new ArgumentException("cookie");
+      }
+
       return Clients.Others.joined(Context.ConnectionId, id);
     }
 
     public override Task OnDisconnected()
     {
-      Guid id = Guid.Parse(Context.Request.Cookies["Ship"].Value);
+      Guid id;
+      if (!Guid.TryParse(Context.Request.Cookies["Ship"]?.Value, out id))
+      {
+        throw new ArgumentException("cookie");
+      }
+
       bool disconnected = Game.Instance.DisconnectShip(id);
+
       return Clients.Others.leave(disconnected, id);
     }
 
     public void UpdateUserShip(string name, int value)
     {
-      Guid id = Guid.Parse(Context.Request.Cookies["Ship"].Value);
+      Guid id;
+      if (!Guid.TryParse(Context.Request.Cookies["Ship"]?.Value, out id))
+      {
+        throw new ArgumentException("cookie");
+      }
+
       Game.Instance.UpdateUserShip(id, name, value);
     }
 
