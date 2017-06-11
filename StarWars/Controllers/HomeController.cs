@@ -4,6 +4,7 @@ using System.Web;
 using System.Web.Mvc;
 using System.Web.SessionState;
 using StarWars.Models;
+using StarWars.Models.ApiModels;
 
 namespace StarWars.Controllers
 {
@@ -20,12 +21,12 @@ namespace StarWars.Controllers
 
     public JsonResult InitGame()
     {
-      var response = new
+      var response = new InitGameViewModel
       {
-        syncRate = Game.SyncRate,
-        sidebarWidth = Game.SidebarWidth,
-        spaceWidth = Game.SpaceWidth,
-        spaceHeight = Game.SpaceHeight
+        SyncRate = Game.SyncRate,
+        SidebarWidth = Game.SidebarWidth,
+        SpaceWidth = Game.SpaceWidth,
+        SpaceHeight = Game.SpaceHeight
       };
 
       return Json(response, JsonRequestBehavior.AllowGet);
@@ -122,12 +123,10 @@ namespace StarWars.Controllers
     [HttpPost]
     public JsonResult InitShips(int index, string name)
     {
-      RangerShip myShip;
       HttpCookie cookie = Request.Cookies["Ship"];
       if (index > -1)
       {
-        myShip = CreateRangerShip(Guid.Parse(cookie.Value), name, index);
-        Game.Instance.AddRangerShip(myShip);
+        CreateRangerShip(Guid.Parse(cookie.Value), name, index);
       }
 
       if (GameConfiguration.IsDominator)
@@ -182,18 +181,21 @@ namespace StarWars.Controllers
       myShip.State = "Inactive";
     }
 
-    //public JsonResult GetShips() {
-    //    Ship myShip = GetShipByCookie();
-    //    var response = new {
-    //        timeFromStart = Game.Instance.TimeFromStart,
-    //        ships = Game.Instance.ShipListActive
-    //    };
-    //    //Logger.WriteToLogFile(dateBegin, DateTime.Now);
-    //    return Json(response, JsonRequestBehavior.AllowGet);
-    //}
+    [HttpGet]
+    public JsonResult GetShips()
+    {
+      var response = new GetShipsViewModel
+      {
+        TimeFromStart = Game.Instance.TimeFromStart,
+        Ships = Game.Instance.RangerShipListActive,
+        Dominators = Game.Instance.DominatorShipListActive
+      };
 
-    [NonAction]
-    public RangerShip CreateRangerShip(Guid id, string name, int index)
+      return Json(response, JsonRequestBehavior.AllowGet);
+    }
+
+    [HttpPost]
+    public JsonResult CreateRangerShip(Guid id, string name, int index)
     {
       string type = "ranger";
       double X = Utils.RandomStartX();
@@ -201,20 +203,22 @@ namespace StarWars.Controllers
       double angle = 0;
       int size = Ship.ShipSize;
       RangerShip ship = new RangerShip(id, name, type, index, X, Y, angle, size);
+      Game.Instance.AddRangerShip(ship);
 
-      return ship;
+      return Json(ship);
     }
 
-    [NonAction]
-    public DominatorShip CreateDominatorShip(Guid id, string name, int typeIndex, int imageIndex, int size)
+    [HttpPost]
+    public JsonResult CreateDominatorShip(Guid id, string name, int typeIndex, int imageIndex, int size)
     {
       string type = "dominator";
       double X = Utils.RandomStartX();
       double Y = Utils.RandomStartY();
       double angle = 0;
       DominatorShip ship = new DominatorShip(id, name + id.ToString().Substring(0, 3).ToUpper(), type, typeIndex, imageIndex, X, Y, angle, size);
+      Game.Instance.AddDominatorShip(ship);
 
-      return ship;
+      return Json(ship);
     }
 
     [NonAction]
@@ -228,8 +232,7 @@ namespace StarWars.Controllers
         var dominatorImageIndex = Utils.RandomInt(0, 3);
         var dominatorSize = DominatorShip.DominatorTypes.Size[dominatorTypeIndex];
 
-        var dominator = CreateDominatorShip(id, "dominator-" + dominatorType, dominatorTypeIndex, dominatorImageIndex, dominatorSize);
-        Game.Instance.AddDominatorShip(dominator);
+        CreateDominatorShip(id, "dominator-" + dominatorType, dominatorTypeIndex, dominatorImageIndex, dominatorSize);
       }
     }
 

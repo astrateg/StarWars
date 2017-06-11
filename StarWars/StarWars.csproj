@@ -133,6 +133,8 @@
     <Compile Include="Global.asax.cs">
       <DependentUpon>Global.asax</DependentUpon>
     </Compile>
+    <Compile Include="Models\ApiModels\GetShipsViewModel.cs" />
+    <Compile Include="Models\ApiModels\InitGameViewModel.cs" />
     <Compile Include="Models\Body.cs" />
     <Compile Include="Models\Bomb.cs" />
     <Compile Include="Models\DominatorShip.cs" />

@@ -185,10 +185,10 @@
     var request = REQUESTS.InitGame();
 
     request.done(function (data) {
-      my.SyncRate = data.syncRate;            // 10
-      my.SidebarWidth = data.sidebarWidth;    // 225
-      my.SpaceWidth = data.spaceWidth;        // 2560   // ширина космоса
-      my.SpaceHeight = data.spaceHeight;      // 1600  // высота космоса
+      my.SyncRate = data.SyncRate;            // 10
+      my.SidebarWidth = data.SidebarWidth;    // 225
+      my.SpaceWidth = data.SpaceWidth;        // 2560   // ширина космоса
+      my.SpaceHeight = data.SpaceHeight;      // 1600  // высота космоса
 
       // *** Константы, связанные с SidebarWidth ***
       my.Sidebar.style.width = my.SidebarWidth + "px";

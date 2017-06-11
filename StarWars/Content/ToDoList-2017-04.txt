@@ -7,7 +7,11 @@
 + Make dominators to follow the nearest ranges
 + Make dominators to shoot
 
-- Add unit tests
++ Create integration tests 
+1. Create integration tests infractructure.
+2. Refactor endpoints.
+3. Create 1 test (CreateRanger_DeleteRanger_Verify).
+
 - Add logging (login, logout, kill, death) - structured log
 - Move constant settings to web.config
 - Add in-game chat
