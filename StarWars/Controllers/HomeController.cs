@@ -56,13 +56,13 @@ namespace StarWars.Controllers
       if (cookie == null)
       {
         cookie = new HttpCookie("Ship");
-        cookie.Value = Game.Instance.TimeFromStart.ToString();
+        cookie.Value = Guid.NewGuid().ToString();
         cookie.Expires = DateTime.Now.AddDays(1);
         Response.Cookies.Add(cookie);
       }
       else
       {
-        myShip = Game.Instance.RangerShipList.FirstOrDefault(s => s.ID == int.Parse(cookie.Value));
+        myShip = Game.Instance.RangerShipList.FirstOrDefault(s => s.ID == Guid.Parse(cookie.Value));
         if (myShip != null)
         {
           myShip.VectorMove = 0;
@@ -115,6 +115,7 @@ namespace StarWars.Controllers
         BombSize = Bomb.Types.Size,
         SyncRate = Game.SyncRate,
       };
+
       return Json(response, JsonRequestBehavior.AllowGet);
     }
 
@@ -125,7 +126,7 @@ namespace StarWars.Controllers
       HttpCookie cookie = Request.Cookies["Ship"];
       if (index > -1)
       {
-        myShip = CreateRangerShip(int.Parse(cookie.Value), name, index);
+        myShip = CreateRangerShip(Guid.Parse(cookie.Value), name, index);
         Game.Instance.AddRangerShip(myShip);
       }
 
@@ -140,34 +141,35 @@ namespace StarWars.Controllers
         ships = Game.Instance.RangerShipListActive,
         dominators = Game.Instance.DominatorShipListActive
       };
+
       return Json(response);
     }
 
     [HttpPost]
     public void UpdateUserName(string userName)
     {
-      int id = GetIdByCookie();
+      Guid id = GetIdByCookie();
       Game.Instance.UpdateUserName(id, userName);
     }
 
     [HttpPost]
     public void UpdateUserShip(string name, int value)
     {
-      int id = GetIdByCookie();
+      Guid id = GetIdByCookie();
       Game.Instance.UpdateUserShip(id, name, value);
     }
 
     [HttpPost]
     public void ChangeWeapon(int index)
     {
-      int id = GetIdByCookie();
+      Guid id = GetIdByCookie();
       Game.Instance.ChangeWeapon(id, index);
     }
 
     [HttpPost]
     public void ChangeSkill(string skill)
     {
-      int id = GetIdByCookie();
+      Guid id = GetIdByCookie();
       Game.Instance.ChangeSkill(id, skill);
     }
 
@@ -191,7 +193,7 @@ namespace StarWars.Controllers
     //}
 
     [NonAction]
-    public RangerShip CreateRangerShip(int id, string name, int index)
+    public RangerShip CreateRangerShip(Guid id, string name, int index)
     {
       string type = "ranger";
       double X = Utils.RandomStartX();
@@ -204,13 +206,13 @@ namespace StarWars.Controllers
     }
 
     [NonAction]
-    public DominatorShip CreateDominatorShip(int id, string name, int typeIndex, int imageIndex, int size)
+    public DominatorShip CreateDominatorShip(Guid id, string name, int typeIndex, int imageIndex, int size)
     {
       string type = "dominator";
       double X = Utils.RandomStartX();
       double Y = Utils.RandomStartY();
       double angle = 0;
-      DominatorShip ship = new DominatorShip(id, name + id.ToString(), type, typeIndex, imageIndex, X, Y, angle, size);
+      DominatorShip ship = new DominatorShip(id, name + id.ToString().Substring(0, 3).ToUpper(), type, typeIndex, imageIndex, X, Y, angle, size);
 
       return ship;
     }
@@ -220,7 +222,7 @@ namespace StarWars.Controllers
     {
       for (int i = 0; i < count; i++)
       {
-        var id = Utils.RandomInt(100, 1000);
+        var id = Guid.NewGuid();
         var dominatorTypeIndex = Utils.RandomInt(0, 4);
         var dominatorType = DominatorShip.DominatorTypes.Type[dominatorTypeIndex];
         var dominatorImageIndex = Utils.RandomInt(0, 3);
@@ -235,14 +237,16 @@ namespace StarWars.Controllers
     public Ship GetShipByCookie()
     {
       HttpCookie cookie = Request.Cookies["Ship"];
-      return Game.Instance.RangerShipList.FirstOrDefault(s => s.ID == int.Parse(cookie.Value));
+
+      return Game.Instance.RangerShipList.FirstOrDefault(s => s.ID == Guid.Parse(cookie.Value));
     }
 
     [NonAction]
-    public int GetIdByCookie()
+    public Guid GetIdByCookie()
     {
       HttpCookie cookie = Request.Cookies["Ship"];
-      return int.Parse(cookie.Value);
+
+      return Guid.Parse(cookie.Value);
     }
   }
 }

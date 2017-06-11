@@ -60,7 +60,7 @@
       for (var i = 0; i < ships.length; i++) {
         ships[i].Image = parseInt(ships[i].Image);
         var userName = ships[i].Name;
-        if (ships[i].ID === +id) {
+        if (ships[i].ID === id) {
           if (userName.length === 0) {
             userName = prompt("Введите свое имя (не более 8 символов)");
             if (userName.length > 8) {
@@ -246,7 +246,7 @@
       for (i = 0; i < serverShipsCount; i++) {
 
         // *** Смещение карты (если это наш корабль) ***
-        if (data.ships[i].ID === +SHIP.MyShip.ID) {
+        if (data.ships[i].ID === SHIP.MyShip.ID) {
 
           // Старые координаты ЦЕНТРА корабля
           var x = SHIP.MyShip.X + SHIP.ShipSize / 2 - GAME.SpaceShiftX;

@@ -27,7 +27,7 @@ namespace StarWars.Models
     public static double DeltaSpeed { get { return 0.1; } }
 
     // Properties
-    public int ID { get; set; }
+    public Guid ID { get; set; }
     public string Name { get; set; }
     public string Type { get; set; }
     public string State { get; set; }
@@ -76,7 +76,7 @@ namespace StarWars.Models
     public List<Bomb> Bombs { get; set; }
 
     // *** Ship Constructor ***
-    public Ship(int id, string name, string type, int indexShip, double X, double Y, double angle, int size)
+    public Ship(Guid id, string name, string type, int indexShip, double X, double Y, double angle, int size)
       : base(X, Y, angle, size, indexShip)
     {
       this.ID = id;

@@ -84,7 +84,7 @@
       allShipMP: "#0000BB"
     };
 
-    if (this.ID === +SHIP.MyShip.ID) {    // Если наш корабль - подсвечиваем его
+    if (this.ID === SHIP.MyShip.ID) {    // Если наш корабль - подсвечиваем его
       GAME.Context.strokeStyle = color.myShipCircle;
       GAME.Context.fillStyle = color.myShipCircle;
 

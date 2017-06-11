@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 using System.Collections.Concurrent;
-using System.Configuration;
 
 namespace StarWars.Models
 {
@@ -16,7 +15,7 @@ namespace StarWars.Models
     public static int SpaceWidth { get { return 2560; } }
     public static int SpaceHeight { get { return 1600; } }
 
-    public Dictionary<int, ConcurrentBag<Bomb>> BombsBuffer { get; set; } // буфер для бомб (тип "bomb"), из которого бомбы перемещаются в коллекцию Bombs
+    public Dictionary<Guid, ConcurrentBag<Bomb>> BombsBuffer { get; set; } // буфер для бомб (тип "bomb"), из которого бомбы перемещаются в коллекцию Bombs
 
     private static Timer _timer;
     private static DateTime _startTime;
@@ -27,7 +26,7 @@ namespace StarWars.Models
     private Game()
     {
       Space.Sun.Angle = 0;
-      BombsBuffer = new Dictionary<int, ConcurrentBag<Bomb>>();
+      BombsBuffer = new Dictionary<Guid, ConcurrentBag<Bomb>>();
 
       _startTime = DateTime.Now;
       _rangers = new List<RangerShip>();
@@ -97,7 +96,7 @@ namespace StarWars.Models
       BombsBuffer.Add(dominator.ID, new ConcurrentBag<Bomb>());  // Key: ship.id;	Value: bombs concurrent collection
     }
 
-    public bool DisconnectShip(int id)
+    public bool DisconnectShip(Guid id)
     {
       RangerShip ranger = _rangers.FirstOrDefault(s => s.ID == id);
       if (ranger != null)
@@ -108,13 +107,13 @@ namespace StarWars.Models
       return false;
     }
 
-    public void UpdateUserName(int id, string name)
+    public void UpdateUserName(Guid id, string name)
     {
       RangerShip oldRanger = _rangers.FirstOrDefault(s => s.ID == id);
       oldRanger.Name = name;
     }
 
-    public void UpdateUserShip(int id, string propertyName, int propertyValue)
+    public void UpdateUserShip(Guid id, string propertyName, int propertyValue)
     {
       RangerShip ranger = _rangers.FirstOrDefault(s => s.ID == id);
       if (ranger != null && ranger.State == "Active")
@@ -129,7 +128,7 @@ namespace StarWars.Models
       }
     }
 
-    public void ChangeWeapon(int id, int index)
+    public void ChangeWeapon(Guid id, int index)
     {
       RangerShip ranger = _rangers.FirstOrDefault(s => s.ID == id);
       if (ranger != null && ranger.State == "Active")
@@ -138,7 +137,7 @@ namespace StarWars.Models
       }
     }
 
-    public void ChangeSkill(int id, string skill)
+    public void ChangeSkill(Guid id, string skill)
     {
       RangerShip ranger = _rangers.FirstOrDefault(s => s.ID == id);
       if (ranger != null && ranger.State == "Active")

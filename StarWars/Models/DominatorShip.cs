@@ -34,7 +34,7 @@ namespace StarWars.Models
         };
     }
 
-    public DominatorShip(int id, string name, string type, int typeIndex, int imageIndex, double X, double Y, double angle, int size) 
+    public DominatorShip(Guid id, string name, string type, int typeIndex, int imageIndex, double X, double Y, double angle, int size) 
       : base(id, name, type, imageIndex, X, Y, angle, size)
     {
       // HP

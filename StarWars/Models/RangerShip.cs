@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 
 namespace StarWars.Models
 {
@@ -39,7 +40,7 @@ namespace StarWars.Models
     }
 
     // *** Ship Constructor ***
-    public RangerShip(int id, string name, string type, int indexRanger, double X, double Y, double angle, int size) 
+    public RangerShip(Guid id, string name, string type, int indexRanger, double X, double Y, double angle, int size) 
       : base(id, name, type, indexRanger, X, Y, angle, size)
     {
       if (indexRanger < 0 || 9 < indexRanger)
