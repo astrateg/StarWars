@@ -20,6 +20,7 @@
     //this.VectorRotate = vectorRotate;
     //this.Delay = delay || 0;
     //this.Shoot = shoot || 0;
+    this.Stealth = args.Stealth;
     this.Kill = args.Kill || 0;
     this.Death = args.Death || 0;
     this.SkillPoints = args.SkillPoints || 0;
@@ -77,7 +78,7 @@
     var lineMP = (this.MP / this.MaxMP) * this.Size;
 
     var color = {
-      myShipCircle: "rgba(0, 200, 0, 0.3)",
+      myShipCircle: this.Stealth === 0 ? "rgba(0, 200, 0, 0.3)" : "rgba(200, 200, 200, 0.3)",
       allShipHPFull: "#00BB00",
       allShipHPMid: "#FFBB00",
       allShipHPEmpty: "#FF0000",
@@ -156,6 +157,10 @@
     }
       // Показываем имена остальных игроков
     else {
+      if (this.Stealth === 1) {
+        return;
+      }
+
       GAME.Context.fillStyle = "#FFF";
       GAME.Context.font = "12pt Arial";
       GAME.Context.textAlign = "center";
@@ -176,11 +181,7 @@
     GAME.Context.fillRect(centerShipX - this.Size / 2, centerShipY + this.Size / 2 + lineHeight, lineMP, lineHeight);         // fillRect(x, y, width, height)
 
     if (this.Angle === 0) {
-      try {
-        GAME.Context.drawImage(this.GetImage(), this.X - GAME.SpaceShiftX, this.Y - GAME.SpaceShiftY);
-      } catch (e) {
-        debugger;
-      }
+      GAME.Context.drawImage(this.GetImage(), this.X - GAME.SpaceShiftX, this.Y - GAME.SpaceShiftY);
     } else {
       // If Angle <> 0, have to rotate the ship ("Angle" - direction for moving & shooting)
       GAME.Context.save();

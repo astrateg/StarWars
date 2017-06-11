@@ -64,7 +64,9 @@ namespace StarWars.Models
     [ScriptIgnore]
     public int VectorRotate { get; set; }    // 1 (CW) | -1 (CCW) | 0 (Stop)
     [ScriptIgnore]
-    public int VectorShoot { get; set; }              // 1 (Shoot) | 0
+    public int VectorShoot { get; set; }     // 1 (Shoot) | 0
+
+    public int Stealth { get; set; }         // 1 (Invisible) | 0
 
     public int Kill { get; set; }
     public int Death { get; set; }
@@ -323,6 +325,29 @@ namespace StarWars.Models
       }
     }
 
+    // If the ship is in Stealth mode, -1 MP. If MP <= 0, then MP = 0 and turn off Stealth.
+    public void CheckStealth()
+    {
+      if (this.State.Contains("Explode"))
+      {
+        return;
+      }
+
+      if (this.Stealth == 0)
+      {
+        return;
+      }
+
+      this.MP--;
+      if (this.MP > 0)
+      {
+        return;
+      }
+
+      this.MP = 0;
+      this.Stealth = 0;
+    }
+
     // Check colliding ship with bomb
     public void CheckBombAndShip()
     {
@@ -496,6 +521,7 @@ namespace StarWars.Models
         this.Regenerate();
         this.CheckStuffAndShip();
         this.CheckSunAndShip();
+        this.CheckStealth();
       }
 
       this.CheckBombAndShip();

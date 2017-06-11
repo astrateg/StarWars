@@ -74,6 +74,7 @@
           SHIP.MyShip.ID = id;
           SHIP.MyShip.Name = userName;
           SHIP.MyShip.State = ships[i].State; // Active | Inactive | ExplodeXXX
+          SHIP.MyShip.Stealth = ships[i].Stealth; // 1 (Stealth) | 0
           SHIP.MyShip.X = ships[i].X;         // X, Y - для центрирования карты по кораблю
           SHIP.MyShip.Y = ships[i].Y;
           SHIP.MyShip.VectorMove = 0;
@@ -324,6 +325,7 @@
             GAME.Statistics.AddStatRow(SHIP.Ships[j]);
           }
           SHIP.Ships[j].State = data.ships[i].State;
+          SHIP.Ships[j].Stealth = data.ships[i].Stealth;
 
           SHIP.Ships[j].MaxHP = data.ships[i].HPCurrent * SHIP.HPMult;
           SHIP.Ships[j].HP = data.ships[i].HP;
@@ -479,6 +481,12 @@
           return;
         }
         break;
+
+      case 81:    // Q (Turn On Stealth mode)
+        SHIP.MyShip.Stealth = 1;
+        actionName = "Stealth";
+        actionValue = 1;
+        break;
     }
 
     // Если сработало какое-то действие, а не просто нажата любая клавиша
@@ -536,6 +544,12 @@
       case 67:    // C (Center map to my ship)
         GAME.CenterSpaceToShip();
         SPACE.Sun.GetCenter();
+        break;
+
+      case 81:    // Q (Turn Off Stealth mode)
+        SHIP.MyShip.Stealth = 0;
+        actionName = "Stealth";
+        actionValue = 0;
         break;
     }
 

@@ -32,5 +32,11 @@ Fixes
 Features
 + app.js: If IsTestingMode == true, press Enter (or make any action) to call new Hub's endpoint: UpdateGameState
 
++ Add Stealth state
+1. Invisible for all other ships, except yourself. 
+2. Consumes MP (1 MP per tick).
+3. Turn on/off: "Q".
+3. When MP is empty, automatically switch to normal state.
+
 - Add FPS (measure interval between current and previous frames, show/hide it in the top right corner by pressing F12)
 - Add auto-moving into the mouse-click-point (auto-rotate + auto-accelerate) !?

@@ -101,6 +101,11 @@ namespace StarWars.Models.Strategies
 
       foreach (var ranger in rangers)
       {
+        if (ranger.Stealth == 1)
+        {
+          continue;
+        }
+
         var currentDistance = CalculateDistanceToRanger(ranger);
         if (currentDistance < nearestDistance)
         {

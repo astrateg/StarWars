@@ -123,6 +123,7 @@ namespace StarWars.Models
           case "VectorMove": ranger.VectorMove = propertyValue; break;
           case "VectorRotate": ranger.VectorRotate = propertyValue; break;
           case "VectorShoot": ranger.VectorShoot = propertyValue; break;
+          case "Stealth": ranger.Stealth = propertyValue; break;
           case "Image": ranger.Image = propertyValue; break;
         }
       }
