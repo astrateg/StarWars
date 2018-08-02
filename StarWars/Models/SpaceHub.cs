@@ -19,7 +19,7 @@ namespace StarWars.Models
       return Clients.Others.joined(Context.ConnectionId, id);
     }
 
-    public override Task OnDisconnected()
+    public override Task OnDisconnected(bool stopCalled)
     {
       Guid id;
       if (!Guid.TryParse(Context.Request.Cookies["Ship"]?.Value, out id))

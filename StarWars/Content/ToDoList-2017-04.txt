@@ -26,7 +26,7 @@
 + Move DominatorsCount to web.config
 + Replace ship's ID with GUID
 
-- Update SignalR to the last stable version (1.0.1. -> 2.2.2)
++ Update SignalR to the last stable version (1.0.1. -> 2.3.0)
 
 ***** JS *****
 Fixes

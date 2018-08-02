@@ -6,7 +6,7 @@
     "knockout": 'Libraries/knockout-2.2.1.debug',
     //"knockout": 'Libraries/knockout-2.2.1.min',
     //"noext":    "Libraries/noext",
-    "sigr": "Libraries/jquery.signalR-1.0.1",
+    "sigr": "Libraries/jquery.signalR-2.3.0",
     "signalr-hubs": "../signalr/hubs?noext"
   },
   shim: {
