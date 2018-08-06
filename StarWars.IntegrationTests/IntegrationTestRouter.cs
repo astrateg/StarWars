@@ -13,6 +13,8 @@ using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using System.Globalization;
 using StarWars.Models.ApiModels;
+using Microsoft.AspNetCore.WebUtilities;
+using Microsoft.AspNetCore.Http.Extensions;
 
 namespace IntegrationTests
 {
@@ -54,14 +56,13 @@ namespace IntegrationTests
     {
       var uri = new Uri(BaseUri, "CreateRangerShip");
 
-      var builder = new UriBuilder(uri);
-      var query = HttpUtility.ParseQueryString(builder.Query);
-      query["id"] = id.ToString();
-      query["name"] = name;
-      query["index"] = index.ToString(CultureInfo.InvariantCulture);
-      builder.Query = query.ToString();
+      // Use the QueryBuilder to add in new items in a safe way (handles multiples and empty values)
+      var qb = new QueryBuilder();
+      qb.Add("id", id.ToString());
+      qb.Add("name", name);
+      qb.Add("index", index.ToString(CultureInfo.InvariantCulture));
 
-      var response = await Client.PostAsync(builder.Uri, null);
+      var response = await Client.PostAsync(uri.ToString() + qb.ToQueryString(), null);
       Assert.AreEqual(statusCode, response.StatusCode);
 
       var stringResult = response.Content.ReadAsStringAsync().Result;

@@ -2,18 +2,18 @@ using System.Reflection;
 using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
 
-[assembly: AssemblyTitle("StarWars.IntegrationTests")]
+[assembly: AssemblyTitle("IntegrationTestsCore")]
 [assembly: AssemblyDescription("")]
 [assembly: AssemblyConfiguration("")]
 [assembly: AssemblyCompany("")]
-[assembly: AssemblyProduct("StarWars.IntegrationTests")]
+[assembly: AssemblyProduct("IntegrationTestsCore")]
 [assembly: AssemblyCopyright("Copyright ©  2018")]
 [assembly: AssemblyTrademark("")]
 [assembly: AssemblyCulture("")]
 
 [assembly: ComVisible(false)]
 
-[assembly: Guid("305f6dd2-1383-4547-8258-d6d2fac5262f")]
+[assembly: Guid("6ca642a4-b527-4d5d-9dc3-4f60c57caf00")]
 
 // [assembly: AssemblyVersion("1.0.*")]
 [assembly: AssemblyVersion("1.0.0.0")]
