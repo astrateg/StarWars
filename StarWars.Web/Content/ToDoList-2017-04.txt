@@ -1,0 +1,46 @@
+﻿***** Git *****
++ Add .gitignore file
+
+***** C# *****
+* Dominators *
++ Add dominators (moving, not shooting, can be killed)
++ Make dominators to follow the nearest ranges
++ Make dominators to shoot
+
++ Create integration tests 
+1. Create integration tests infractructure.
+2. Refactor endpoints.
+3. Create 1 test (CreateRanger_DeleteRanger_Verify).
+
+- Add logging (login, logout, kill, death) - structured log
+- Move constant settings to web.config
+- Add in-game chat
+
+* Refactoring *
++ Move start point to Global.asax (now Game.Instance starts by SpaceHub.OnDisconnected)
++ Add new config for testing mode - IsTestingMode
++ Call Timer-based workflow only when IsTestingMode == false
++ Call Notifier.Send only when IsTestingMode == false
+- Create the endpoint UpdateGameState(int steps = 1), use only when IsTestingMode == true
++ Make Dominators as a feature
++ Move DominatorsCount to web.config
++ Replace ship's ID with GUID
+
++ Update SignalR to the last stable version (1.0.1. -> 2.3.0)
+
+***** JS *****
+Fixes
+- Fix autocheck errors in JS files
++ Add constants into Window object in View-file (and refactor ImagePath usage in game.js, ship.js, space.js)
+
+Features
++ app.js: If IsTestingMode == true, press Enter (or make any action) to call new Hub's endpoint: UpdateGameState
+
++ Add Stealth state
+1. Invisible for all other ships, except yourself. 
+2. Consumes MP (1 MP per tick).
+3. Turn on/off: "Q".
+3. When MP is empty, automatically switch to normal state.
+
+- Add FPS (measure interval between current and previous frames, show/hide it in the top right corner by pressing F12)
+- Add auto-moving into the mouse-click-point (auto-rotate + auto-accelerate) !?

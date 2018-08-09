@@ -1,0 +1,146 @@
+﻿@{
+    Layout = null;
+}
+
+<!DOCTYPE html>
+
+<html>
+<head>
+    <meta name="viewport" content="width=device-width" />
+    <link rel="stylesheet" type="text/css" href="~/Content/Site.css">
+    <title>Star Wars</title>
+</head>
+<body>
+    <div id="ModalWindow">
+        <div id="SelectShipWindow" class="Panel Rounded">
+            <div id="SelectShipIcon" class="Panel Rounded"></div>
+            <div class="Wrapper">
+                <div id="SelectShipParameters" class="Panel Rounded">
+                    <div class="Type">
+                        <div class="Name">Type</div>
+                        <div id="SkillPoints" data-bind="text: SkillPoints"></div>
+                        <div class="Value">Noname</div>
+                    </div>
+                    <div class="HP">
+                        <div class="Name">HP</div>
+                        <div class="Plus" data-bind="style: { display: (SkillPoints() > 0 && HPCurrent() < HPLimit()) ? 'block' : 'none' }"></div>
+                        <div class="Value">
+                            @for (int i = 0; i < 10; i++)
+                            {
+                                <div class="Point" data-bind="css: HPSkill(@i)"></div>
+                            }
+                        </div>
+                    </div>
+                    <div class="MP">
+                        <div class="Name">MP</div>
+                        <div class="Plus" data-bind="style: { display: (SkillPoints() > 0 && MPCurrent() < MPLimit()) ? 'block' : 'none' }"></div>
+                        <div class="Value">
+                            @for (int i = 0; i < 10; i++)
+                            {
+                                <div class="Point" data-bind="css: MPSkill(@i)"></div>
+                            }
+                        </div>
+                    </div>
+                    <div class="Armor">
+                        <div class="Name">Armor</div>
+                        <div class="Plus" data-bind="style: { display: (SkillPoints() > 0 && ArmorCurrent() < ArmorLimit()) ? 'block' : 'none' }"></div>
+                        <div class="Value">
+                            @for (int i = 0; i < 10; i++)
+                            {
+                                <div class="Point" data-bind="css: ArmorSkill(@i)"></div>
+                            }
+                        </div>
+                    </div>
+                    <div class="Speed">
+                        <div class="Name">Speed</div>
+                        <div class="Plus" data-bind="style: { display: (SkillPoints() > 0 && SpeedCurrent() < SpeedLimit()) ? 'block' : 'none' }"></div>
+                        <div class="Value">
+                            @for (int i = 0; i < 10; i++)
+                            {
+                                <div class="Point" data-bind="css: SpeedSkill(@i)"></div>
+                            }
+                        </div>
+                    </div>
+                    <div class="AngleSpeed">
+                        <div class="Name">Angle Speed</div>
+                        <div class="Plus" data-bind="style: { display: (SkillPoints() > 0 && AngleSpeedCurrent() < AngleSpeedLimit()) ? 'block' : 'none' }"></div>
+                        <div class="Value">
+                            @for (int i = 0; i < 10; i++)
+                            {
+                                <div class="Point" data-bind="css: AngleSpeedSkill(@i)"></div>
+                            }
+                        </div>
+                    </div>
+                </div>
+                <div id="SelectUserName" class="Panel Rounded">
+                    <div class="Name">Name</div>
+                    <div class="Value">
+                        <input id="UserName" type="text" value="" />
+                    </div>
+                </div>
+                <div id="ButtonOK" class="Button Rounded">OK</div>
+            </div>
+        </div>
+    </div>
+    <div id="Sidebar">
+        <div id="CurrentShip">
+            <div id="CurrentShipHP">
+                <div id="CurrentShipHPValue"></div>
+            </div>
+            <div id="CurrentShipMP">
+                <div id="CurrentShipMPValue"></div>
+            </div>
+            <div id="CurrentShipSpeed">
+                <div id="CurrentShipSpeedTitle"></div>
+                <div id="CurrentShipSpeedNegative">
+                    <div class="Name">-</div>
+                    <div id="CurrentShipSpeedNegativeValue">
+                        @for (int i = 0; i < 5; i++)
+                        {
+                            <div class="Square"></div>
+                        }
+                    </div>
+                    <div style="clear: left;"></div>
+                </div>
+                <div id="CurrentShipSpeedZero"></div>
+                <div id="CurrentShipSpeedPositive">
+                    <div class="Name">+</div>
+                    <div id="CurrentShipSpeedPositiveValue">
+                        @for (int i = 0; i < 5; i++)
+                        {
+                            <div class="Square"></div>
+                        }
+                    </div>
+                    <div style="clear: left;"></div>
+                </div>
+                <div style="clear: left;"></div>
+            </div>
+        </div>
+        <div id="CurrentShipWeapons">
+            <div id="0" class="weapon">1</div>
+            <div id="1" class="weapon">2</div>
+            <div id="2" class="weapon">3</div>
+        </div>
+
+        <table id="Statistics">
+            <tbody>
+                <tr id="StatHeader">
+                    <td class="StatShip">Ship</td>
+                    <td class="StatPlayer">Player</td>
+                    <td class="StatKill">+</td>
+                    <td class="StatDeath">-</td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+
+    <script>
+    window.GameConfiguration = {
+      IsTestingMode: @StarWars.Models.GameConfiguration.IsTestingMode.ToString().ToLower()
+    };
+    </script>
+
+    <script data-main="Scripts/main" src="~/Scripts/Libraries/require.js"></script>
+</body>
+
+</html>
