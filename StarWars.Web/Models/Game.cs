@@ -17,7 +17,6 @@ namespace StarWars.Web.Models
 
     public Dictionary<Guid, ConcurrentBag<Bomb>> BombsBuffer { get; set; } // буфер для бомб (тип "bomb"), из которого бомбы перемещаются в коллекцию Bombs
 
-    private static Timer _timer;
     private static DateTime _startTime;
     private static List<RangerShip> _rangers;
     private static List<DominatorShip> _dominators;
@@ -32,13 +31,6 @@ namespace StarWars.Web.Models
       _rangers = new List<RangerShip>();
       _dominators = new List<DominatorShip>();
       _stuffs = new List<Stuff>();
-
-      if (GameConfiguration.IsTestingMode)
-      {
-        return;
-      }
-
-      _timer = new Timer(new TimerCallback(UpdateGameState), null, 0, Game.SyncRate);     // запускаем таймер, обновляющий все объекты
     }
 
     public static Game Instance
@@ -180,7 +172,7 @@ namespace StarWars.Web.Models
     }
 
     // Timer
-    public void UpdateGameState(object state)
+    public void UpdateGameState()
     {
       // Sun and planets
       Space.Sun.Rotate();
@@ -206,8 +198,11 @@ namespace StarWars.Web.Models
         dominator.UpdateState();
       }
       _dominators.RemoveAll(s => s.State == "Inactive");
+    }
 
-      var response = new
+    public object GetGameState()
+    {
+      return new
       {
         timeFromStart = Game.Instance.TimeFromStart,
         ships = Game.Instance.RangerShipListActive,
@@ -215,8 +210,6 @@ namespace StarWars.Web.Models
         stuffs = Game.Instance.StuffList,
         sunAngle = Math.Round(Space.Sun.Angle, 3),
       };
-
-      Notifier.Send(response);
     }
   }
 }

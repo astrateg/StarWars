@@ -1,23 +1,17 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-using Microsoft.AspNetCore.Builder;
+﻿using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.HttpsPolicy;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
-
-using Microsoft.Owin;
-using Owin;
 using StarWars.Web.Models;
 
 namespace StarWars.Web
 {
-    public class Startup
+  public class Startup
     {
+        public GameNotifier GameNotifier { get; private set; }
+
         public Startup(IConfiguration configuration)
         {
             Configuration = configuration;
@@ -38,10 +32,11 @@ namespace StarWars.Web
 
             services.AddMvc().SetCompatibilityVersion(CompatibilityVersion.Version_2_1);
             services.AddSignalR();
+            services.AddTransient<GameNotifier>();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
-        public void Configure(IApplicationBuilder app, IHostingEnvironment env)
+        public void Configure(IApplicationBuilder app, IHostingEnvironment env, IApplicationLifetime appLifetime)
         {
             if (env.IsDevelopment())
             {
@@ -69,7 +64,11 @@ namespace StarWars.Web
                     template: "{controller=Home}/{action=Index}/{id?}");
             });
 
-            Game.Instance.UpdateGameState(null);
+            appLifetime.ApplicationStarted.Register(() =>
+            {
+                GameNotifier = app.ApplicationServices.GetService<GameNotifier>();
+                GameNotifier.UpdateGameState(null);
+            });
         }
     }
 }

@@ -46,13 +46,5 @@ namespace StarWars.Web.Models
 
       Game.Instance.UpdateUserShip(id, name, value);
     }
-
-    //public void UpdateGameState()
-    //{
-    //  if (GameConfiguration.IsTestingMode)
-    //  {
-    //    Game.Instance.UpdateGameState(null);
-    //  }
-    //}
   }
 }
