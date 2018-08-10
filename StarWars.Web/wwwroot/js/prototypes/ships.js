@@ -1,4 +1,4 @@
-﻿define(['Modules/game', 'Modules/ship'], function (GAME, SHIP) {
+﻿define(['modules/game', 'modules/ship'], function (GAME, SHIP) {
   function Ship(args) {
     this.ID = args.ID;
     this.Name = args.Name;

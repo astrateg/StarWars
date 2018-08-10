@@ -1,5 +1,5 @@
 ﻿// *** MODULE for Ships & Bombs ***
-define(['Modules/requests'], function (REQUESTS) {
+define(['modules/requests'], function (REQUESTS) {
   var my = {};
 
   // *** Ships ***
@@ -33,12 +33,12 @@ define(['Modules/requests'], function (REQUESTS) {
   my.Dominator.ImagesSmall = new Array(my.Dominator.Types.length);
   my.Dominator.ImagesMax = 3;
 
-  var imagePath = location.href + "/Content/Images/";    // Чтобы не ссылаться на GAME (иначе будет циклическая ссылка)
+  var imagePath = location.href + "/images/";    // Чтобы не ссылаться на GAME (иначе будет циклическая ссылка)
 
   // Загружаем маленькие иконки кораблей - они нужны в любом случае (весь набор)
   for (var i = 0; i < my.Ranger.ImagesMax; i++) {
     my.Ranger.ImagesSmall[i] = new Image();
-    my.Ranger.ImagesSmall[i].src = imagePath + "Rangers/ranger" + (i + 1) + ".png";
+    my.Ranger.ImagesSmall[i].src = imagePath + "rangers/ranger" + (i + 1) + ".png";
   }
 
   // Загружаем маленькие иконки кораблей доминаторов (весь набор)
@@ -46,7 +46,7 @@ define(['Modules/requests'], function (REQUESTS) {
     my.Dominator.ImagesSmall[i] = new Array(my.Dominator.ImagesMax);
     for (var j = 0; j < my.Dominator.ImagesMax; j++) {
       my.Dominator.ImagesSmall[i][j] = new Image();
-      my.Dominator.ImagesSmall[i][j].src = imagePath + "Dominators/dominator-" + my.Dominator.Types[i] + (j + 1) + ".png";
+      my.Dominator.ImagesSmall[i][j].src = imagePath + "dominators/dominator-" + my.Dominator.Types[i] + (j + 1) + ".png";
     }
   }
 
@@ -77,7 +77,7 @@ define(['Modules/requests'], function (REQUESTS) {
 
         for (var i = 0; i < my.Ranger.ImagesMax; i++) {
           my.Ranger.ImagesBig[i] = new Image();
-          my.Ranger.ImagesBig[i].src = imagePath + "Rangers/Original/ranger" + (i + 1) + ".png";
+          my.Ranger.ImagesBig[i].src = imagePath + "rangers/original/ranger" + (i + 1) + ".png";
           my.Ranger.ImagesBig[i].className = "Rounded";
 
           var buttonOK = $("#ButtonOK");
@@ -93,8 +93,8 @@ define(['Modules/requests'], function (REQUESTS) {
               $(my.Ranger.ImagesBig[my.MyShip.ImageIndex]).removeClass("Selected");
 
               my.MyShip.ImageIndex = index;
-              my.MyShip.ImageSmall.src = imagePath + "Rangers/ranger" + (index + 1) + ".png";
-              my.MyShip.ImageBig.src = imagePath + "Rangers/Original/ranger" + (index + 1) + ".png";
+              my.MyShip.ImageSmall.src = imagePath + "rangers/ranger" + (index + 1) + ".png";
+              my.MyShip.ImageBig.src = imagePath + "rangers/original/ranger" + (index + 1) + ".png";
               // data.Types.Weapons - массив массивов (все оружия для всех рейнджеров)
               my.MyShip.Weapons = data.Types.Weapons[index];
               my.MyShip.WeaponActive = 0;
@@ -124,19 +124,19 @@ define(['Modules/requests'], function (REQUESTS) {
       my.Bomb.Size = data.BombSize;  // array
       my.Bomb.Images = [];
       my.Bomb.Images[0] = new Image();
-      my.Bomb.Images[0].src = imagePath + "Weapons/weapon-bomb02-green.png";
+      my.Bomb.Images[0].src = imagePath + "weapons/weapon-bomb02-green.png";
       my.Bomb.Images[1] = new Image();
-      my.Bomb.Images[1].src = imagePath + "Weapons/shuriken1.png";
+      my.Bomb.Images[1].src = imagePath + "weapons/shuriken1.png";
       my.Bomb.Images[2] = new Image();
-      my.Bomb.Images[2].src = imagePath + "Weapons/orb1.png";
+      my.Bomb.Images[2].src = imagePath + "weapons/orb1.png";
       my.Bomb.Images[3] = new Image();
-      my.Bomb.Images[3].src = imagePath + "Weapons/sphere1.png";
+      my.Bomb.Images[3].src = imagePath + "weapons/sphere1.png";
       my.Bomb.Images[4] = new Image();
-      my.Bomb.Images[4].src = imagePath + "Weapons/mine1.png";
+      my.Bomb.Images[4].src = imagePath + "weapons/mine1.png";
       my.Bomb.Images[5] = new Image();
-      my.Bomb.Images[5].src = imagePath + "Weapons/mine2.png";
+      my.Bomb.Images[5].src = imagePath + "weapons/mine2.png";
       my.Bomb.Images[6] = new Image();
-      my.Bomb.Images[6].src = imagePath + "Weapons/weapon-bomb02-blue.png";
+      my.Bomb.Images[6].src = imagePath + "weapons/weapon-bomb02-blue.png";
 
       // Show icons for my weapons
       my.MyShip.ShowAllWeapons = function () {

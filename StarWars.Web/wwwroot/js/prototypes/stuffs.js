@@ -1,4 +1,4 @@
-﻿define(['Modules/game', 'Modules/space'], function (GAME, SPACE) {
+﻿define(['modules/game', 'modules/space'], function (GAME, SPACE) {
   function Stuff(args) {
     this.Type = args.Type;
     this.X = args.X;

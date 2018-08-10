@@ -1,4 +1,4 @@
-﻿define(['Modules/requests', 'Modules/game'], function (REQUESTS, GAME) {
+﻿define(['modules/requests', 'modules/game'], function (REQUESTS, GAME) {
 
   // Images for planets
   var my = {};
@@ -9,7 +9,7 @@
   imgPlanets["jupiter"] = new Image();
 
   // Objects "Image" are used as properties of the appropriate "Planet" objects (planets.js).
-  var imagePath = location.href + "/Content/Images/";
+  var imagePath = location.href + "/images/";
 
   imgPlanets["sun"].src = imagePath + "sun.png";
   imgPlanets["earth"].src = imagePath + "earth.png";
@@ -20,9 +20,9 @@
   my.Stuff.Stuffs = [];
   my.Stuff.Images = [];
   my.Stuff.Images[0] = new Image();
-  my.Stuff.Images[0].src = imagePath + "Stuff/bonusHP.png";
+  my.Stuff.Images[0].src = imagePath + "stuff/bonusHP.png";
   my.Stuff.Images[1] = new Image();
-  my.Stuff.Images[1].src = imagePath + "Stuff/bonusMP.png";
+  my.Stuff.Images[1].src = imagePath + "stuff/bonusMP.png";
 
 
   my.Init = function () {

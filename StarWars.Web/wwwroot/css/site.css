@@ -146,11 +146,11 @@ body {
 	right: 5px;
 	height: 15px;
 	width: 15px;
-	background-image: url(Images/plus2.png);
+	background-image: url(../images/plus2.png);
 }
 
 	#SelectShipParameters .Plus:active {
-		background-image: url(Images/plus1.png);
+		background-image: url(../images/plus1.png);
 	}
 
 

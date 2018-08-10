@@ -1,4 +1,4 @@
-﻿define(['Modules/game'], function (GAME) {
+﻿define(['modules/game'], function (GAME) {
   var my = {};
 
   my.GetElement = function (arr, propName, propValue) {

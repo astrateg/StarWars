@@ -1,6 +1,6 @@
-﻿define(['Modules/requests', 'Modules/ship'], function (REQUESTS, SHIP) {
+﻿define(['modules/requests', 'modules/ship'], function (REQUESTS, SHIP) {
   var my = {};
-  my.ImagePath = location.href + "/Content/Images/";
+  my.ImagePath = location.href + "/images/";
   my.IntervalID = 0;      // для setInterval
 
   var totalWidth = document.documentElement.clientWidth;

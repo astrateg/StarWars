@@ -1,4 +1,4 @@
-﻿define(['knockout', 'Modules/game', 'Modules/requests', 'Modules/ship', 'Modules/space', 'Modules/utils', 'Prototypes/ships', 'Prototypes/stuffs', 'Prototypes/bombs'], function (ko, GAME, REQUESTS, SHIP, SPACE, UTILS, Ship, Stuff, Bomb) {
+﻿define(['knockout', 'modules/game', 'modules/requests', 'modules/ship', 'modules/space', 'modules/utils', 'prototypes/ships', 'prototypes/stuffs', 'prototypes/bombs'], function (ko, GAME, REQUESTS, SHIP, SPACE, UTILS, Ship, Stuff, Bomb) {
   // Функция для сравнения старого и нового значений observable.
   // Для скиллов не подходит, т.к. перехватывает binding у функций во View, типа *** data-bind="css: HPSkill(@i)" ***
   // Оранжевый div остается оранжевым даже после возврата скилла [+] - этот шаг по j автоматом пропускается в функции *** SHIP.MyShip[skill + "Skill"] = ... ***
@@ -81,7 +81,7 @@
           SHIP.MyShip.VectorRotate = 0;
 
           SHIP.MyShip.ImageIndex = ships[i].Image;
-          SHIP.MyShip.ImageBig.src = GAME.ImagePath + "Rangers/Original/ranger" + (ships[i].Image + 1) + ".png";   // При загрузке сразу показываем увеличенную копию
+          SHIP.MyShip.ImageBig.src = GAME.ImagePath + "rangers/original/ranger" + (ships[i].Image + 1) + ".png";   // При загрузке сразу показываем увеличенную копию
           SHIP.MyShip.Weapons = ships[i].Weapons;
           SHIP.MyShip.WeaponActive = ships[i].WeaponActive;
           SHIP.MyShip.ShowAllWeapons();
