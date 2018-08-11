@@ -1,21 +1,21 @@
-﻿define(['knockout', 'modules/game', 'modules/requests', 'modules/ship', 'modules/space', 'modules/utils', 'prototypes/ships', 'prototypes/stuffs', 'prototypes/bombs'], function (ko, GAME, REQUESTS, SHIP, SPACE, UTILS, Ship, Stuff, Bomb) {
-  // Функция для сравнения старого и нового значений observable.
-  // Для скиллов не подходит, т.к. перехватывает binding у функций во View, типа *** data-bind="css: HPSkill(@i)" ***
-  // Оранжевый div остается оранжевым даже после возврата скилла [+] - этот шаг по j автоматом пропускается в функции *** SHIP.MyShip[skill + "Skill"] = ... ***
+﻿var $ = require('../lib/jquery/dist/jquery');
+var ko = require('../lib/knockout/knockout-latest');
+var REQUESTS = require('modules/requests');
+var SHIP = require('modules/ship');
+var GAME = require('modules/game');
+var SPACE = require('modules/space');
+var UTILS = require('modules/utils');
+var Ship = require('prototypes/ships');
+var Stuff = require('prototypes/stuffs');
+var Bomb = require('prototypes/bombs');
 
-  //ko.observable.fn.subscribeChanged = function (callback) {
-  //	var oldValue;
-  //	this.subscribe(function (_oldValue) {
-  //		oldValue = _oldValue;
-  //	}, undefined, 'beforeChange');
-  //	this.subscribe(function (newValue) {
-  //		callback(oldValue, newValue);
-  //	});
-  //};
-
-  my = {};
+var APP = (function () {
   // *** Main start point ***
+
+  var my = {};
+
   my.Init = function () {
+    console.log("app: init");
     // Синхронные запросы для инициализации
     GAME.Init();
     SPACE.Init();
@@ -208,7 +208,7 @@
 
         break;
       }
-      
+
       // если корабля не было в массиве JS, то добавляем его в в массив
       if (!isDominatorFound) {
         data.dominators[i].Image = parseInt(data.dominators[i].Image);
@@ -562,4 +562,6 @@
   };
 
   return my;
-});
+}());
+
+module.exports = APP;

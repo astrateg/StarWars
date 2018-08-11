@@ -53,7 +53,7 @@ namespace StarWars.Web.Models
       {
         Game.Instance.UpdateGameState();
         var response = Game.Instance.GetGameState();
-        Clients.All.SendAsync("Broadcast", response);
+        Clients.All.SendAsync("broadcastMessage", response);
       }
     }
   }

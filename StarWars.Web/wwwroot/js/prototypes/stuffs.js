@@ -1,4 +1,7 @@
-﻿define(['modules/game', 'modules/space'], function (GAME, SPACE) {
+﻿var GAME = require('modules/game');
+var SPACE = require('modules/space');
+
+var Stuff = (function () {
   function Stuff(args) {
     this.Type = args.Type;
     this.X = args.X;
@@ -36,4 +39,6 @@
   };
 
   return Stuff;
-});
+}());
+
+module.exports = Stuff;

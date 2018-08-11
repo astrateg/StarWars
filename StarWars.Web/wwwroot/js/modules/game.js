@@ -1,4 +1,8 @@
-﻿define(['modules/requests', 'modules/ship'], function (REQUESTS, SHIP) {
+﻿var $ = require('../../lib/jquery/dist/jquery');
+var REQUESTS = require('modules/requests');
+var SHIP = require('modules/ship');
+
+var GAME = (function () {
   var my = {};
   my.ImagePath = location.href + "/images/";
   my.IntervalID = 0;      // для setInterval
@@ -206,4 +210,6 @@
   };
 
   return my;
-});
+}());
+
+module.exports = GAME;

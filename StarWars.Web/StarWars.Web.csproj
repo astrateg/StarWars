@@ -5,6 +5,10 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <Content Remove="wwwroot\js\main.js" />
+  </ItemGroup>
+
+  <ItemGroup>
     <None Remove="wwwroot\images\dominators\dominator-ekventor1.png" />
     <None Remove="wwwroot\images\dominators\dominator-ekventor2.png" />
     <None Remove="wwwroot\images\dominators\dominator-ekventor3.png" />
@@ -93,7 +97,12 @@
     <None Include="wwwroot\images\originalSize\weapon-all.png" />
     <None Include="wwwroot\images\weapons\mine1.png" />
     <None Include="wwwroot\images\weapons\mine2.png" />
-    <None Include="wwwroot\lib\jquery-3.3.1.intellisense.js" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Folder Include="wwwroot\lib\knockout\" />
+    <Folder Include="wwwroot\lib\signalr\" />
+    <Folder Include="wwwroot\dist\" />
   </ItemGroup>
 
 </Project>

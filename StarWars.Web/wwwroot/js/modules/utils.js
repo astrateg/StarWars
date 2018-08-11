@@ -1,4 +1,6 @@
-﻿define(['modules/game'], function (GAME) {
+﻿var GAME = require('modules/game');
+
+var UTILS = (function () {
   var my = {};
 
   my.GetElement = function (arr, propName, propValue) {
@@ -21,4 +23,6 @@
   //}
 
   return my;
-});
+}());
+
+module.exports = UTILS;

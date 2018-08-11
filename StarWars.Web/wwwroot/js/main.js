@@ -1,13 +1,13 @@
 ﻿require.config({
-  baseUrl: 'lib',
+  baseUrl: '..',
   paths: {
     //"jquery": "http://code.jquery.com/jquery-latest",
-    "jquery": "jquery-3.3.1.min",
-    "knockout": 'knockout-2.2.1.debug',
+    "jquery": "lib/jquery-3.3.1.min",
+    "knockout": 'lib/knockout-2.2.1.debug',
     //"knockout": 'Libraries/knockout-2.2.1.min',
     //"noext":    "Libraries/noext",
-    "sigr": "jquery.signalR-2.3.0",
-    "signalr-hubs": "../signalr/hubs?noext"
+    "sigr": "lib/jquery.signalR-2.3.0",
+    "signalr-hubs": "lib/hubs?noext"
   },
   shim: {
     "sigr": { deps: ['jquery'] },

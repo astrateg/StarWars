@@ -4,6 +4,7 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Newtonsoft.Json.Serialization;
 using StarWars.Web.Models;
 
 namespace StarWars.Web
@@ -29,9 +30,16 @@ namespace StarWars.Web
         options.MinimumSameSitePolicy = SameSiteMode.None;
       });
 
+      services
+        .AddMvc()
+        .AddJsonOptions(options => options.SerializerSettings.ContractResolver = new DefaultContractResolver())
+        .SetCompatibilityVersion(CompatibilityVersion.Version_2_1);
 
-      services.AddMvc().SetCompatibilityVersion(CompatibilityVersion.Version_2_1);
-      services.AddSignalR();
+      services.AddSignalR(o =>
+      {
+        o.EnableDetailedErrors = true;
+      });
+
       services.AddTransient<GameNotifier>();
     }
 

@@ -7,7 +7,7 @@
 body {
 	margin: 0;
 	padding: 0;
-	background-image: url('Images/Space01.jpg');
+	background-image: url('../images/Space01.jpg');
 	background-position: 0 0;
 	background-repeat: no-repeat;
 }

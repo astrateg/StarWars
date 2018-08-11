@@ -1,4 +1,8 @@
-﻿define(['modules/game', 'modules/ship'], function (GAME, SHIP) {
+﻿var $ = require('../../lib/jquery/dist/jquery');
+var GAME = require('modules/game');
+var SHIP = require('modules/ship');
+
+var Ship = (function () {
   function Ship(args) {
     this.ID = args.ID;
     this.Name = args.Name;
@@ -130,7 +134,7 @@
         currentShipSpeedPositive.eq(0).css("backgroundColor", "transparent");
         currentShipSpeedNegative.eq(0).css("backgroundColor", "transparent");
       }
-        // Если скорость > 0
+      // Если скорость > 0
       else if (this.Speed > 0) {
         currentShipSpeedNegative.eq(0).css("backgroundColor", "transparent");
         jQuery.each(currentShipSpeedPositive, function (index, value) {
@@ -142,7 +146,7 @@
           }
         });
       }
-        // Если скорость < 0
+      // Если скорость < 0
       else if (this.Speed < 0) {
         currentShipSpeedPositive.eq(0).css("backgroundColor", "transparent");
         jQuery.each(currentShipSpeedNegative, function (index, value) {
@@ -155,7 +159,7 @@
         });
       }
     }
-      // Показываем имена остальных игроков
+    // Показываем имена остальных игроков
     else {
       if (this.Stealth === 1) {
         return;
@@ -193,4 +197,6 @@
   };
 
   return Ship;
-});
+}());
+
+module.exports = Ship;

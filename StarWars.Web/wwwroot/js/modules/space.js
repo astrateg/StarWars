@@ -1,4 +1,7 @@
-﻿define(['modules/requests', 'modules/game'], function (REQUESTS, GAME) {
+﻿var REQUESTS = require('modules/requests');
+var GAME = require('modules/game');
+
+var SPACE = (function () {
 
   // Images for planets
   var my = {};
@@ -35,12 +38,12 @@
       for (var i = 0; i < data.Planets.length; i++) {
         var planetName = data.Planets[i].Name;
         var planet = new Planet(
-            planetName,
-            data.Planets[i].OrbitRadius,
-            data.Planets[i].OrbitAngleStart,
-            data.Planets[i].MoveAngle,
-            data.Planets[i].Size,
-            imgPlanets[planetName]
+          planetName,
+          data.Planets[i].OrbitRadius,
+          data.Planets[i].OrbitAngleStart,
+          data.Planets[i].MoveAngle,
+          data.Planets[i].Size,
+          imgPlanets[planetName]
         );
         my.Planets.push(planet);
       }
@@ -94,5 +97,6 @@
 
 
   return my;
-});
+}());
 
+module.exports = SPACE;

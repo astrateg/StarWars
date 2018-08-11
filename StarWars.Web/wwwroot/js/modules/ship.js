@@ -1,5 +1,8 @@
 ﻿// *** MODULE for Ships & Bombs ***
-define(['modules/requests'], function (REQUESTS) {
+var $ = require('../../lib/jquery/dist/jquery');
+var REQUESTS = require('modules/requests');
+
+var SHIP = (function () {
   var my = {};
 
   // *** Ships ***
@@ -63,11 +66,11 @@ define(['modules/requests'], function (REQUESTS) {
       my.Types = data.Types;
       my.DominatorTypes = data.DominatorTypes;
       my.HPMult = data.HPMult,
-      my.MPMult = data.MPMult,
-      my.SpeedMult = data.SpeedMult,
-      my.AngleSpeedMult = data.AngleSpeedMult,
+        my.MPMult = data.MPMult,
+        my.SpeedMult = data.SpeedMult,
+        my.AngleSpeedMult = data.AngleSpeedMult,
 
-      my.ShipSize = data.ShipSize;
+        my.ShipSize = data.ShipSize;
 
       if (my.MyShip.Exists === 0) {
         $("#ModalWindow").css("display", "block");
@@ -203,4 +206,6 @@ define(['modules/requests'], function (REQUESTS) {
   }
 
   return my;
-});
+}());
+
+module.exports = SHIP;

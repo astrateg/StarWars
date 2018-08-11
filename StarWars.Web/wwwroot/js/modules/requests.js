@@ -1,4 +1,6 @@
-﻿define([], function () {
+﻿var $ = require('../../lib/jquery/dist/jquery');
+
+var REQUESTS = (function () {
   var my = {};
   var homePath = location.href + "Home/";
 
@@ -122,4 +124,6 @@
   };
 
   return my;
-});
+}());
+
+module.exports = REQUESTS;

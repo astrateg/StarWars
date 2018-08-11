@@ -24,6 +24,6 @@ public class GameNotifier
   {
     Game.Instance.UpdateGameState();
     var response = Game.Instance.GetGameState();
-    _hubContext.Clients.All.SendAsync("Broadcast", response).Wait();
+    _hubContext.Clients.All.SendAsync("broadcastMessage", response).Wait();
   }
 }
