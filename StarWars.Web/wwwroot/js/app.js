@@ -15,7 +15,6 @@ var APP = (function () {
   var my = {};
 
   my.Init = function () {
-    console.log("app: init");
     // Синхронные запросы для инициализации
     GAME.Init();
     SPACE.Init();
@@ -42,8 +41,7 @@ var APP = (function () {
   };
 
   // *** END of Main start point***
-
-
+  
   function LoadGame(index, name) {
     var request = REQUESTS.InitShips(index, name);
 

@@ -5,13 +5,15 @@ using System.Threading;
 public class GameNotifier
 {
   private readonly IHubContext<SpaceHub> _hubContext;
+  private readonly GameConfiguration _gameConfiguration;
   private readonly Timer _timer;
 
-  public GameNotifier(IHubContext<SpaceHub> hubContext)
+  public GameNotifier(IHubContext<SpaceHub> hubContext, GameConfiguration gameConfiguration)
   {
     _hubContext = hubContext;
+    _gameConfiguration = gameConfiguration;
 
-    if (GameConfiguration.IsTestingMode)
+    if (_gameConfiguration.IsTestingMode)
     {
       return;
     }

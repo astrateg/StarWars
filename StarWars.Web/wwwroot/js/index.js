@@ -6,13 +6,10 @@ var APP = require('./app');
 
 APP.Init();
 
-console.log("index: init");
-
 var connection = new signalR.HubConnectionBuilder().withUrl("/spaceHub").build();
 
 connection.on("BroadcastMessage", function (data) {
     APP.Synchronize(data);
-    console.log(data);
 });
 
 connection.start().then(function () {

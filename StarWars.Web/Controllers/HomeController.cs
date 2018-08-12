@@ -9,6 +9,13 @@ namespace StarWars.Web.Controllers
 {
   public class HomeController : Controller
   {
+    private readonly GameConfiguration _gameConfiguration;
+
+    public HomeController(GameConfiguration gameConfiguration)
+    {
+      _gameConfiguration = gameConfiguration;
+    }
+
     public IActionResult Index()
     {
       return View();
@@ -54,7 +61,13 @@ namespace StarWars.Web.Controllers
 
       if (string.IsNullOrEmpty(cookie))
       {
-        CookieOptions option = new CookieOptions { Expires = DateTime.Now.AddDays(1) };
+        CookieOptions option = new CookieOptions
+        {
+          //Domain = "127.0.0.1",
+          Expires = DateTime.Now.AddDays(1),
+          SameSite = SameSiteMode.None
+        };
+
         Response.Cookies.Append("Ship", Guid.NewGuid().ToString(), option);
       }
       else
@@ -125,9 +138,9 @@ namespace StarWars.Web.Controllers
         CreateRangerShip(Guid.Parse(cookie), name, index);
       }
 
-      if (GameConfiguration.IsDominator)
+      if (_gameConfiguration.IsDominator)
       {
-        GenerateRandomDominatorShips(GameConfiguration.DominatorCount);
+        GenerateRandomDominatorShips(_gameConfiguration.DominatorsCount);
       }
 
       var response = new

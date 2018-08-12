@@ -1,6 +1,7 @@
 ﻿@{
     Layout = null;
 }
+@inject GameConfiguration GameConfiguration
 
 <!DOCTYPE html>
 
@@ -136,7 +137,7 @@
 
     <script>
         window.GameConfiguration = {
-            IsTestingMode: @StarWars.Web.Models.GameConfiguration.IsTestingMode.ToString().ToLower()
+            IsTestingMode: @GameConfiguration.IsTestingMode.ToString().ToLower()
         };
     </script>
 

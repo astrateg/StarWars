@@ -8,6 +8,13 @@ namespace StarWars.Web.Models
   // To call from client's script
   public class SpaceHub : Hub
   {
+    private readonly GameConfiguration _gameConfiguration;
+
+    public SpaceHub(GameConfiguration gameConfiguration)
+    {
+      _gameConfiguration = gameConfiguration;
+    }
+
     public override async Task OnConnectedAsync()
     {
       Guid id;
@@ -49,7 +56,7 @@ namespace StarWars.Web.Models
 
     public void UpdateGameState()
     {
-      if (GameConfiguration.IsTestingMode)
+      if (_gameConfiguration.IsTestingMode)
       {
         Game.Instance.UpdateGameState();
         var response = Game.Instance.GetGameState();
