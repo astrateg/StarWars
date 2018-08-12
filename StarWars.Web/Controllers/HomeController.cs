@@ -63,7 +63,6 @@ namespace StarWars.Web.Controllers
       {
         CookieOptions option = new CookieOptions
         {
-          //Domain = "127.0.0.1",
           Expires = DateTime.Now.AddDays(1),
           SameSite = SameSiteMode.None
         };

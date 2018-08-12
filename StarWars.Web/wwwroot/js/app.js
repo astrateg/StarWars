@@ -475,7 +475,7 @@ var APP = (function () {
 
       case 13:    // Enter (Manually update game state in Testing mode)
         if (window.GameConfiguration.IsTestingMode) {
-          spaceHub.server.updateGameState();
+          spaceHub.invoke("UpdateGameState");
           return;
         }
         break;
@@ -490,10 +490,10 @@ var APP = (function () {
     // Если сработало какое-то действие, а не просто нажата любая клавиша
     if (actionName.length > 0) {
       //REQUESTS.UpdateUserShip(actionName, actionValue);
-      spaceHub.server.updateUserShip(actionName, actionValue);
+      spaceHub.invoke("UpdateUserShip", actionName, actionValue);
 
       if (window.GameConfiguration.IsTestingMode) {
-        spaceHub.server.updateGameState();
+        spaceHub.invoke("UpdateGameState");
       }
     }
 
@@ -553,7 +553,7 @@ var APP = (function () {
 
     if (actionName.length > 0) {
       //REQUESTS.UpdateUserShip(actionName, actionValue);
-      spaceHub.server.updateUserShip(actionName, actionValue);
+      spaceHub.invoke("UpdateUserShip", actionName, actionValue);
     }
 
     //return false;
