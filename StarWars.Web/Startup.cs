@@ -35,10 +35,15 @@ namespace StarWars.Web
         .AddJsonOptions(options => options.SerializerSettings.ContractResolver = new DefaultContractResolver())
         .SetCompatibilityVersion(CompatibilityVersion.Version_2_1);
 
-      services.AddSignalR(o =>
-      {
-        o.EnableDetailedErrors = true;
-      });
+      services
+        .AddSignalR(options =>
+        {
+          options.EnableDetailedErrors = true;
+        })
+        .AddJsonProtocol(options =>
+        {
+          options.PayloadSerializerSettings.ContractResolver = new DefaultContractResolver();
+        });
 
       services.AddTransient<GameNotifier>();
       services.AddSingleton(Configuration.GetSection("GameConfiguration").Get<GameConfiguration>());

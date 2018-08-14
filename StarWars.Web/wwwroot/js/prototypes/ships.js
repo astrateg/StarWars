@@ -137,7 +137,7 @@ var Ship = (function () {
       // Если скорость > 0
       else if (this.Speed > 0) {
         currentShipSpeedNegative.eq(0).css("backgroundColor", "transparent");
-        jQuery.each(currentShipSpeedPositive, function (index, value) {
+        $.each(currentShipSpeedPositive, function (index, value) {
           if (index < points) {
             $(value).css("backgroundColor", "green");
           }
@@ -149,7 +149,7 @@ var Ship = (function () {
       // Если скорость < 0
       else if (this.Speed < 0) {
         currentShipSpeedPositive.eq(0).css("backgroundColor", "transparent");
-        jQuery.each(currentShipSpeedNegative, function (index, value) {
+        $.each(currentShipSpeedNegative, function (index, value) {
           if (-index > points) {
             $(value).css("backgroundColor", "orange");
           }

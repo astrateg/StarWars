@@ -65,12 +65,12 @@ var SHIP = (function () {
 
       my.Types = data.Types;
       my.DominatorTypes = data.DominatorTypes;
-      my.HPMult = data.HPMult,
-        my.MPMult = data.MPMult,
-        my.SpeedMult = data.SpeedMult,
-        my.AngleSpeedMult = data.AngleSpeedMult,
+      my.HPMult = data.HPMult;
+      my.MPMult = data.MPMult;
+      my.SpeedMult = data.SpeedMult;
+      my.AngleSpeedMult = data.AngleSpeedMult;
 
-        my.ShipSize = data.ShipSize;
+      my.ShipSize = data.ShipSize;
 
       if (my.MyShip.Exists === 0) {
         $("#ModalWindow").css("display", "block");
